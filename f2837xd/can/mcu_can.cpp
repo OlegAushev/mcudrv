@@ -11,7 +11,7 @@ const uint32_t impl::can_pie_int_nums[2] = {INT_CANA0, INT_CANB0};
 void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint32_t, uint16_t);
 
 
-Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, Bitrate bitrate, Mode mode)
+Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config)
 	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
 	, _peripheral(peripheral)
 	, _module(impl::can_bases[peripheral.underlying_value()], impl::can_pie_int_nums[peripheral.underlying_value()])
@@ -23,23 +23,23 @@ Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Co
 	CAN_initModule(_module.base);
 	CAN_selectClockSource(_module.base, CAN_CLOCK_SOURCE_SYS);
 
-	switch (bitrate.native_value())
+	switch (config.bitrate.native_value())
 	{
 		case Bitrate::bitrate_125k:
 		case Bitrate::bitrate_500k:
-			CAN_setBitRate(_module.base, mcu::sysclk_freq(), static_cast<uint32_t>(bitrate.underlying_value()), 16);
+			CAN_setBitRate(_module.base, mcu::sysclk_freq(), static_cast<uint32_t>(config.bitrate.underlying_value()), 16);
 			break;
 		case Bitrate::bitrate_1000k:
-			CAN_setBitRate(_module.base, mcu::sysclk_freq(), static_cast<uint32_t>(bitrate.underlying_value()), 10);
+			CAN_setBitRate(_module.base, mcu::sysclk_freq(), static_cast<uint32_t>(config.bitrate.underlying_value()), 10);
 			break;
 	}
 
 	CAN_setAutoBusOnTime(_module.base, 0);
 	CAN_enableAutoBusOn(_module.base);
 
-	if (mode != Mode::normal)
+	if (config.mode != Mode::normal)
 	{
-		CAN_enableTestMode(_module.base, static_cast<uint16_t>(mode.underlying_value()));
+		CAN_enableTestMode(_module.base, static_cast<uint16_t>(config.mode.underlying_value()));
 	}
 
 	CAN_startModule(_module.base);

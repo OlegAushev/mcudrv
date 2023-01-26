@@ -55,6 +55,13 @@ struct MessageObject
 };
 
 
+struct Config
+{
+	Bitrate bitrate;
+	Mode mode;
+};
+
+
 namespace impl {
 
 struct Module
@@ -78,7 +85,7 @@ private:
 	const Peripheral _peripheral;
 	impl::Module _module;
 public:
-	Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, Bitrate bitrate, Mode mode);
+	Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config);
 #ifdef CPU1
 	static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin);
 #endif
