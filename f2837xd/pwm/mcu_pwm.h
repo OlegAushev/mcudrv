@@ -105,15 +105,15 @@ SCOPED_ENUM_DECLARE_END(OutputSwap)
 template <PhaseCount::enum_type PhaseCount>
 struct Config
 {
-	Peripheral::enum_type peripheral[PhaseCount];
+	Peripheral peripheral[PhaseCount];
 	float switching_freq;
 	float deadtime_ns;
 	uint32_t clock_prescaler;	// must be the product of clkDivider and hsclkDivider
-	ClockDivider::enum_type clk_divider;
-	HsClockDivider::enum_type hsclk_divider;
-	OperatingMode::enum_type operating_mode;
-	CounterMode::enum_type counter_mode;
-	OutputSwap::enum_type output_swap;
+	ClockDivider clk_divider;
+	HsClockDivider hsclk_divider;
+	OperatingMode operating_mode;
+	CounterMode counter_mode;
+	OutputSwap output_swap;
 	uint16_t event_interrupt_source;
 	bool enable_adc_trigger[2];
 	EPWM_ADCStartOfConversionSource adc_trigger_source[2];
@@ -173,10 +173,10 @@ public:
 		for (size_t i = 0; i < Phases; ++i)
 		{
 			_peripheral[i] = config.peripheral[i];
-			_module.base[i] = impl::pwm_bases[config.peripheral[i]];
+			_module.base[i] = impl::pwm_bases[config.peripheral[i].underlying_value()];
 		}
-		_module.pie_event_int_num = impl::pwm_pie_event_int_nums[config.peripheral[0]];
-		_module.pie_trip_int_num = impl::pwm_pie_trip_int_nums[config.peripheral[0]];
+		_module.pie_event_int_num = impl::pwm_pie_event_int_nums[config.peripheral[0].underlying_value()];
+		_module.pie_trip_int_num = impl::pwm_pie_trip_int_nums[config.peripheral[0].underlying_value()];
 
 		for (size_t i = 0; i < Phases; ++i)
 		{
@@ -195,7 +195,7 @@ public:
 
 		/* ========================================================================== */
 		// Calculate TBPRD value
-		switch (config.counter_mode)
+		switch (config.counter_mode.native_value())
 		{
 			case CounterMode::up:
 			case CounterMode::down:
@@ -214,8 +214,8 @@ public:
 			/* ========================================================================== */
 			// Clock prescaler
 			EPWM_setClockPrescaler(_module.base[i],
-					static_cast<EPWM_ClockDivider>(config.clk_divider),
-					static_cast<EPWM_HSClockDivider>(config.hsclk_divider));
+					static_cast<EPWM_ClockDivider>(config.clk_divider.underlying_value()),
+					static_cast<EPWM_HSClockDivider>(config.hsclk_divider.underlying_value()));
 
 			/* ========================================================================== */
 			// Compare values
@@ -224,7 +224,7 @@ public:
 			/* ========================================================================== */
 			// Counter mode
 			EPWM_setTimeBaseCounterMode(_module.base[i],
-					static_cast<EPWM_TimeBaseCountMode>(config.counter_mode));
+					static_cast<EPWM_TimeBaseCountMode>(config.counter_mode.underlying_value()));
 
 #ifdef CPU1
 			/* ========================================================================== */
@@ -321,7 +321,7 @@ public:
 			/* ========================================================================== */
 			// CMPA actions
 				// PWMxA configuration for typical waveforms
-			switch (config.operating_mode)
+			switch (config.operating_mode.native_value())
 			{
 				case CounterMode::up:
 					EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_A,
@@ -358,7 +358,7 @@ public:
 			EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_FED, true);
 			EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_RED, true);
 
-			switch (config.operating_mode)
+			switch (config.operating_mode.native_value())
 			{
 				case OperatingMode::active_high_complementary:
 					EPWM_setDeadBandDelayPolarity(_module.base[i], EPWM_DB_RED, EPWM_DB_POLARITY_ACTIVE_HIGH);
@@ -376,7 +376,7 @@ public:
 			EPWM_setFallingEdgeDelayCount(_module.base[i], _deadtime_cycles);
 			EPWM_setDeadBandCounterClock(_module.base[i], EPWM_DB_COUNTER_CLOCK_FULL_CYCLE);
 
-			switch (config.output_swap)
+			switch (config.output_swap.native_value())
 			{
 				case OutputSwap::no:
 					EPWM_setDeadBandOutputSwapMode(_module.base[i], EPWM_DB_OUTPUT_A, false);
@@ -390,7 +390,7 @@ public:
 
 			/* ========================================================================== */
 			// Trip-Zone actions
-			switch (config.operating_mode)
+			switch (config.operating_mode.native_value())
 			{
 				case OperatingMode::active_high_complementary:
 					EPWM_setTripZoneAction(_module.base[i], EPWM_TZ_ACTION_EVENT_TZA, EPWM_TZ_ACTION_LOW);
@@ -625,10 +625,10 @@ protected:
 	{
 		for (size_t i = 0; i < Phases; ++i)
 		{
-			GPIO_setPadConfig(config.peripheral[i] * 2, GPIO_PIN_TYPE_STD);
-			GPIO_setPadConfig(config.peripheral[i] * 2 + 1, GPIO_PIN_TYPE_STD);
-			GPIO_setPinConfig(impl::pwm_pin_outa_configs[config.peripheral[i]]);
-			GPIO_setPinConfig(impl::pwm_pin_outb_configs[config.peripheral[i]]);
+			GPIO_setPadConfig(config.peripheral[i].underlying_value() * 2, GPIO_PIN_TYPE_STD);
+			GPIO_setPadConfig(config.peripheral[i].underlying_value() * 2 + 1, GPIO_PIN_TYPE_STD);
+			GPIO_setPinConfig(impl::pwm_pin_outa_configs[config.peripheral[i].underlying_value()]);
+			GPIO_setPinConfig(impl::pwm_pin_outb_configs[config.peripheral[i].underlying_value()]);
 		}
 	}
 #endif
