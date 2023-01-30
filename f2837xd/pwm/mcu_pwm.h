@@ -80,7 +80,8 @@ SCOPED_ENUM_DECLARE_END(HsClockDivider)
 SCOPED_ENUM_DECLARE_BEGIN(OperatingMode)
 {
 	active_high_complementary,
-	active_low_complementary
+	active_low_complementary,
+	pass_through
 }
 SCOPED_ENUM_DECLARE_END(OperatingMode)
 
@@ -100,6 +101,14 @@ SCOPED_ENUM_DECLARE_BEGIN(OutputSwap)
 	yes
 }
 SCOPED_ENUM_DECLARE_END(OutputSwap)
+
+
+SCOPED_ENUM_DECLARE_BEGIN(CounterCompareModule)
+{
+	a = EPWM_COUNTER_COMPARE_A,
+	b = EPWM_COUNTER_COMPARE_B
+}
+SCOPED_ENUM_DECLARE_END(CounterCompareModule)
 
 
 template <PhaseCount::enum_type PhaseCount>
@@ -290,11 +299,23 @@ public:
 					else
 					{
 						EPWM_enablePhaseShiftLoad(_module.base[i]);
-						// start counting up when sync occurs
-						// used when the time-base counter is configured in the up-down-count mode
-						EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
-						// 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
-						EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
+						switch (config.counter_mode.native_value())
+						{
+							case CounterMode::up:
+								EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
+								// 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
+								EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
+								break;
+							case CounterMode::down:
+								EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_DOWN_AFTER_SYNC);
+								EPWM_setPhaseShift(_module.base[i], _phase_shift[i]);
+								break;
+							case CounterMode::updown:
+								EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
+								// 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
+								EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
+								break;
+						}
 					}
 					break;
 				case PhaseCount::one:
@@ -306,8 +327,23 @@ public:
 					else
 					{
 						EPWM_enablePhaseShiftLoad(_module.base[i]);
-						EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
-						EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
+						switch (config.counter_mode.native_value())
+						{
+							case CounterMode::up:
+								EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
+								// 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
+								EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
+								break;
+							case CounterMode::down:
+								EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_DOWN_AFTER_SYNC);
+								EPWM_setPhaseShift(_module.base[i], _phase_shift[i]);
+								break;
+							case CounterMode::updown:
+								EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
+								// 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
+								EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
+								break;
+						}
 					}
 					break;
 			}
@@ -316,12 +352,14 @@ public:
 			// Shadowing
 			EPWM_selectPeriodLoadEvent(_module.base[i], EPWM_SHADOW_LOAD_MODE_COUNTER_ZERO);
 			EPWM_setCounterCompareShadowLoadMode(_module.base[i], EPWM_COUNTER_COMPARE_A, EPWM_COMP_LOAD_ON_CNTR_ZERO);
+			EPWM_setCounterCompareShadowLoadMode(_module.base[i], EPWM_COUNTER_COMPARE_B, EPWM_COMP_LOAD_ON_CNTR_ZERO);
 			EPWM_setActionQualifierContSWForceShadowMode(_module.base[i], EPWM_AQ_SW_IMMEDIATE_LOAD);
 
 			/* ========================================================================== */
-			// CMPA actions
+			// PWMxA(CMPA) actions
 				// PWMxA configuration for typical waveforms
-			switch (config.operating_mode.native_value())
+				// Typically only PWMxA is used by dead-band submodule
+			switch (config.counter_mode.native_value())
 			{
 				case CounterMode::up:
 					EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_A,
@@ -342,31 +380,51 @@ public:
 							EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);
 					break;
 			}
-				// PWMxB configuration - always LOW: typically only PWMxA is used by dead-band submodule
-			EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_B,
-					EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);
-			EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
-					EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);
-			EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
-					EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);
-			EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
-					EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);
+
+			// PWMxB(CMPB) actions
+			switch (config.counter_mode.native_value())
+			{
+				case CounterMode::up:
+					EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_B,
+							EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);
+					EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
+							EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);
+					break;
+				case CounterMode::down:
+					EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_B,
+							EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);
+					EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
+							EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);
+					break;
+				case CounterMode::updown:
+					EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
+							EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);
+					EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
+							EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);
+					break;
+			}
 
 			/* ========================================================================== */
 			// Dead-Band
 			EPWM_setDeadBandControlShadowLoadMode(_module.base[i], EPWM_DB_LOAD_ON_CNTR_ZERO);
-			EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_FED, true);
-			EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_RED, true);
 
 			switch (config.operating_mode.native_value())
 			{
 				case OperatingMode::active_high_complementary:
+					EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_FED, true);
+					EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_RED, true);
 					EPWM_setDeadBandDelayPolarity(_module.base[i], EPWM_DB_RED, EPWM_DB_POLARITY_ACTIVE_HIGH);
 					EPWM_setDeadBandDelayPolarity(_module.base[i], EPWM_DB_FED, EPWM_DB_POLARITY_ACTIVE_LOW);
 					break;
 				case OperatingMode::active_low_complementary:
+					EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_FED, true);
+					EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_RED, true);
 					EPWM_setDeadBandDelayPolarity(_module.base[i], EPWM_DB_RED, EPWM_DB_POLARITY_ACTIVE_LOW);
 					EPWM_setDeadBandDelayPolarity(_module.base[i], EPWM_DB_FED, EPWM_DB_POLARITY_ACTIVE_HIGH);
+					break;
+				case OperatingMode::pass_through:
+					EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_FED, false);
+					EPWM_setDeadBandDelayMode(_module.base[i], EPWM_DB_RED, false);
 					break;
 			}
 
@@ -399,6 +457,10 @@ public:
 				case OperatingMode::active_low_complementary:
 					EPWM_setTripZoneAction(_module.base[i], EPWM_TZ_ACTION_EVENT_TZA, EPWM_TZ_ACTION_HIGH);
 					EPWM_setTripZoneAction(_module.base[i], EPWM_TZ_ACTION_EVENT_TZB, EPWM_TZ_ACTION_HIGH);
+					break;
+				case OperatingMode::pass_through:
+					EPWM_setTripZoneAction(_module.base[i], EPWM_TZ_ACTION_EVENT_TZA, EPWM_TZ_ACTION_LOW);
+					EPWM_setTripZoneAction(_module.base[i], EPWM_TZ_ACTION_EVENT_TZB, EPWM_TZ_ACTION_LOW);
 					break;
 			}
 
@@ -526,53 +588,53 @@ public:
 		}
 	}
 
-	void set_compare_values(const uint16_t cmpValues[])
+	void set_compare_values(const uint16_t cmp_values[], CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < PhaseCount; ++i)
 		{
 			EPWM_setCounterCompareValue(_module.base[i],
-			                            EPWM_COUNTER_COMPARE_A,
-			                            cmpValues[i]);
+							static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+							cmp_values[i]);
 		}
 	}
 
-	void set_compare_values(const emb::Array<uint16_t, Phases>& cmpValues)
+	void set_compare_values(const emb::Array<uint16_t, Phases>& cmp_values, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < PhaseCount; ++i)
 		{
 			EPWM_setCounterCompareValue(_module.base[i],
-			                            EPWM_COUNTER_COMPARE_A,
-			                            cmpValues[i]);
+							static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+							cmp_values[i]);
 		}
 	}
 
-	void set_compare_value(uint16_t cmpValue)
+	void set_compare_value(uint16_t cmp_value, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < PhaseCount; ++i)
 		{
 			EPWM_setCounterCompareValue(_module.base[i],
-			                            EPWM_COUNTER_COMPARE_A,
-			                            cmpValue);
+							static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+							cmp_value);
 		}
 	}
 
-	void set_duty_cycles(const emb::Array<float, Phases>& dutyCycles)
+	void set_duty_cycles(const emb::Array<float, Phases>& duty_cycles, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < Phases; ++i)
 		{
 			EPWM_setCounterCompareValue(_module.base[i],
-			                            EPWM_COUNTER_COMPARE_A,
-			                            static_cast<uint16_t>(dutyCycles[i] * _period));
+							static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+							static_cast<uint16_t>(duty_cycles[i] * _period));
 		}
 	}
 
-	void set_duty_cycle(float dutyCycle)
+	void set_duty_cycle(float duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < PhaseCount; ++i)
 		{
 			EPWM_setCounterCompareValue(_module.base[i],
-			                            EPWM_COUNTER_COMPARE_A,
-			                            static_cast<uint16_t>(dutyCycle * _period));
+							static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+							static_cast<uint16_t>(duty_cycle * _period));
 		}
 	}
 
