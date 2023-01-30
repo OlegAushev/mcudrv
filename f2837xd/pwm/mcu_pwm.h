@@ -111,10 +111,8 @@ SCOPED_ENUM_DECLARE_BEGIN(CounterCompareModule)
 SCOPED_ENUM_DECLARE_END(CounterCompareModule)
 
 
-template <PhaseCount::enum_type PhaseCount>
 struct Config
 {
-	Peripheral peripheral[PhaseCount];
 	float switching_freq;
 	float deadtime_ns;
 	uint32_t clock_prescaler;	// must be the product of clkDivider and hsclkDivider
@@ -143,8 +141,6 @@ struct Module
 extern const uint32_t pwm_bases[12];
 extern const uint32_t pwm_pie_event_int_nums[12];
 extern const uint32_t pwm_pie_trip_int_nums[12];
-extern const uint32_t pwm_pin_outa_configs[12];
-extern const uint32_t pwm_pin_outb_configs[12];
 
 } // namespace impl
 
@@ -171,7 +167,9 @@ private:
 
 	State _state;
 public:
-	Module(const pwm::Config<Phases>& config)
+	Module(const emb::Array<Peripheral, Phases>& peripherals,
+			const emb::Array<mcu::gpio::Config, 2*Phases>& pins,
+			const pwm::Config& config)
 		: _timebase_clk_freq(pwm_clk_freq / config.clock_prescaler)
 		, _timebase_cycle_ns(pwm_clk_cycle_ns * config.clock_prescaler)
 		, _counter_mode(config.counter_mode)
@@ -181,11 +179,11 @@ public:
 	{
 		for (size_t i = 0; i < Phases; ++i)
 		{
-			_peripheral[i] = config.peripheral[i];
-			_module.base[i] = impl::pwm_bases[config.peripheral[i].underlying_value()];
+			_peripheral[i] = peripherals[i];
+			_module.base[i] = impl::pwm_bases[peripherals[i].underlying_value()];
 		}
-		_module.pie_event_int_num = impl::pwm_pie_event_int_nums[config.peripheral[0].underlying_value()];
-		_module.pie_trip_int_num = impl::pwm_pie_trip_int_nums[config.peripheral[0].underlying_value()];
+		_module.pie_event_int_num = impl::pwm_pie_event_int_nums[peripherals[0].underlying_value()];
+		_module.pie_trip_int_num = impl::pwm_pie_trip_int_nums[peripherals[0].underlying_value()];
 
 		for (size_t i = 0; i < Phases; ++i)
 		{
@@ -193,10 +191,7 @@ public:
 		}
 
 #ifdef CPU1
-		_init_pins(config);
-#else
-		EMB_UNUSED(impl::pwm_pin_outa_configs);
-		EMB_UNUSED(impl::pwm_pin_outb_configs);
+		_init_pins(pins);
 #endif
 
 		// Disable sync, freeze clock to PWM
@@ -683,14 +678,12 @@ public:
 	void acknowledge_trip_interrupt() { Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP2); }
 protected:
 #ifdef CPU1
-	void _init_pins(const pwm::Config<Phases>& config)
+	void _init_pins(const emb::Array<mcu::gpio::Config, 2*Phases> pins)
 	{
-		for (size_t i = 0; i < Phases; ++i)
+		for (size_t i = 0; i < pins.size(); ++i)
 		{
-			GPIO_setPadConfig(config.peripheral[i].underlying_value() * 2, GPIO_PIN_TYPE_STD);
-			GPIO_setPadConfig(config.peripheral[i].underlying_value() * 2 + 1, GPIO_PIN_TYPE_STD);
-			GPIO_setPinConfig(impl::pwm_pin_outa_configs[config.peripheral[i].underlying_value()]);
-			GPIO_setPinConfig(impl::pwm_pin_outb_configs[config.peripheral[i].underlying_value()]);
+			GPIO_setPadConfig(pins[i].no, GPIO_PIN_TYPE_STD);
+			GPIO_setPinConfig(pins[i].mux);
 		}
 	}
 #endif
