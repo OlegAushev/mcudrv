@@ -694,10 +694,7 @@ protected:
 		}
 	}
 #endif
-	void _init_custom_options()
-	{
-		// place custom options here
-	}
+	void _init_custom_options();
 };
 
 } // namespace pwm
