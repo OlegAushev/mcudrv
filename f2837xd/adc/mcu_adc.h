@@ -23,6 +23,9 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral)
 SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
+const size_t peripheral_count = 4;
+
+
 struct Config
 {
 	uint32_t sample_window_ns;
@@ -34,44 +37,48 @@ namespace impl {
 struct Module
 {
 	uint32_t base;
+	uint32_t result_base;
+	Module(uint32_t base_, uint32_t result_base_)
+		: base(base_), result_base(result_base_) {}
 };
 
 
 extern const uint32_t adc_bases[4];
+extern const uint32_t adc_result_bases[4];
 extern const uint16_t adc_pie_int_groups[4];
 
 
 struct Channel
 {
-	uint32_t base;
-	uint32_t result_base;
+	Peripheral peripheral;
 	ADC_Channel channel;
 	ADC_SOCNumber soc;
 	ADC_Trigger trigger;
-	Channel() {}
-	Channel(uint32_t base_, uint32_t result_base_, ADC_Channel channel_, ADC_SOCNumber soc_, ADC_Trigger trigger_)
-		: base(base_)
-		, result_base(result_base_)
+	bool registered;
+	Channel() { registered = false; }
+	Channel(Peripheral peripheral_, ADC_Channel channel_, ADC_SOCNumber soc_, ADC_Trigger trigger_)
+		: peripheral(peripheral_)
 		, channel(channel_)
 		, soc(soc_)
 		, trigger(trigger_)
-	{}
+	{ registered = false; }
 };
 
 
 struct Irq
 {
-	uint32_t base;
+	Peripheral peripheral;
 	ADC_IntNumber int_num;
 	ADC_SOCNumber soc;
 	uint32_t pie_int_num;
-	Irq() {}
-	Irq(uint32_t base_, ADC_IntNumber int_num_, ADC_SOCNumber soc_, uint32_t pie_int_num_)
-		: base(base_)
+	bool registered;
+	Irq() { registered = false; }
+	Irq(Peripheral peripheral_, ADC_IntNumber int_num_, ADC_SOCNumber soc_, uint32_t pie_int_num_)
+		: peripheral(peripheral_)
 		, int_num(int_num_)
 		, soc(soc_)
 		, pie_int_num(pie_int_num_)
-	{}
+	{ registered = false; }
 };
 
 
@@ -83,23 +90,27 @@ void init_irqs(emb::Array<impl::Irq, IrqName::count>& irqs);
 } // namespace impl
 
 
-class Module : public emb::c28x::interrupt_invoker<Module>, private emb::noncopyable
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
 {
 private:
-	impl::Module _module[4];
+	const Peripheral _peripheral;
+	impl::Module _module;
+	const uint32_t sample_window_cycles;
+
 	static emb::Array<impl::Channel, ChannelName::count> _channels;
 	static emb::Array<impl::Irq, IrqName::count> _irqs;
-	const uint32_t sample_window_cycles;
+	static bool _channels_and_irqs_initialized;
 public:
-	Module(const adc::Config& config);
+	Module(Peripheral peripheral, const adc::Config& config);
 	void start(ChannelName channel)
 	{
-		ADC_forceSOC(_channels[channel.underlying_value()].base, _channels[channel.underlying_value()].soc);
+		// TODO assert
+		ADC_forceSOC(_module.base, _channels[channel.underlying_value()].soc);
 	}
 
 	uint16_t read(ChannelName channel) const
 	{
-		return ADC_readResult(_channels[channel.underlying_value()].result_base, _channels[channel.underlying_value()].soc);
+		return ADC_readResult(_module.result_base, _channels[channel.underlying_value()].soc);
 	}
 
 	void enable_interrupts()
@@ -125,18 +136,18 @@ public:
 
 	void acknowledge_interrupt(IrqName irq)
 	{
-		ADC_clearInterruptStatus(_irqs[irq.underlying_value()].base, _irqs[irq.underlying_value()].int_num);
+		ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
 		Interrupt_clearACKGroup(impl::adc_pie_int_groups[_irqs[irq.underlying_value()].int_num]);
 	}
 
 	bool interrupt_pending(IrqName irq) const
 	{
-		return ADC_getInterruptStatus(_irqs[irq.underlying_value()].base, _irqs[irq.underlying_value()].int_num);
+		return ADC_getInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
 	}
 
 	void clear_interrupt_status(IrqName irq)
 	{
-		ADC_clearInterruptStatus(_irqs[irq.underlying_value()].base, _irqs[irq.underlying_value()].int_num);
+		ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
 	}
 };
 
@@ -149,13 +160,13 @@ private:
 	ChannelName _channel_name;
 public:
 	Channel()
-		: adc(Module::instance())
+		: adc(static_cast<Module*>(NULL))
 		, _channel_name(ChannelName::count)	// dummy write
 	{}
 
 	Channel(ChannelName channel_name)
-		: adc(Module::instance())
-		, _channel_name(channel_name)
+		// TODO : adc(Module::instance())
+		//, _channel_name(channel_name)
 	{}
 
 	void init(ChannelName channel_name)
