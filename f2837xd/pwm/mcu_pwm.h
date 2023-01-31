@@ -539,20 +539,19 @@ public:
 #endif
 
 #ifdef CPU1
-	void transfer_control_to_cpu2()
+	static void transfer_control_to_cpu2(const emb::Array<Peripheral, Phases>& peripherals,
+			const emb::Array<mcu::gpio::Config, 2*Phases> pins)
 	{
 		SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);	// Disable sync(Freeze clock to PWM as well)
-
-		for (size_t i = 0; i < PhaseCount; ++i)
+		_init_pins(pins);
+		for (size_t i = 0; i < pins.size(); ++i)
 		{
-			GPIO_setMasterCore(_module.instance[i] * 2, GPIO_CORE_CPU2);
-			GPIO_setMasterCore(_module.instance[i] * 2 + 1, GPIO_CORE_CPU2);
+			GPIO_setMasterCore(pins[i].no, GPIO_CORE_CPU2);
 		}
 
-		for (size_t i = 0; i < PhaseCount; ++i)
+		for (size_t i = 0; i < peripherals.size(); ++i)
 		{
-			SysCtl_selectCPUForPeripheral(SYSCTL_CPUSEL0_EPWM,
-					static_cast<uint16_t>(_module.instance[i])+1, SYSCTL_CPUSEL_CPU2);
+			SysCtl_selectCPUForPeripheral(SYSCTL_CPUSEL0_EPWM, peripherals[i].underlying_value()+1, SYSCTL_CPUSEL_CPU2);
 		}
 
 		SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);	// Enable sync and clock to PWM
@@ -625,7 +624,7 @@ public:
 
 	void set_duty_cycle(float duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
-		for (size_t i = 0; i < PhaseCount; ++i)
+		for (size_t i = 0; i < Phases; ++i)
 		{
 			EPWM_setCounterCompareValue(_module.base[i],
 							static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
@@ -678,7 +677,7 @@ public:
 	void acknowledge_trip_interrupt() { Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP2); }
 protected:
 #ifdef CPU1
-	void _init_pins(const emb::Array<mcu::gpio::Config, 2*Phases> pins)
+	static void _init_pins(const emb::Array<mcu::gpio::Config, 2*Phases> pins)
 	{
 		for (size_t i = 0; i < pins.size(); ++i)
 		{
