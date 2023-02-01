@@ -324,6 +324,21 @@ public:
 		}
 	}
 
+	explicit DurationLogger(uint32_t pin_num)
+		: _pin(pin_num)
+	{
+		if (Mode == DurationLoggerMode::set_reset)
+		{
+			GPIO_writePin(_pin, 1);
+		}
+		else
+		{
+			GPIO_togglePin(_pin);
+			NOP; NOP; NOP; NOP; NOP; NOP; NOP; NOP;
+			GPIO_togglePin(_pin);
+		}
+	}
+
 	~DurationLogger()
 	{
 		if (Mode == DurationLoggerMode::set_reset)

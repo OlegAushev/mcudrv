@@ -103,6 +103,10 @@ private:
 	static bool _channels_and_irqs_initialized;
 public:
 	Module(Peripheral peripheral, const adc::Config& config);
+#ifdef CPU1
+	static void transfer_control_to_cpu2(Peripheral peripheral);
+#endif
+
 	void start(ChannelName channel)
 	{
 		assert(_channels[channel.underlying_value()].peripheral == _peripheral);

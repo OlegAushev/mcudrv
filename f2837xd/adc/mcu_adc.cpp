@@ -62,6 +62,31 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
 	}
 }
 
+
+#ifdef CPU1
+void Module::transfer_control_to_cpu2(Peripheral peripheral)
+{
+	SysCtl_CPUSelPeriphInstance peripheral_;
+	switch (peripheral.native_value())
+	{
+		case Peripheral::adca:
+			peripheral_ = SYSCTL_CPUSEL_ADCA;
+			break;
+		case Peripheral::adcb:
+			peripheral_ = SYSCTL_CPUSEL_ADCB;
+			break;
+		case Peripheral::adcc:
+			peripheral_ = SYSCTL_CPUSEL_ADCC;
+			break;
+		case Peripheral::adcd:
+			peripheral_ = SYSCTL_CPUSEL_ADCD;
+			break;
+	}
+
+	SysCtl_selectCPUForPeripheralInstance(peripheral_ ,SYSCTL_CPUSEL_CPU2);
+}
+#endif
+
 } // namespace adc
 
 } // namespace mcu
