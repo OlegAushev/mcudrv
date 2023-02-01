@@ -105,48 +105,60 @@ public:
 	Module(Peripheral peripheral, const adc::Config& config);
 	void start(ChannelName channel)
 	{
+		assert(_channels[channel.underlying_value()].peripheral == _peripheral);
 		ADC_forceSOC(_module.base, _channels[channel.underlying_value()].soc);
 	}
 
 	uint16_t read(ChannelName channel) const
 	{
+		assert(_channels[channel.underlying_value()].peripheral == _peripheral);
 		return ADC_readResult(_module.result_base, _channels[channel.underlying_value()].soc);
 	}
 
 	void enable_interrupts()
 	{
-		for (size_t i = 0; i < IrqName::count; ++i)
+		for (size_t i = 0; i < _irqs.size(); ++i)
 		{
-			Interrupt_enable(_irqs[i].pie_int_num);
+			if (_irqs[i].peripheral == _peripheral)
+			{
+				Interrupt_enable(_irqs[i].pie_int_num);
+			}
 		}
 	}
 
 	void disable_interrupts()
 	{
-		for (size_t i = 0; i < IrqName::count; ++i)
+		for (size_t i = 0; i < _irqs.size(); ++i)
 		{
-			Interrupt_disable(_irqs[i].pie_int_num);
+			if (_irqs[i].peripheral == _peripheral)
+			{
+				Interrupt_disable(_irqs[i].pie_int_num);
+			}
 		}
 	}
 
 	void register_interrupt_handler(IrqName irq, void (*handler)(void))
 	{
+		assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
 		Interrupt_register(_irqs[irq.underlying_value()].pie_int_num, handler);
 	}
 
 	void acknowledge_interrupt(IrqName irq)
 	{
+		assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
 		ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
 		Interrupt_clearACKGroup(impl::adc_pie_int_groups[_irqs[irq.underlying_value()].int_num]);
 	}
 
 	bool interrupt_pending(IrqName irq) const
 	{
+		assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
 		return ADC_getInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
 	}
 
 	void clear_interrupt_status(IrqName irq)
 	{
+		assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
 		ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
 	}
 };
@@ -171,20 +183,10 @@ public:
 
 	void init(ChannelName channel)
 	{
-		_channel = channel;
-
 		assert(Module::_channels_and_irqs_initialized);
 		assert(Module::_channels[channel.underlying_value()].registered);
-
-		if (Module::_channels_and_irqs_initialized
-				&& Module::_channels[channel.underlying_value()].registered)
-		{
-			adc = Module::instance(Module::_channels[channel.underlying_value()].peripheral.underlying_value());
-		}
-		else
-		{
-			adc = static_cast<Module*>(NULL);
-		}
+		_channel = channel;
+		adc = Module::instance(Module::_channels[channel.underlying_value()].peripheral.underlying_value());
 	}
 
 	void start() { adc->start(_channel); }
