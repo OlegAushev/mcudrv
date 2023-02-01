@@ -166,13 +166,12 @@ public:
 
 class Channel
 {
-public:
-	Module* adc;
 private:
+	Module* _adc;
 	ChannelName _channel;
 public:
 	Channel()
-		: adc(static_cast<Module*>(NULL))
+		: _adc(static_cast<Module*>(NULL))
 		, _channel(ChannelName::count)	// dummy write
 	{}
 
@@ -186,11 +185,12 @@ public:
 		assert(Module::_channels_and_irqs_initialized);
 		assert(Module::_channels[channel.underlying_value()].registered);
 		_channel = channel;
-		adc = Module::instance(Module::_channels[channel.underlying_value()].peripheral.underlying_value());
+		_adc = Module::instance(Module::_channels[channel.underlying_value()].peripheral.underlying_value());
 	}
 
-	void start() { adc->start(_channel); }
-	uint16_t read() const {	return adc->read(_channel); }
+	void start() { _adc->start(_channel); }
+	uint16_t read() const {	return _adc->read(_channel); }
+	Module* adc() { return _adc; }
 };
 
 } // namespace adc
