@@ -92,6 +92,7 @@ void init_irqs(emb::Array<impl::Irq, IrqName::count>& irqs);
 
 class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
 {
+	friend class Channel;
 private:
 	const Peripheral _peripheral;
 	impl::Module _module;
@@ -104,7 +105,6 @@ public:
 	Module(Peripheral peripheral, const adc::Config& config);
 	void start(ChannelName channel)
 	{
-		// TODO assert
 		ADC_forceSOC(_module.base, _channels[channel.underlying_value()].soc);
 	}
 
@@ -157,25 +157,38 @@ class Channel
 public:
 	Module* adc;
 private:
-	ChannelName _channel_name;
+	ChannelName _channel;
 public:
 	Channel()
 		: adc(static_cast<Module*>(NULL))
-		, _channel_name(ChannelName::count)	// dummy write
+		, _channel(ChannelName::count)	// dummy write
 	{}
 
-	Channel(ChannelName channel_name)
-		// TODO : adc(Module::instance())
-		//, _channel_name(channel_name)
-	{}
-
-	void init(ChannelName channel_name)
+	Channel(ChannelName channel)
 	{
-		_channel_name = channel_name;
+		init(channel);
 	}
 
-	void start() { adc->start(_channel_name); }
-	uint16_t read() const {	return adc->read(_channel_name);	}
+	void init(ChannelName channel)
+	{
+		_channel = channel;
+
+		assert(Module::_channels_and_irqs_initialized);
+		assert(Module::_channels[channel.underlying_value()].registered);
+
+		if (Module::_channels_and_irqs_initialized
+				&& Module::_channels[channel.underlying_value()].registered)
+		{
+			adc = Module::instance(Module::_channels[channel.underlying_value()].peripheral.underlying_value());
+		}
+		else
+		{
+			adc = static_cast<Module*>(NULL);
+		}
+	}
+
+	void start() { adc->start(_channel); }
+	uint16_t read() const {	return adc->read(_channel); }
 };
 
 } // namespace adc
