@@ -66,15 +66,28 @@ inline void reset_device() { SysCtl_resetDevice(); }
 
 class critical_section
 {
+private:
+	uint16_t int_status;
 public:
-	critical_section() { DINT; }	// disable maskable interrupts
-	~critical_section() { EINT; }	// enable maskable interrupts
-	static void enter() { DINT; }
-	static void leave() { EINT; }
+	critical_section()
+	{
+		int_status = __disable_interrupts();
+	}
+
+	~critical_section()
+	{
+		if(!(int_status & 0x1)) { EINT; }
+		if(!(int_status & 0x2)) { ERTM;	}
+	}
 };
 
 
 inline uint32_t sysclk_freq() { return DEVICE_SYSCLK_FREQ; }
+
+
+#define INVOKE_USER1_INTERRUPT() __asm(" TRAP #20")
+#define INVOKE_USER2_INTERRUPT() __asm(" TRAP #21")
+#define INVOKE_USER3_INTERRUPT() __asm(" TRAP #22")
 
 } // namespace mcu
 
