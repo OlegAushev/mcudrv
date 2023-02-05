@@ -1,4 +1,4 @@
-#include <mcu_c28x/f2837xd/ipc/mcu_ipc.h>
+#include <c28x_mcu/f2837xd/ipc/mcu_ipc.h>
 
 
 namespace mcu {

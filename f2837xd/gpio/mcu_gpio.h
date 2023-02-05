@@ -5,7 +5,7 @@
 #include "device.h"
 #include <assert.h>
 #include <emb_c28x/emb_interfaces/emb_gpio.h>
-#include <mcu_c28x/f2837xd/system/mcu_system.h>
+#include <c28x_mcu/f2837xd/system/mcu_system.h>
 
 
 namespace mcu {

@@ -3,7 +3,7 @@
 
 #include <emb_c28x/emb_core.h>
 #include <emb_c28x/emb_staticvector.h>
-#include <mcu_c28x/f2837xd/system/mcu_system.h>
+#include <c28x_mcu/f2837xd/system/mcu_system.h>
 #include "driverlib.h"
 #include "device.h"
 

@@ -7,7 +7,7 @@
 #include "device.h"
 
 #include <math.h>
-#include <mcu_c28x/f2837xd/gpio/mcu_gpio.h>
+#include <c28x_mcu/f2837xd/gpio/mcu_gpio.h>
 
 
 namespace mcu {

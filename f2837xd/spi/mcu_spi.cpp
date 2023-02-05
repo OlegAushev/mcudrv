@@ -1,4 +1,4 @@
-#include <mcu_c28x/f2837xd/spi/mcu_spi.h>
+#include <c28x_mcu/f2837xd/spi/mcu_spi.h>
 
 
 namespace mcu {
