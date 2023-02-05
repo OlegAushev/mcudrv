@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <emb_c28x/emb_array.h>
-#include <emb_c28x/emb_core.h>
+#include <c28x_emb/emb_array.h>
+#include <c28x_emb/emb_core.h>
 #include <c28x_mcu/f2837xd/gpio/mcu_gpio.h>
 #include "driverlib.h"
 #include "device.h"

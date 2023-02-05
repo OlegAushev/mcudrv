@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <emb_c28x/emb_array.h>
-#include <emb_c28x/emb_core.h>
+#include <c28x_emb/emb_array.h>
+#include <c28x_emb/emb_core.h>
 #include <mcu/adc_channels/mcu_adcchannels.h>
 #include <c28x_mcu/f2837xd/system/mcu_system.h>
 #include "driverlib.h"
