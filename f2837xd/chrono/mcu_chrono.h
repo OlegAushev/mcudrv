@@ -80,7 +80,7 @@ public:
 		}
 	}
 protected:
-	static __interrupt void on_interrupt();
+	static interrupt void on_interrupt();
 };
 
 
@@ -103,7 +103,7 @@ public:
 		Interrupt_enable(INT_TIMER1);
 	}
 private:
-	static __interrupt void on_interrupt();
+	static interrupt void on_interrupt();
 };
 
 

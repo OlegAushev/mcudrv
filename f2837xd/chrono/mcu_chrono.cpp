@@ -69,7 +69,7 @@ void system_clock::run_tasks()
 }
 
 
-__interrupt void system_clock::on_interrupt()
+interrupt void system_clock::on_interrupt()
 {
 	_time += time_step;
 	Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
