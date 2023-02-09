@@ -118,7 +118,7 @@ public:
 		return SCI_getRxStatus(_module.base) & SCI_RXSTATUS_ERROR;
 	}
 
-	virtual int recv(char& ch)
+	virtual int getchar(char& ch)
 	{
 		if (SCI_getRxFIFOStatus(_module.base) != SCI_FIFO_RX0)
 		{
@@ -133,7 +133,7 @@ public:
 		size_t i = 0;
 		char ch = 0;
 
-		while ((i < bufLen) && (recv(ch) == 1))
+		while ((i < bufLen) && (getchar(ch) == 1))
 		{
 			buf[i++] = ch;
 		}
@@ -145,7 +145,7 @@ public:
 		return i;
 	}
 
-	virtual int send(char ch)
+	virtual int putchar(char ch)
 	{
 		if (SCI_getTxFIFOStatus(_module.base) != SCI_FIFO_TX15)
 		{
