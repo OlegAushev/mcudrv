@@ -98,12 +98,12 @@ struct Config
 
 namespace impl {
 
-class GpioBase
+class Gpio
 {
 protected:
 	Config _config;
 	bool _initialized;
-	GpioBase() : _initialized(false) {}
+	Gpio() : _initialized(false) {}
 public:
 	void set_master_core(MasterCore master_core)
 	{
@@ -121,7 +121,7 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::IInput, public impl::GpioBase
+class Input : public emb::gpio::IInput, public impl::Gpio
 {
 private:
 	GPIO_ExternalIntNum _int_num;
@@ -175,7 +175,7 @@ public:
 };
 
 
-class Output : public emb::gpio::IOutput, public impl::GpioBase
+class Output : public emb::gpio::IOutput, public impl::Gpio
 {
 public:
 	Output() {}
