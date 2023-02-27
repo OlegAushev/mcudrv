@@ -146,7 +146,7 @@ extern const uint32_t pwm_pie_trip_int_nums[12];
 
 
 template <PhaseCount::enum_type Phases>
-class Module : private emb::noncopyable
+class Module : private emb::NonCopyable
 {
 private:
 	// there is a divider ( EPWMCLKDIV ) of the system clock

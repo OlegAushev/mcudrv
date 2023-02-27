@@ -9,7 +9,7 @@ const uint32_t impl::dac_bases[3] = {DACA_BASE, DACB_BASE, DACC_BASE};
 
 
 Module::Module(Peripheral peripheral)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+	: emb::c28x::InterruptInvokerArray<Module, peripheral_count>(this, peripheral.underlying_value())
 	, _peripheral(peripheral)
 	, _module(impl::dac_bases[peripheral.underlying_value()])
 {

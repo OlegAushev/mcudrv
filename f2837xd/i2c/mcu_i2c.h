@@ -68,7 +68,7 @@ extern const uint32_t i2c_bases[2];
 } // namespace impl
 
 
-class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
+class Module : public emb::c28x::InterruptInvokerArray<Module, peripheral_count>, private emb::NonCopyable
 {
 private:
 	const Peripheral _peripheral;

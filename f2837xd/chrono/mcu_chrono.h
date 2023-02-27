@@ -20,7 +20,7 @@ SCOPED_ENUM_DECLARE_BEGIN(TaskStatus)
 SCOPED_ENUM_DECLARE_END(TaskStatus)
 
 
-class system_clock : public emb::monostate<system_clock>
+class system_clock : public emb::Monostate<system_clock>
 {
 private:
 	static volatile uint64_t _time;
@@ -84,7 +84,7 @@ protected:
 };
 
 
-class high_resolution_clock : public emb::monostate<high_resolution_clock>
+class high_resolution_clock : public emb::Monostate<high_resolution_clock>
 {
 private:
 	static uint32_t _period;

@@ -12,7 +12,7 @@ const uint32_t impl::spi_rx_pie_int_nums[3] = {INT_SPIA_RX, INT_SPIB_RX, INT_SPI
 Module::Module(Peripheral peripheral, const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
 		const gpio::Config& clk_pin, const gpio::Config& cs_pin,
 		const Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+	: emb::c28x::InterruptInvokerArray<Module, peripheral_count>(this, peripheral.underlying_value())
 	, _peripheral(peripheral)
 	, _module(impl::spi_bases[peripheral.underlying_value()], impl::spi_rx_pie_int_nums[peripheral.underlying_value()])
 {

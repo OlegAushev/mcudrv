@@ -17,7 +17,7 @@ bool Module::_channels_and_irqs_initialized = false;
 
 
 Module::Module(Peripheral peripheral, const adc::Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+	: emb::c28x::InterruptInvokerArray<Module, peripheral_count>(this, peripheral.underlying_value())
 	, _peripheral(peripheral)
 	, _module(impl::adc_bases[peripheral.underlying_value()], impl::adc_result_bases[peripheral.underlying_value()])
 	, sample_window_cycles(config.sample_window_ns / (1000000000 / mcu::sysclk_freq()))

@@ -90,7 +90,7 @@ void init_irqs(emb::Array<impl::Irq, IrqName::count>& irqs);
 } // namespace impl
 
 
-class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
+class Module : public emb::c28x::InterruptInvokerArray<Module, peripheral_count>, private emb::NonCopyable
 {
 	friend class Channel;
 private:
