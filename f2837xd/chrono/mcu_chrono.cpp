@@ -5,12 +5,13 @@ namespace mcu {
 
 namespace chrono {
 
-volatile uint64_t system_clock::_time;
+volatile int64_t system_clock::_time;
+const emb::chrono::milliseconds system_clock::time_step(1);
 
 emb::StaticVector<system_clock::Task, system_clock::task_count_max> system_clock::_tasks;
 
-uint64_t system_clock::_delayed_task_start;
-uint64_t system_clock::_delayed_task_delay;
+emb::chrono::milliseconds system_clock::_delayed_task_start;
+emb::chrono::milliseconds system_clock::_delayed_task_delay;
 void (*system_clock::_delayed_task)();
 
 
@@ -20,8 +21,8 @@ void system_clock::init()
 
 	_time = 0;
 
-	_delayed_task_start = 0;
-	_delayed_task_delay = 0;
+	_delayed_task_start = emb::chrono::milliseconds(0);
+	_delayed_task_delay = emb::chrono::milliseconds(-1);
 
 	Interrupt_register(INT_TIMER0, system_clock::on_interrupt);
 
@@ -30,7 +31,7 @@ void system_clock::init()
 	CPUTimer_setPreScaler(CPUTIMER0_BASE, 0);	// Initialize pre-scale counter to divide by 1 (SYSCLKOUT)
 	CPUTimer_reloadTimerCounter(CPUTIMER0_BASE);	// Reload counter register with period value
 
-	uint32_t tmp = (uint32_t)((mcu::sysclk_freq() / 1000) * time_step);
+	uint32_t tmp = (uint32_t)((mcu::sysclk_freq() / 1000) * time_step.count());
 	CPUTimer_setPeriod(CPUTIMER0_BASE, tmp - 1);
 	CPUTimer_setEmulationMode(CPUTIMER0_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 
@@ -58,12 +59,12 @@ void system_clock::run_tasks()
 
 	}
 
-	if (_delayed_task_delay != 0)
+	if (_delayed_task_delay.count() >= 0)
 	{
 		if (now() >= (_delayed_task_start + _delayed_task_delay))
 		{
 			_delayed_task();
-			_delayed_task_delay = 0;
+			_delayed_task_delay = emb::chrono::milliseconds(-1);
 		}
 	}
 }
@@ -71,7 +72,7 @@ void system_clock::run_tasks()
 
 interrupt void system_clock::on_interrupt()
 {
-	_time += time_step;
+	_time += time_step.count();
 	Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 

@@ -2,6 +2,7 @@
 
 
 #include <c28x_emb/emb_core.h>
+#include <c28x_emb/emb_chrono.h>
 #include <c28x_emb/emb_staticvector.h>
 #include <c28x_mcu/f2837xd/system/mcu_system.h>
 #include "driverlib.h"
@@ -23,26 +24,26 @@ SCOPED_ENUM_DECLARE_END(TaskStatus)
 class system_clock : public emb::Monostate<system_clock>
 {
 private:
-	static volatile uint64_t _time;
-	static const uint32_t time_step = 1;
+	static volatile int64_t _time;
+	static const emb::chrono::milliseconds time_step;
 	static const size_t task_count_max = 4;
 private:
 	struct Task
 	{
-		uint64_t period;
-		uint64_t timepoint;
+		emb::chrono::milliseconds period;
+		emb::chrono::milliseconds timepoint;
 		TaskStatus (*func)(size_t);
 	};
 	static TaskStatus empty_task() { return TaskStatus::success; }
 	static emb::StaticVector<Task, task_count_max> _tasks;
 public:
-	static void register_task(TaskStatus (*func)(size_t), uint64_t period)
+	static void register_task(TaskStatus (*func)(size_t), emb::chrono::milliseconds period)
 	{
 		Task task = {period, now(), func};
 		_tasks.push_back(task);
 	}
 
-	static void set_task_period(size_t index, uint64_t period)
+	static void set_task_period(size_t index, emb::chrono::milliseconds period)
 	{
 		if (index < _tasks.size())
 		{
@@ -50,12 +51,12 @@ public:
 		}
 	}
 private:
-	static uint64_t _delayed_task_start;
-	static uint64_t _delayed_task_delay;
+	static emb::chrono::milliseconds _delayed_task_start;
+	static emb::chrono::milliseconds _delayed_task_delay;
 	static void (*_delayed_task)();
 	static void empty_delayed_task() {}
 public:
-	static void register_delayed_task(void (*task)(), uint64_t delay)
+	static void register_delayed_task(void (*task)(), emb::chrono::milliseconds delay)
 	{
 		_delayed_task = task;
 		_delayed_task_delay = delay;
@@ -67,8 +68,8 @@ private:
 	system_clock& operator=(const system_clock& other);	// no copy assignment operator
 public:
 	static void init();
-	static uint64_t now() { return _time; }
-	static uint32_t step() { return time_step; }
+	static emb::chrono::milliseconds now() { return emb::chrono::milliseconds(_time); }
+	static emb::chrono::milliseconds step() { return time_step; }
 	static void run_tasks();
 
 	static void reset()
@@ -110,17 +111,17 @@ private:
 class Timeout
 {
 private:
-	const uint64_t _timeout;
-	volatile uint64_t _start;
+	const emb::chrono::milliseconds _timeout;
+	emb::chrono::milliseconds _start;
 public:
-	Timeout(uint64_t timeout = 0)
+	Timeout(emb::chrono::milliseconds timeout = emb::chrono::milliseconds(-1))
 		: _timeout(timeout)
 		, _start(system_clock::now())
 	{}
 
-	bool expired() volatile
+	bool expired()
 	{
-		if (_timeout == 0)
+		if (_timeout.count() < 0)
 		{
 			return false;
 		}
@@ -131,7 +132,7 @@ public:
 		return false;
 	}
 
-	void reset() volatile {	_start = system_clock::now(); }
+	void reset() { _start = system_clock::now(); }
 };
 
 } // namespace chrono
