@@ -5,7 +5,8 @@
 #include "device.h"
 #include <assert.h>
 #include <c28x_emb/emb_interfaces/emb_gpio.h>
-#include <c28x_mcu/f2837xd/system/mcu_system.h>
+#include <c28x_emb/emb_chrono.h>
+#include "../system/mcu_system.h"
 
 
 namespace mcu {
@@ -232,24 +233,17 @@ class InputDebouncer
 {
 private:
 	const Input _pin;
-public:
-	const unsigned int acq_period_ms;
-	const unsigned int active_debounce_ms;
-	const unsigned int inactive_debounce_ms;
-private:
 	const unsigned int _active_debounce_count;
 	const unsigned int _inactive_debounce_count;
 	unsigned int _count;
 	emb::gpio::State _state;
 	bool _state_changed;
 public:
-	InputDebouncer(const Input& pin, unsigned int acq_period_ms, unsigned int act_ms, unsigned int inact_ms)
+	InputDebouncer(const Input& pin, emb::chrono::milliseconds acq_period,
+			emb::chrono::milliseconds active_debounce, emb::chrono::milliseconds inactive_debounce)
 		: _pin(pin)
-		, acq_period_ms(acq_period_ms)
-		, active_debounce_ms(act_ms)
-		, inactive_debounce_ms(inact_ms)
-		, _active_debounce_count(act_ms / acq_period_ms)
-		, _inactive_debounce_count(inact_ms / acq_period_ms)
+		, _active_debounce_count(active_debounce.count() / acq_period.count())
+		, _inactive_debounce_count(inactive_debounce.count() / acq_period.count())
 		, _state(emb::gpio::State::inactive)
 		, _state_changed(false)
 	{

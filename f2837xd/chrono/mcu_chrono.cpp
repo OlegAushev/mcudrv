@@ -80,7 +80,7 @@ interrupt void system_clock::on_interrupt()
 uint32_t high_resolution_clock::_period;
 
 
-void high_resolution_clock::init(uint32_t period_us)
+void high_resolution_clock::init(emb::chrono::microseconds period)
 {
 	if (initialized()) return;
 
@@ -89,7 +89,7 @@ void high_resolution_clock::init(uint32_t period_us)
 	CPUTimer_setPreScaler(CPUTIMER1_BASE, 0);       	// Initialize pre-scale counter to divide by 1 (SYSCLKOUT)
 	CPUTimer_reloadTimerCounter(CPUTIMER1_BASE);    	// Reload counter register with period value
 
-	_period = (uint32_t)(mcu::sysclk_freq() / 1000000) * period_us - 1;
+	_period = (uint32_t)(mcu::sysclk_freq() / 1000000) * period.count() - 1;
 	CPUTimer_setPeriod(CPUTIMER1_BASE, _period);
 	CPUTimer_setEmulationMode(CPUTIMER1_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 

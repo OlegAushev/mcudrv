@@ -89,11 +89,11 @@ class high_resolution_clock : public emb::Monostate<high_resolution_clock>
 {
 private:
 	static uint32_t _period;
-	static const uint32_t sysclk_period_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
+	static const int64_t sysclk_period_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
 public:
-	static void init(uint32_t period_us);
+	static void init(emb::chrono::microseconds period);
 	static uint32_t counter() { return CPUTimer_getTimerCount(CPUTIMER1_BASE); }
-	static uint64_t now() {	return static_cast<uint64_t>(_period - counter()) * sysclk_period_ns; }
+	static emb::chrono::nanoseconds now() {	return emb::chrono::nanoseconds((_period - counter()) * sysclk_period_ns); }
 	static void start() { CPUTimer_startTimer(CPUTIMER1_BASE); }
 	static void stop() { CPUTimer_stopTimer(CPUTIMER1_BASE); }
 
