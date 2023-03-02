@@ -9,7 +9,7 @@ namespace mcu {
 
 namespace crc {
 
-inline uint32_t calc_crc32(uint16_t* buf, size_t bytes)
+inline uint32_t calc_crc32(const uint16_t* buf, size_t bytes)
 {
 	// CRC-32/MPEG-2
 	CRC_Obj crc_obj;
@@ -18,7 +18,7 @@ inline uint32_t calc_crc32(uint16_t* buf, size_t bytes)
 	crc_obj.nMsgBytes = bytes;
 	crc_obj.parity = CRC_parity_even;
 	crc_obj.crcResult = 0;
-	crc_obj.pMsgBuffer = buf;
+	crc_obj.pMsgBuffer = const_cast<uint16_t*>(buf);
 	crc_obj.init = reinterpret_cast<void(*)(void*)>(CRC_init32Bit);
 	crc_obj.run = reinterpret_cast<void(*)(void*)>(CRC_run32BitPoly1);
 
@@ -26,6 +26,13 @@ inline uint32_t calc_crc32(uint16_t* buf, size_t bytes)
 	crc_obj.run(&crc_obj);
 
 	return crc_obj.crcResult;
+}
+
+
+inline uint32_t calc_crc32_byte8(const uint8_t* buf, size_t len)
+{
+	// calculate CRC with padding zeros
+	return calc_crc32(buf, len*2);
 }
 
 
