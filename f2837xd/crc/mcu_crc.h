@@ -9,12 +9,12 @@ namespace mcu {
 
 namespace crc {
 
-
-uint32_t calc_crc32(uint16_t* buf, size_t bytes)
+inline uint32_t calc_crc32(uint16_t* buf, size_t bytes)
 {
+	// CRC-32/MPEG-2
 	CRC_Obj crc_obj;
 
-	crc_obj.seedValue = INIT_CRC32;
+	crc_obj.seedValue = 0xFFFFFFFF;//INIT_CRC32;
 	crc_obj.nMsgBytes = bytes;
 	crc_obj.parity = CRC_parity_even;
 	crc_obj.crcResult = 0;
@@ -28,6 +28,14 @@ uint32_t calc_crc32(uint16_t* buf, size_t bytes)
 	return crc_obj.crcResult;
 }
 
+
+inline void reset()
+{
+	//CRC_reset();
+	uint16_t buf[4] = {0x0100, 0x0302, 0x0504, 0x0706};
+	uint32_t res = calc_crc32(buf, 8);
+	EMB_UNUSED(res);
+}
 
 } // namespace crc
 
