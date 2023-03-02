@@ -1,10 +1,9 @@
 #pragma once
 
 
+#include "../system/mcu_system.h"
+#include "../gpio/mcu_gpio.h"
 #include <c28x_emb/emb_core.h>
-#include <c28x_mcu/f2837xd/gpio/mcu_gpio.h>
-#include "driverlib.h"
-#include "device.h"
 
 
 namespace mcu {
@@ -116,7 +115,7 @@ public:
 		switch (_word_len.native_value())
 		{
 			case WordLen::Word8Bit:
-				uint16_t byte8[sizeof(T)*2];
+				uint8_t byte8[sizeof(T)*2];
 				for (size_t i = 0; i < sizeof(T)*2; ++i)
 				{
 					byte8[i] = SPI_readDataBlockingFIFO(_module.base) & 0x00FF;
@@ -140,7 +139,7 @@ public:
 		switch (_word_len.native_value())
 		{
 			case WordLen::Word8Bit:
-				uint16_t byte8[sizeof(T)*2];
+				uint8_t byte8[sizeof(T)*2];
 				emb::c28x::to_bytes<T>(byte8, data);
 				for (size_t i = 0; i < sizeof(T)*2; ++i)
 				{

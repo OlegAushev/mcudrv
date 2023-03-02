@@ -1,12 +1,10 @@
 #pragma once
 
 
+#include "../system/mcu_system.h"
+#include "../gpio/mcu_gpio.h"
 #include <c28x_emb/emb_array.h>
 #include <c28x_emb/emb_core.h>
-#include <c28x_mcu/f2837xd/gpio/mcu_gpio.h>
-#include "driverlib.h"
-#include "device.h"
-
 
 
 namespace mcu {

@@ -1,9 +1,8 @@
 #pragma once
 
 
+#include "../system/mcu_system.h"
 #include <c28x_emb/emb_core.h>
-#include "driverlib.h"
-#include "device.h"
 #include "F2837xD_Ipc_drivers.h"
 
 

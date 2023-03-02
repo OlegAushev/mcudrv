@@ -1,10 +1,8 @@
 #pragma once
 
 
+#include "../system/mcu_system.h"
 #include <c28x_emb/emb_core.h>
-#include <c28x_mcu/f2837xd/system/mcu_system.h>
-#include "driverlib.h"
-#include "device.h"
 
 
 namespace mcu {

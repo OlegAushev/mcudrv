@@ -1,12 +1,10 @@
 #pragma once
 
 
-#include "driverlib.h"
-#include "device.h"
-#include <assert.h>
+#include "../system/mcu_system.h"
 #include <c28x_emb/emb_interfaces/emb_gpio.h>
 #include <c28x_emb/emb_chrono.h>
-#include "../system/mcu_system.h"
+#include <assert.h>
 
 
 namespace mcu {

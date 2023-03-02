@@ -2,8 +2,9 @@
 
 
 #include <c28x_emb/emb_core.h>
-#include "driverlib.h"
-#include "device.h"
+#include <driverlib.h>
+#include <device.h>
+#include <F28x_Project.h>
 
 
 namespace mcu {
