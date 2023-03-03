@@ -56,7 +56,7 @@ public:
 		, _value(value & 0x0FFF)
 	{}
 
-	uint16_t value() const { return _value; }
+	uint16_t get() const { return _value; }
 	uint16_t tag() const { return _tag; }
 };
 
@@ -68,7 +68,7 @@ private:
 	impl::Module _module;
 public:
 	Module(Peripheral peripheral);
-	void convert(Input input) { DAC_setShadowValue(_module.base, input.value()); }
+	void convert(Input input) { DAC_setShadowValue(_module.base, input.get()); }
 };
 
 } // namespace dac
