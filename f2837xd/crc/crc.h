@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "../system/mcu_system.h"
+#include "../system/system.h"
 #include <dsp/vcu/vcu2_crc.h>
 
 

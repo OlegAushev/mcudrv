@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <c28x_emb/emb_core.h>
+#include <c28x_emblib/core.h>
 #include <driverlib.h>
 #include <device.h>
 #include <F28x_Project.h>

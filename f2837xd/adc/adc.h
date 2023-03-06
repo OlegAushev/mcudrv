@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include <c28x_emb/emb_array.h>
-#include <c28x_emb/emb_core.h>
+#include <c28x_emblib/array.h>
+#include <c28x_emblib/core.h>
 #include <mcu/adc_channels/mcu_adcchannels.h>
-#include <c28x_mcu/f2837xd/system/mcu_system.h>
+#include <c28x_mcu_drivers/f2837xd/system/system.h>
 
 
 namespace mcu {

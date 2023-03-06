@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include "../system/mcu_system.h"
-#include <c28x_emb/emb_core.h>
-#include <c28x_emb/emb_chrono.h>
-#include <c28x_emb/emb_staticvector.h>
+#include "../system/system.h"
+#include <c28x_emblib/core.h>
+#include <c28x_emblib/chrono.h>
+#include <c28x_emblib/staticvector.h>
 
 
 namespace mcu {

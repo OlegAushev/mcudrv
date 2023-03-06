@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include "../system/mcu_system.h"
-#include <c28x_emb/emb_interfaces/emb_gpio.h>
-#include <c28x_emb/emb_chrono.h>
+#include "../system/system.h"
+#include <c28x_emblib/interfaces/gpio.h>
+#include <c28x_emblib/chrono.h>
 #include <assert.h>
 
 

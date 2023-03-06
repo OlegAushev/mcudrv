@@ -1,4 +1,4 @@
-#include <c28x_mcu/f2837xd/i2c/mcu_i2c.h>
+#include <c28x_mcu_drivers/f2837xd/i2c/i2c.h>
 
 
 namespace mcu {

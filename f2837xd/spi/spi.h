@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include "../system/mcu_system.h"
-#include "../gpio/mcu_gpio.h"
-#include <c28x_emb/emb_core.h>
+#include "../system/system.h"
+#include "../gpio/gpio.h"
+#include <c28x_emblib/core.h>
 
 
 namespace mcu {
