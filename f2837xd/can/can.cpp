@@ -1,4 +1,4 @@
-#include <c28x_mcu_drivers/f2837xd/can/can.h>
+#include <mculib_c28x/f2837xd/can/can.h>
 
 
 namespace mcu {

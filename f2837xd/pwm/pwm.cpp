@@ -1,4 +1,4 @@
-#include <c28x_mcu_drivers/f2837xd/pwm/pwm.h>
+#include <mculib_c28x/f2837xd/pwm/pwm.h>
 
 
 namespace mcu {

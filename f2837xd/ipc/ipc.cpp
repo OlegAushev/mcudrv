@@ -1,4 +1,4 @@
-#include <c28x_mcu_drivers/f2837xd/ipc/ipc.h>
+#include <mculib_c28x/f2837xd/ipc/ipc.h>
 
 
 namespace mcu {

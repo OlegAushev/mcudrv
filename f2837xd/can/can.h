@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include <c28x_emblib/core.h>
-#include <c28x_mcu_drivers/f2837xd/gpio/gpio.h>
-#include <c28x_mcu_drivers/f2837xd/system/system.h>
+#include <emblib_c28x/core.h>
+#include <mculib_c28x/f2837xd/gpio/gpio.h>
+#include <mculib_c28x/f2837xd/system/system.h>
 
 
 namespace mcu {

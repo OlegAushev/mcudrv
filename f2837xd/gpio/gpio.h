@@ -2,8 +2,8 @@
 
 
 #include "../system/system.h"
-#include <c28x_emblib/interfaces/gpio.h>
-#include <c28x_emblib/chrono.h>
+#include <emblib_c28x/interfaces/gpio.h>
+#include <emblib_c28x/chrono.h>
 #include <assert.h>
 
 

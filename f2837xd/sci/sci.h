@@ -3,8 +3,8 @@
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <c28x_emblib/core.h>
-#include <c28x_emblib/interfaces/uart.h>
+#include <emblib_c28x/core.h>
+#include <emblib_c28x/interfaces/uart.h>
 
 
 namespace mcu {
