@@ -161,20 +161,20 @@ void mcu::tests::chrono()
 	EMB_ASSERT_TRUE(!timeout.expired());
 	for (size_t i = 0; i < 15; ++i)
 	{
-		mcu::delay_us(1000);
+		mcu::delay(emb::chrono::milliseconds(1));
 		EMB_ASSERT_TRUE(!timeout.expired());
 	}
-	mcu::delay_us(6000);
+	mcu::delay(emb::chrono::milliseconds(6));
 	EMB_ASSERT_TRUE(timeout.expired());
 
 	timeout.reset();
 	EMB_ASSERT_TRUE(!timeout.expired());
 	for (size_t i = 0; i < 15; ++i)
 	{
-		mcu::delay_us(1000);
+		mcu::delay(emb::chrono::milliseconds(1));
 		EMB_ASSERT_TRUE(!timeout.expired());
 	}
-	mcu::delay_us(6000);
+	mcu::delay(emb::chrono::milliseconds(6));
 	EMB_ASSERT_TRUE(timeout.expired());
 }
 

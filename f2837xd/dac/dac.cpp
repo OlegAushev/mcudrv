@@ -16,7 +16,7 @@ Module::Module(Peripheral peripheral)
 	DAC_setReferenceVoltage(_module.base, DAC_REF_ADC_VREFHI);
 	DAC_enableOutput(_module.base);
 	DAC_setShadowValue(_module.base, 0);
-	mcu::delay_us(10);	// Delay for buffered DAC to power up
+	mcu::delay(emb::chrono::microseconds(10));	// Delay for buffered DAC to power up
 }
 
 } // namespace dac

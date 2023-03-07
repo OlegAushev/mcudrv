@@ -2,6 +2,7 @@
 
 
 #include <emblib_c28x/core.h>
+#include <emblib_c28x/chrono.h>
 #include <driverlib.h>
 #include <device.h>
 #include <F28x_Project.h>
@@ -35,26 +36,32 @@ inline void boot_cpu2() { Device_bootCPU2(C1C2_BROM_BOOTMODE_BOOT_FROM_FLASH); }
 #endif
 
 
-inline void delay_ns(uint32_t delay_ns)
+inline void delay(emb::chrono::nanoseconds ns)
 {
 	const uint32_t sysclkCycle_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
 	const uint32_t delayLoop_ns = 5 * sysclkCycle_ns;
 	const uint32_t delayOverhead_ns = 9 * sysclkCycle_ns;
 
-	if (delay_ns < delayLoop_ns + delayOverhead_ns)
+	if (ns.count() < delayLoop_ns + delayOverhead_ns)
 	{
 		SysCtl_delay(1);
 	}
 	else
 	{
-		SysCtl_delay((delay_ns - delayOverhead_ns) / delayLoop_ns);
+		SysCtl_delay((ns.count() - delayOverhead_ns) / delayLoop_ns);
 	}
 }
 
 
-inline void delay_us(uint32_t delay_us)
+inline void delay(emb::chrono::microseconds us)
 {
-	DEVICE_DELAY_US(delay_us);
+	DEVICE_DELAY_US(us.count());
+}
+
+
+inline void delay(emb::chrono::milliseconds ms)
+{
+	delay(emb::chrono::duration_cast<emb::chrono::microseconds>(ms));
 }
 
 
