@@ -91,7 +91,7 @@ public:
 	void send_start() { I2C_sendStartCondition(_module.base); }
 	void send_stop() { I2C_sendStopCondition(_module.base); }
 	void send(uint8_t data) { I2C_putData(_module.base, data); }
-	uint8_t recv() { I2C_getData(_module.base); }
+	uint8_t recv() { return I2C_getData(_module.base); }
 
 protected:
 #ifdef CPU1
