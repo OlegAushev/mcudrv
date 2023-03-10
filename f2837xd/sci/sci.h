@@ -100,7 +100,7 @@ extern const uint16_t sci_pie_int_groups[4];
 } // namespace impl
 
 
-class Module : public emb::c28x::InterruptInvokerArray<Module, peripheral_count>, public emb::uart::UartInterface, private emb::NonCopyable
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, public emb::uart::UartInterface, private emb::noncopyable
 {
 private:
 	const Peripheral _peripheral;

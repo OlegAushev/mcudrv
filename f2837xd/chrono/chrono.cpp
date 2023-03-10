@@ -8,7 +8,7 @@ namespace chrono {
 volatile int64_t system_clock::_time;
 const emb::chrono::milliseconds system_clock::time_step(1);
 
-emb::StaticVector<system_clock::Task, system_clock::task_count_max> system_clock::_tasks;
+emb::static_vector<system_clock::Task, system_clock::task_count_max> system_clock::_tasks;
 
 emb::chrono::milliseconds system_clock::_delayed_task_start;
 emb::chrono::milliseconds system_clock::_delayed_task_delay;

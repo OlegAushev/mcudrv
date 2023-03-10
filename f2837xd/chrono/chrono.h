@@ -19,7 +19,7 @@ SCOPED_ENUM_DECLARE_BEGIN(TaskStatus)
 SCOPED_ENUM_DECLARE_END(TaskStatus)
 
 
-class system_clock : public emb::Monostate<system_clock>
+class system_clock : public emb::monostate<system_clock>
 {
 private:
 	static volatile int64_t _time;
@@ -33,7 +33,7 @@ private:
 		TaskStatus (*func)(size_t);
 	};
 	static TaskStatus empty_task() { return TaskStatus::success; }
-	static emb::StaticVector<Task, task_count_max> _tasks;
+	static emb::static_vector<Task, task_count_max> _tasks;
 public:
 	static void register_task(TaskStatus (*func)(size_t), emb::chrono::milliseconds period)
 	{
@@ -83,7 +83,7 @@ protected:
 };
 
 
-class high_resolution_clock : public emb::Monostate<high_resolution_clock>
+class high_resolution_clock : public emb::monostate<high_resolution_clock>
 {
 private:
 	static uint32_t _period;

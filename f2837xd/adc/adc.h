@@ -80,15 +80,15 @@ struct Irq
 };
 
 
-void init_channels(emb::Array<impl::Channel, ChannelName::count>& channels);
+void init_channels(emb::array<impl::Channel, ChannelName::count>& channels);
 
 
-void init_irqs(emb::Array<impl::Irq, IrqName::count>& irqs);
+void init_irqs(emb::array<impl::Irq, IrqName::count>& irqs);
 
 } // namespace impl
 
 
-class Module : public emb::c28x::InterruptInvokerArray<Module, peripheral_count>, private emb::NonCopyable
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
 {
 	friend class Channel;
 private:
@@ -96,8 +96,8 @@ private:
 	impl::Module _module;
 	const uint32_t sample_window_cycles;
 
-	static emb::Array<impl::Channel, ChannelName::count> _channels;
-	static emb::Array<impl::Irq, IrqName::count> _irqs;
+	static emb::array<impl::Channel, ChannelName::count> _channels;
+	static emb::array<impl::Irq, IrqName::count> _irqs;
 	static bool _channels_and_irqs_initialized;
 public:
 	Module(Peripheral peripheral, const adc::Config& config);

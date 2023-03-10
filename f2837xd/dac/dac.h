@@ -61,7 +61,7 @@ public:
 };
 
 
-class Module : public emb::c28x::InterruptInvokerArray<Module, peripheral_count>, private emb::NonCopyable
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
 {
 private:
 	const Peripheral _peripheral;

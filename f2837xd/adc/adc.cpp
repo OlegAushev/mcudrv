@@ -11,13 +11,13 @@ const uint16_t impl::adc_pie_int_groups[4] = {INTERRUPT_ACK_GROUP1, INTERRUPT_AC
 		INTERRUPT_ACK_GROUP10, INTERRUPT_ACK_GROUP10};
 
 
-emb::Array<impl::Channel, ChannelName::count> Module::_channels;
-emb::Array<impl::Irq, IrqName::count> Module::_irqs;
+emb::array<impl::Channel, ChannelName::count> Module::_channels;
+emb::array<impl::Irq, IrqName::count> Module::_irqs;
 bool Module::_channels_and_irqs_initialized = false;
 
 
 Module::Module(Peripheral peripheral, const adc::Config& config)
-	: emb::c28x::InterruptInvokerArray<Module, peripheral_count>(this, peripheral.underlying_value())
+	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
 	, _peripheral(peripheral)
 	, _module(impl::adc_bases[peripheral.underlying_value()], impl::adc_result_bases[peripheral.underlying_value()])
 	, sample_window_cycles(config.sample_window_ns / (1000000000 / mcu::sysclk_freq()))

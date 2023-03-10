@@ -12,7 +12,7 @@ const uint16_t impl::sci_pie_int_groups[4] = {INTERRUPT_ACK_GROUP9, INTERRUPT_AC
 
 
 Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config)
-	: emb::c28x::InterruptInvokerArray<Module, peripheral_count>(this, peripheral.underlying_value())
+	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
 	, _peripheral(peripheral)
 	, _module(impl::sci_bases[peripheral.underlying_value()],
 			impl::sci_rx_pie_int_nums[peripheral.underlying_value()],

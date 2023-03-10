@@ -144,7 +144,7 @@ extern const uint32_t pwm_pie_trip_int_nums[12];
 
 
 template <PhaseCount::enum_type Phases>
-class Module : private emb::NonCopyable
+class Module : private emb::noncopyable
 {
 private:
 	// there is a divider ( EPWMCLKDIV ) of the system clock
@@ -165,8 +165,8 @@ private:
 
 	State _state;
 public:
-	Module(const emb::Array<Peripheral, Phases>& peripherals,
-			const emb::Array<mcu::gpio::Config, 2*Phases>& pins,
+	Module(const emb::array<Peripheral, Phases>& peripherals,
+			const emb::array<mcu::gpio::Config, 2*Phases>& pins,
 			const pwm::Config& config)
 		: _timebase_clk_freq(pwm_clk_freq / config.clock_prescaler)
 		, _timebase_cycle_ns(pwm_clk_cycle_ns * config.clock_prescaler)
@@ -537,8 +537,8 @@ public:
 #endif
 
 #ifdef CPU1
-	static void transfer_control_to_cpu2(const emb::Array<Peripheral, Phases>& peripherals,
-			const emb::Array<mcu::gpio::Config, 2*Phases> pins)
+	static void transfer_control_to_cpu2(const emb::array<Peripheral, Phases>& peripherals,
+			const emb::array<mcu::gpio::Config, 2*Phases> pins)
 	{
 		SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);	// Disable sync(Freeze clock to PWM as well)
 		_init_pins(pins);
@@ -590,7 +590,7 @@ public:
 		}
 	}
 
-	void set_compare_values(const emb::Array<uint16_t, Phases>& cmp_values, CounterCompareModule cmp_module = CounterCompareModule::a)
+	void set_compare_values(const emb::array<uint16_t, Phases>& cmp_values, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < PhaseCount; ++i)
 		{
@@ -610,7 +610,7 @@ public:
 		}
 	}
 
-	void set_duty_cycles(const emb::Array<float, Phases>& duty_cycles, CounterCompareModule cmp_module = CounterCompareModule::a)
+	void set_duty_cycles(const emb::array<float, Phases>& duty_cycles, CounterCompareModule cmp_module = CounterCompareModule::a)
 	{
 		for (size_t i = 0; i < Phases; ++i)
 		{
@@ -675,7 +675,7 @@ public:
 	void acknowledge_trip_interrupt() { Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP2); }
 protected:
 #ifdef CPU1
-	static void _init_pins(const emb::Array<mcu::gpio::Config, 2*Phases> pins)
+	static void _init_pins(const emb::array<mcu::gpio::Config, 2*Phases> pins)
 	{
 		for (size_t i = 0; i < pins.size(); ++i)
 		{
