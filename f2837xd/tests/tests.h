@@ -17,9 +17,9 @@ namespace mcu {
 class tests
 {
 public:
-	static void gpio();
-	static void chrono();
-	static void crc();
+	static void gpio_test();
+	static void chrono_test();
+	static void crc_test();
 };
 
 } // namespace mcu

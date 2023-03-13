@@ -53,8 +53,8 @@ public:
 	}
 
 	void set() { IPCLtoRFlagSet(_mask); }
-	inline void reset() { IPCLtoRFlagClear(_mask); }
-	bool is_set() { return IPCLtoRFlagBusy(_mask); }
+	void reset() { IPCLtoRFlagClear(_mask); }
+	bool is_set() const { return IPCLtoRFlagBusy(_mask); }
 };
 
 
@@ -82,8 +82,8 @@ public:
 		IPCRtoLFlagAcknowledge(_mask);
 	}
 
-	bool is_set() { return IPCRtoLFlagBusy(_mask); }
-	inline void acknowledge() { IPCRtoLFlagAcknowledge(_mask); }
+	bool is_set() const { return IPCRtoLFlagBusy(_mask); }
+	void acknowledge() { IPCRtoLFlagAcknowledge(_mask); }
 };
 
 
@@ -108,7 +108,7 @@ public:
 		remote.init(flagNo);
 	}
 
-	bool is_set()
+	bool is_set() const
 	{
 		switch (_mode.native_value())
 		{
@@ -120,7 +120,7 @@ public:
 		return false;
 	}
 
-	inline void reset()
+	void reset()
 	{
 		switch (_mode.native_value())
 		{
@@ -132,6 +132,8 @@ public:
 				return;
 		}
 	}
+
+	Mode mode() const { return _mode; }
 };
 
 
