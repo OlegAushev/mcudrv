@@ -12,12 +12,11 @@ const uint16_t impl::sci_pie_int_groups[4] = {INTERRUPT_ACK_GROUP9, INTERRUPT_AC
 
 
 Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
-	, _peripheral(peripheral)
-	, _module(impl::sci_bases[peripheral.underlying_value()],
-			impl::sci_rx_pie_int_nums[peripheral.underlying_value()],
-			impl::sci_pie_int_groups[peripheral.underlying_value()])
-{
+		: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+		, _peripheral(peripheral)
+		, _module(impl::sci_bases[peripheral.underlying_value()],
+				impl::sci_rx_pie_int_nums[peripheral.underlying_value()],
+				impl::sci_pie_int_groups[peripheral.underlying_value()]) {
 #ifdef CPU1
 	_init_pins(rx_pin, tx_pin);
 #endif
@@ -41,8 +40,7 @@ Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Co
 	SCI_enableModule(_module.base);
 	SCI_performSoftwareReset(_module.base);
 
-	if (config.autobaud_mode == AutoBaudMode::enabled)
-	{
+	if (config.autobaud_mode == AutoBaudMode::enabled) {
 		// Perform an autobaud lock.
 		// SCI expects an 'a' or 'A' to lock the baud rate.
 		SCI_lockAutobaud(_module.base);
@@ -51,8 +49,7 @@ Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Co
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin)
-{
+void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin) {
 	_init_pins(rx_pin, tx_pin);
 	GPIO_setMasterCore(rx_pin.no, GPIO_CORE_CPU2);
 	GPIO_setMasterCore(tx_pin.no, GPIO_CORE_CPU2);
@@ -63,8 +60,7 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config&
 
 
 #ifdef CPU1
-void Module::_init_pins(const gpio::Config& rx_pin, const gpio::Config& tx_pin)
-{
+void Module::_init_pins(const gpio::Config& rx_pin, const gpio::Config& tx_pin) {
 	GPIO_setPinConfig(rx_pin.mux);
 	GPIO_setDirectionMode(rx_pin.no, GPIO_DIR_MODE_IN);
 	GPIO_setPadConfig(rx_pin.no, GPIO_PIN_TYPE_STD);

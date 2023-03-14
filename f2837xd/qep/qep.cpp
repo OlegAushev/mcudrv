@@ -11,10 +11,9 @@ const uint32_t impl::qep_pie_int_nums[3] = {INT_EQEP1, INT_EQEP2, INT_EQEP3};
 
 Module::Module(Peripheral peripheral, const gpio::Config& qepa_pin, const gpio::Config& qepb_pin,
 		const gpio::Config& qepi_pin, const Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
-	, _peripheral(peripheral)
-	, _module(impl::qep_bases[peripheral.underlying_value()], config.int_flags, impl::qep_pie_int_nums[peripheral.underlying_value()])
-{
+		: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+		, _peripheral(peripheral)
+		, _module(impl::qep_bases[peripheral.underlying_value()], config.int_flags, impl::qep_pie_int_nums[peripheral.underlying_value()]) {
 #ifdef CPU1
 	_init_pins(qepa_pin, qepb_pin, qepi_pin);
 #endif
@@ -51,19 +50,16 @@ Module::Module(Peripheral peripheral, const gpio::Config& qepa_pin, const gpio::
 
 #ifdef CPU1
 void Module::_init_pins(const gpio::Config& qepa_pin, const gpio::Config& qepb_pin,
-		const gpio::Config& qepi_pin)
-{
+						const gpio::Config& qepi_pin) {
 	GPIO_setPadConfig(qepa_pin.no, GPIO_PIN_TYPE_STD);
 	GPIO_setPinConfig(qepa_pin.mux);
 
-	if (qepb_pin.valid)
-	{
+	if (qepb_pin.valid) {
 		GPIO_setPadConfig(qepb_pin.no, GPIO_PIN_TYPE_STD);
 		GPIO_setPinConfig(qepb_pin.mux);
 	}
 
-	if (qepi_pin.valid)
-	{
+	if (qepi_pin.valid) {
 		GPIO_setPadConfig(qepi_pin.no, GPIO_PIN_TYPE_STD);
 		GPIO_setPinConfig(qepi_pin.mux);
 	}

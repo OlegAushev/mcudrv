@@ -10,12 +10,11 @@ const uint32_t impl::spi_rx_pie_int_nums[3] = {INT_SPIA_RX, INT_SPIB_RX, INT_SPI
 
 
 Module::Module(Peripheral peripheral, const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
-		const gpio::Config& clk_pin, const gpio::Config& cs_pin,
-		const Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
-	, _peripheral(peripheral)
-	, _module(impl::spi_bases[peripheral.underlying_value()], impl::spi_rx_pie_int_nums[peripheral.underlying_value()])
-{
+				const gpio::Config& clk_pin, const gpio::Config& cs_pin,
+				const Config& config)
+		: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+		, _peripheral(peripheral)
+		, _module(impl::spi_bases[peripheral.underlying_value()], impl::spi_rx_pie_int_nums[peripheral.underlying_value()]) {
 	assert((config.data_size >= 1) && (config.data_size <= 16));
 
 	_word_len = config.word_len;
@@ -39,14 +38,12 @@ Module::Module(Peripheral peripheral, const gpio::Config& mosi_pin, const gpio::
 
 #ifdef CPU1
 void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
-		const gpio::Config& clk_pin, const gpio::Config& cs_pin)
-{
+										const gpio::Config& clk_pin, const gpio::Config& cs_pin) {
 	_init_pins(mosi_pin, miso_pin, clk_pin, cs_pin);
 	GPIO_setMasterCore(mosi_pin.no, GPIO_CORE_CPU2);
 	GPIO_setMasterCore(miso_pin.no, GPIO_CORE_CPU2);
 	GPIO_setMasterCore(clk_pin.no, GPIO_CORE_CPU2);
-	if (cs_pin.valid)
-	{
+	if (cs_pin.valid) {
 		GPIO_setMasterCore(cs_pin.no, GPIO_CORE_CPU2);
 	}
 
@@ -57,8 +54,7 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config&
 
 #ifdef CPU1
 void Module::_init_pins(const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
-		const gpio::Config& clk_pin, const gpio::Config& cs_pin)
-{
+						const gpio::Config& clk_pin, const gpio::Config& cs_pin) {
 	GPIO_setPinConfig(mosi_pin.mux);
 	//GPIO_setPadConfig(mosiPin.no, GPIO_PIN_TYPE_PULLUP);
 	GPIO_setQualificationMode(mosi_pin.no, GPIO_QUAL_ASYNC);
@@ -71,8 +67,7 @@ void Module::_init_pins(const gpio::Config& mosi_pin, const gpio::Config& miso_p
 	//GPIO_setPadConfig(clkPin.no, GPIO_PIN_TYPE_PULLUP);
 	GPIO_setQualificationMode(clk_pin.no, GPIO_QUAL_ASYNC);
 
-	if (cs_pin.valid)
-	{
+	if (cs_pin.valid) {
 		GPIO_setPinConfig(cs_pin.mux);
 		//GPIO_setPadConfig(csPin.no, GPIO_PIN_TYPE_PULLUP);
 		GPIO_setQualificationMode(cs_pin.no, GPIO_QUAL_ASYNC);

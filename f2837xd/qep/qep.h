@@ -11,56 +11,45 @@ namespace mcu {
 namespace qep {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral)
-{
+SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 	qep1,
 	qep2,
 	qep3
-}
-SCOPED_ENUM_DECLARE_END(Peripheral)
+} SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
 const size_t peripheral_count = 3;
 
 
-SCOPED_ENUM_DECLARE_BEGIN(InputMode)
-{
+SCOPED_ENUM_DECLARE_BEGIN(InputMode) {
 	quadrature = EQEP_CONFIG_QUADRATURE,
 	clockdir = EQEP_CONFIG_CLOCK_DIR,
 	upcount = EQEP_CONFIG_UP_COUNT,
 	downcount = EQEP_CONFIG_DOWN_COUNT
-}
-SCOPED_ENUM_DECLARE_END(InputMode)
+} SCOPED_ENUM_DECLARE_END(InputMode)
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Resolution)
-{
+SCOPED_ENUM_DECLARE_BEGIN(Resolution) {
 	x2 = EQEP_CONFIG_2X_RESOLUTION,
 	x1 = EQEP_CONFIG_1X_RESOLUTION
-}
-SCOPED_ENUM_DECLARE_END(Resolution)
+} SCOPED_ENUM_DECLARE_END(Resolution)
 
 
-SCOPED_ENUM_DECLARE_BEGIN(SwapAB)
-{
+SCOPED_ENUM_DECLARE_BEGIN(SwapAB) {
 	no = EQEP_CONFIG_NO_SWAP,
 	yes = EQEP_CONFIG_SWAP
-}
-SCOPED_ENUM_DECLARE_END(SwapAB)
+} SCOPED_ENUM_DECLARE_END(SwapAB)
 
 
-SCOPED_ENUM_DECLARE_BEGIN(PositionResetMode)
-{
+SCOPED_ENUM_DECLARE_BEGIN(PositionResetMode) {
 	reset_on_idx = EQEP_POSITION_RESET_IDX,
 	reset_on_max = EQEP_POSITION_RESET_MAX_POS,
 	reset_on_1st_idx = EQEP_POSITION_RESET_1ST_IDX,
 	reset_on_timeout = EQEP_POSITION_RESET_UNIT_TIME_OUT
-}
-SCOPED_ENUM_DECLARE_END(PositionResetMode)
+} SCOPED_ENUM_DECLARE_END(PositionResetMode)
 
 
-struct Config
-{
+struct Config {
 	InputMode input_mode;
 	Resolution resolution;
 	SwapAB swap_ab;
@@ -78,13 +67,12 @@ struct Config
 
 namespace impl {
 
-struct Module
-{
+struct Module {
 	uint32_t base;
 	uint16_t int_flags;
 	uint32_t pie_int_num;
 	Module(uint32_t base_, uint16_t int_flags_, uint32_t pie_int_num_)
-		: base(base_), int_flags(int_flags_), pie_int_num(pie_int_num_) {}
+			: base(base_), int_flags(int_flags_), pie_int_num(pie_int_num_) {}
 };
 
 
@@ -94,8 +82,7 @@ extern const uint32_t qep_pie_int_nums[3];
 } // namespace impl
 
 
-class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
-{
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
 	const Peripheral _peripheral;
 	impl::Module _module;
@@ -104,8 +91,7 @@ public:
 			const gpio::Config& qepi_pin, const Config& config);
 
 	uint32_t base() const { return _module.base; }
-	void register_interrupt_handler(void (*handler)(void))
-	{
+	void register_interrupt_handler(void (*handler)(void)) {
 		Interrupt_register(_module.pie_int_num, handler);
 		EQEP_enableInterrupt(_module.base, _module.int_flags);
 	}
