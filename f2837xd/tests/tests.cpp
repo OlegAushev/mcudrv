@@ -35,7 +35,7 @@ void mcu::tests::gpio_test() {
 
 	GPIO_writePin(31, 1);
 	GPIO_writePin(34, 1);
-#elif defined(ON_TARGET_TEST)
+#elif defined(ON_TARGET_TESTS)
 #warning "LAUNCHXL is required for full testing."
 #endif
 
