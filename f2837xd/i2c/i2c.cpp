@@ -9,10 +9,9 @@ const uint32_t impl::i2c_bases[2] = {I2CA_BASE, I2CB_BASE};
 
 
 Module::Module(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin, const i2c::Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
-	, _peripheral(peripheral)
-	, _module(impl::i2c_bases[peripheral.underlying_value()])
-{
+		: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+		, _peripheral(peripheral)
+		, _module(impl::i2c_bases[peripheral.underlying_value()]) {
 #ifdef CPU1
 	_init_pins(sda_pin, scl_pin);
 #endif
@@ -30,8 +29,7 @@ Module::Module(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::C
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin)
-{
+void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin) {
 	_init_pins(sda_pin, scl_pin);
 	GPIO_setMasterCore(sda_pin.no, GPIO_CORE_CPU2);
 	GPIO_setMasterCore(scl_pin.no, GPIO_CORE_CPU2);
@@ -42,8 +40,7 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config&
 
 
 #ifdef CPU1
-void Module::_init_pins(const gpio::Config& sda_pin, const gpio::Config& scl_pin)
-{
+void Module::_init_pins(const gpio::Config& sda_pin, const gpio::Config& scl_pin) {
 	GPIO_setPadConfig(sda_pin.no, GPIO_PIN_TYPE_PULLUP);
 	GPIO_setQualificationMode(sda_pin.no, GPIO_QUAL_ASYNC);
 	GPIO_setPinConfig(sda_pin.mux);

@@ -10,19 +10,16 @@ namespace mcu {
 
 namespace i2c {
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral)
-{
+SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 	i2ca,
 	i2cb
-}
-SCOPED_ENUM_DECLARE_END(Peripheral)
+} SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
 const size_t peripheral_count = 2;
 
 
-SCOPED_ENUM_DECLARE_BEGIN(BitCount)
-{
+SCOPED_ENUM_DECLARE_BEGIN(BitCount) {
 	bc1 = I2C_BITCOUNT_1,
 	bc2 = I2C_BITCOUNT_2,
 	bc3 = I2C_BITCOUNT_3,
@@ -31,20 +28,16 @@ SCOPED_ENUM_DECLARE_BEGIN(BitCount)
 	bc6 = I2C_BITCOUNT_6,
 	bc7 = I2C_BITCOUNT_7,
 	bc8 = I2C_BITCOUNT_8
-}
-SCOPED_ENUM_DECLARE_END(BitCount)
+} SCOPED_ENUM_DECLARE_END(BitCount)
 
 
-SCOPED_ENUM_DECLARE_BEGIN(DutyCycle)
-{
+SCOPED_ENUM_DECLARE_BEGIN(DutyCycle) {
 	dc33 = I2C_DUTYCYCLE_33,
 	dc50 = I2C_DUTYCYCLE_50
-}
-SCOPED_ENUM_DECLARE_END(DutyCycle)
+} SCOPED_ENUM_DECLARE_END(DutyCycle)
 
 
-struct Config
-{
+struct Config {
 	uint32_t bitrate;
 	BitCount bitcount;
 	DutyCycle duty_cycle;
@@ -54,8 +47,7 @@ struct Config
 
 namespace impl {
 
-struct Module
-{
+struct Module {
 	uint32_t base;
 	Module(uint32_t base_) : base(base_) {}
 };
@@ -66,8 +58,7 @@ extern const uint32_t i2c_bases[2];
 } // namespace impl
 
 
-class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable
-{
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
 	const Peripheral _peripheral;
 	impl::Module _module;

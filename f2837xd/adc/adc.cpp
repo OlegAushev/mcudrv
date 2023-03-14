@@ -17,13 +17,11 @@ bool Module::_channels_and_irqs_initialized = false;
 
 
 Module::Module(Peripheral peripheral, const adc::Config& config)
-	: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
-	, _peripheral(peripheral)
-	, _module(impl::adc_bases[peripheral.underlying_value()], impl::adc_result_bases[peripheral.underlying_value()])
-	, sample_window_cycles(config.sample_window_ns / (1000000000 / mcu::sysclk_freq()))
-{
-	if (!_channels_and_irqs_initialized)
-	{
+		: emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+		, _peripheral(peripheral)
+		, _module(impl::adc_bases[peripheral.underlying_value()], impl::adc_result_bases[peripheral.underlying_value()])
+		, sample_window_cycles(config.sample_window_ns / (1000000000 / mcu::sysclk_freq())) {
+	if (!_channels_and_irqs_initialized) {
 		impl::init_channels(_channels);
 		impl::init_irqs(_irqs);
 		_channels_and_irqs_initialized = true;
@@ -39,10 +37,8 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
 	// Configure SOCs
 	// For 12-bit resolution, a sampling window of (5 x sample_window_cycles)ns
 	// at a 200MHz SYSCLK rate will be used
-	for (size_t i = 0; i < _channels.size(); ++i)
-	{
-		if (_channels[i].peripheral == _peripheral)
-		{
+	for (size_t i = 0; i < _channels.size(); ++i) {
+		if (_channels[i].peripheral == _peripheral) {
 			ADC_setupSOC(_module.base, _channels[i].soc, _channels[i].trigger, _channels[i].channel, sample_window_cycles);
 			_channels[i].registered = true;
 		}
@@ -50,10 +46,8 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
 	}
 
 	// Interrupt config
-	for (size_t i = 0; i < _irqs.size(); ++i)
-	{
-		if (_irqs[i].peripheral == _peripheral)
-		{
+	for (size_t i = 0; i < _irqs.size(); ++i) {
+		if (_irqs[i].peripheral == _peripheral) {
 			ADC_setInterruptSource(_module.base, _irqs[i].int_num, _irqs[i].soc);
 			ADC_enableInterrupt(_module.base, _irqs[i].int_num);
 			ADC_clearInterruptStatus(_module.base, _irqs[i].int_num);
@@ -64,23 +58,21 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral)
-{
+void Module::transfer_control_to_cpu2(Peripheral peripheral) {
 	SysCtl_CPUSelPeriphInstance peripheral_;
-	switch (peripheral.native_value())
-	{
-		case Peripheral::adca:
-			peripheral_ = SYSCTL_CPUSEL_ADCA;
-			break;
-		case Peripheral::adcb:
-			peripheral_ = SYSCTL_CPUSEL_ADCB;
-			break;
-		case Peripheral::adcc:
-			peripheral_ = SYSCTL_CPUSEL_ADCC;
-			break;
-		case Peripheral::adcd:
-			peripheral_ = SYSCTL_CPUSEL_ADCD;
-			break;
+	switch (peripheral.native_value()) {
+	case Peripheral::adca:
+		peripheral_ = SYSCTL_CPUSEL_ADCA;
+		break;
+	case Peripheral::adcb:
+		peripheral_ = SYSCTL_CPUSEL_ADCB;
+		break;
+	case Peripheral::adcc:
+		peripheral_ = SYSCTL_CPUSEL_ADCC;
+		break;
+	case Peripheral::adcd:
+		peripheral_ = SYSCTL_CPUSEL_ADCD;
+		break;
 	}
 
 	SysCtl_selectCPUForPeripheralInstance(peripheral_ ,SYSCTL_CPUSEL_CPU2);

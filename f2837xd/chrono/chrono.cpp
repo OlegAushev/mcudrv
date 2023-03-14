@@ -15,9 +15,8 @@ emb::chrono::milliseconds system_clock::_delayed_task_delay;
 void (*system_clock::_delayed_task)();
 
 
-void system_clock::init()
-{
-	if (initialized()) return;
+void system_clock::init() {
+	if (initialized()) { return; }
 
 	_time = 0;
 
@@ -45,24 +44,18 @@ void system_clock::init()
 }
 
 
-void system_clock::run_tasks()
-{
-	for (size_t i = 0; i < _tasks.size(); ++i)
-	{
-		if (now() >= (_tasks[i].timepoint + _tasks[i].period))
-		{
-			if (_tasks[i].func(i) == TaskStatus::success)
-			{
+void system_clock::run_tasks() {
+	for (size_t i = 0; i < _tasks.size(); ++i) {
+		if (now() >= (_tasks[i].timepoint + _tasks[i].period)) {
+			if (_tasks[i].func(i) == TaskStatus::success) {
 				_tasks[i].timepoint = now();
 			}
 		}
 
 	}
 
-	if (_delayed_task_delay.count() >= 0)
-	{
-		if (now() >= (_delayed_task_start + _delayed_task_delay))
-		{
+	if (_delayed_task_delay.count() >= 0) {
+		if (now() >= (_delayed_task_start + _delayed_task_delay)) {
 			_delayed_task();
 			_delayed_task_delay = emb::chrono::milliseconds(-1);
 		}
@@ -70,8 +63,7 @@ void system_clock::run_tasks()
 }
 
 
-interrupt void system_clock::on_interrupt()
-{
+interrupt void system_clock::on_interrupt() {
 	_time += time_step.count();
 	Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
@@ -80,9 +72,8 @@ interrupt void system_clock::on_interrupt()
 uint32_t high_resolution_clock::_period;
 
 
-void high_resolution_clock::init(emb::chrono::microseconds period)
-{
-	if (initialized()) return;
+void high_resolution_clock::init(emb::chrono::microseconds period) {
+	if (initialized()) { return; }
 
 	CPUTimer_stopTimer(CPUTIMER1_BASE);             	// Make sure timer is stopped
 	CPUTimer_setPeriod(CPUTIMER1_BASE, 0xFFFFFFFF); 	// Initialize timer period to maximum
