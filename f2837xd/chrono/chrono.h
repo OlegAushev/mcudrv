@@ -31,7 +31,7 @@ private:
 	static TaskStatus empty_task() { return TaskStatus::success; }
 	static emb::static_vector<Task, task_count_max> _tasks;
 public:
-	static void register_task(TaskStatus (*func)(size_t), emb::chrono::milliseconds period) {
+	static void add_task(TaskStatus (*func)(size_t), emb::chrono::milliseconds period) {
 		Task task = {period, now(), func};
 		_tasks.push_back(task);
 	}
