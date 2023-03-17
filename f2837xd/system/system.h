@@ -17,15 +17,15 @@ struct unused{};
 
 inline void init_device() {
 #ifdef CPU1
-	Device_init();			// Initialize device clock and peripherals
-	Device_initGPIO();		// Disable pin locks and enable internal pull-ups
-	Interrupt_initModule();		// Initialize PIE and clear PIE registers. Disable CPU interrupts
-	Interrupt_initVectorTable();	// Initialize the PIE vector table with pointers to the shell Interrupt Service Routines (ISR)
+    Device_init();                  // Initialize device clock and peripherals
+    Device_initGPIO();              // Disable pin locks and enable internal pull-ups
+    Interrupt_initModule();         // Initialize PIE and clear PIE registers. Disable CPU interrupts
+    Interrupt_initVectorTable();    // Initialize the PIE vector table with pointers to the shell Interrupt Service Routines (ISR)
 #endif
 #ifdef CPU2
-	Device_init();
-	Interrupt_initModule();
-	Interrupt_initVectorTable();
+    Device_init();
+    Interrupt_initModule();
+    Interrupt_initVectorTable();
 #endif
 }
 
@@ -36,25 +36,25 @@ inline void boot_cpu2() { Device_bootCPU2(C1C2_BROM_BOOTMODE_BOOT_FROM_FLASH); }
 
 
 inline void delay(emb::chrono::nanoseconds ns) {
-	const uint32_t sysclkCycle_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
-	const uint32_t delayLoop_ns = 5 * sysclkCycle_ns;
-	const uint32_t delayOverhead_ns = 9 * sysclkCycle_ns;
+    const uint32_t sysclkCycle_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
+    const uint32_t delayLoop_ns = 5 * sysclkCycle_ns;
+    const uint32_t delayOverhead_ns = 9 * sysclkCycle_ns;
 
-	if (ns.count() < delayLoop_ns + delayOverhead_ns) {
-		SysCtl_delay(1);
-	} else {
-		SysCtl_delay((ns.count() - delayOverhead_ns) / delayLoop_ns);
-	}
+    if (ns.count() < delayLoop_ns + delayOverhead_ns) {
+        SysCtl_delay(1);
+    } else {
+        SysCtl_delay((ns.count() - delayOverhead_ns) / delayLoop_ns);
+    }
 }
 
 
 inline void delay(emb::chrono::microseconds us) {
-	DEVICE_DELAY_US(us.count());
+    DEVICE_DELAY_US(us.count());
 }
 
 
 inline void delay(emb::chrono::milliseconds ms) {
-	delay(emb::chrono::duration_cast<emb::chrono::microseconds>(ms));
+    delay(emb::chrono::duration_cast<emb::chrono::microseconds>(ms));
 }
 
 
@@ -67,16 +67,16 @@ inline void reset_device() { SysCtl_resetDevice(); }
 
 class critical_section {
 private:
-	uint16_t int_status;
+    uint16_t int_status;
 public:
-	critical_section() {
-		int_status = __disable_interrupts();
-	}
+    critical_section() {
+        int_status = __disable_interrupts();
+    }
 
-	~critical_section() {
-		if(!(int_status & 0x1)) { EINT; }
-		if(!(int_status & 0x2)) { ERTM;	}
-	}
+    ~critical_section() {
+        if(!(int_status & 0x1)) { EINT; }
+        if(!(int_status & 0x2)) { ERTM;	}
+    }
 };
 
 
