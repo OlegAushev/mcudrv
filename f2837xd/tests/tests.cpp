@@ -130,7 +130,7 @@ void mcu::tests::gpio_test() {
     db2.debounce();
     EMB_ASSERT_EQUAL(db2.state(), emb::gpio::State::active);
     EMB_ASSERT_TRUE(!db2.state_changed());
-#elif defined(TEST_BUILD)
+#elif defined(ON_TARGET_TESTS)
 #warning "LAUNCHXL is required for full testing."
 #endif
 }
