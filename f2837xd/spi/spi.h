@@ -88,6 +88,7 @@ public:
                                          const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
                                          const gpio::Config& clk_pin, const gpio::Config& cs_pin);
 #endif
+    Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
     void enable_loopback() {
         SPI_disableModule(_module.base);

@@ -54,6 +54,8 @@ private:
     impl::Module _module;
 public:
     Module(Peripheral peripheral);
+    Peripheral peripheral() const { return _peripheral; }
+    uint32_t base() const { return _module.base; }
     void convert(Input input) { DAC_setShadowValue(_module.base, input.get()); }
 };
 

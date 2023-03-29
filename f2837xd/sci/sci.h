@@ -95,6 +95,7 @@ public:
 #ifdef CPU1
     static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin);
 #endif
+    Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
     virtual void reset() { SCI_performSoftwareReset(_module.base); }
     virtual bool has_rx_error() const {

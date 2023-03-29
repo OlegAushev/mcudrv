@@ -67,6 +67,7 @@ public:
 #ifdef CPU1
     static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& sdaPin, const gpio::Config& sclPin);
 #endif
+    Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
     void set_slave_address(uint16_t slave_addr) { I2C_setSlaveAddress(_module.base, slave_addr); }
     void enable() { I2C_enableModule(_module.base); }

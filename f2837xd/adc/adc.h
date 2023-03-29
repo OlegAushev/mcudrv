@@ -99,6 +99,8 @@ public:
 #ifdef CPU1
     static void transfer_control_to_cpu2(Peripheral peripheral);
 #endif
+    Peripheral peripheral() const { return _peripheral; }
+    uint32_t base() const { return _module.base; }
 
     void start(ChannelName channel) {
         assert(_channels[channel.underlying_value()].peripheral == _peripheral);

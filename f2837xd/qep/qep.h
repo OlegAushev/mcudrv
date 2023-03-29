@@ -90,6 +90,7 @@ public:
     Module(Peripheral peripheral, const gpio::Config& qepa_pin, const gpio::Config& qepb_pin,
             const gpio::Config& qepi_pin, const Config& config);
 
+    Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
     void register_interrupt_handler(void (*handler)(void)) {
         Interrupt_register(_module.pie_int_num, handler);
