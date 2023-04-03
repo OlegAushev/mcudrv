@@ -8,7 +8,7 @@
 #include "mculib_c28x/f2837xd/crc/crc.h"
 
 #ifdef _LAUNCHXL_F28379D
-#include <bsp/launchpad/launchpad.h>
+#include <bsp_c28x/launchpad/launchpad.h>
 #endif
 
 
