@@ -515,14 +515,14 @@ public:
             break;
         }
 
-        for (size_t i = 0; i < PhaseCount; ++i) {
+        for (size_t i = 0; i < Phases; ++i) {
             EPWM_setTimeBasePeriod(_module.base[i], _period);
         }
     }
 
     void set_compare_values(const uint16_t cmp_values[],
                             CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < PhaseCount; ++i) {
+        for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         cmp_values[i]);
@@ -531,7 +531,7 @@ public:
 
     void set_compare_values(const emb::array<uint16_t, Phases>& cmp_values,
                             CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < PhaseCount; ++i) {
+        for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                             static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                             cmp_values[i]);
@@ -540,7 +540,7 @@ public:
 
     void set_compare_value(uint16_t cmp_value,
                            CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < PhaseCount; ++i) {
+        for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         cmp_value);
