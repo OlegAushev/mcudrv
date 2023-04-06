@@ -484,7 +484,7 @@ public:
 
 #ifdef CPU1
     static void transfer_control_to_cpu2(const emb::array<Peripheral, Phases>& peripherals,
-                                            const emb::array<mcu::gpio::Config, 2*Phases> pins) {
+                                         const emb::array<mcu::gpio::Config, 2*Phases> pins) {
         SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);  // Disable sync(Freeze clock to PWM as well)
         _init_pins(pins);
         for (size_t i = 0; i < pins.size(); ++i) {
@@ -520,7 +520,17 @@ public:
         }
     }
 
-    void set_compare_values(const uint16_t cmp_values[], CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_compare_values(const uint16_t cmp_values[],
+                            CounterCompareModule cmp_module = CounterCompareModule::a) {
+        for (size_t i = 0; i < PhaseCount; ++i) {
+            EPWM_setCounterCompareValue(_module.base[i],
+                                        static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+                                        cmp_values[i]);
+        }
+    }
+
+    void set_compare_values(const emb::array<uint16_t, Phases>& cmp_values,
+                            CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (size_t i = 0; i < PhaseCount; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                             static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
@@ -528,35 +538,30 @@ public:
         }
     }
 
-    void set_compare_values(const emb::array<uint16_t, Phases>& cmp_values, CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_compare_value(uint16_t cmp_value,
+                           CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (size_t i = 0; i < PhaseCount; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
-                            static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                            cmp_values[i]);
+                                        static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+                                        cmp_value);
         }
     }
 
-    void set_compare_value(uint16_t cmp_value, CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < PhaseCount; ++i) {
-            EPWM_setCounterCompareValue(_module.base[i],
-                            static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                            cmp_value);
-        }
-    }
-
-    void set_duty_cycles(const emb::array<float, Phases>& duty_cycles, CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_duty_cycles(const emb::array<float, Phases>& duty_cycles,
+                         CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
-                            static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                            static_cast<uint16_t>(duty_cycles[i] * _period));
+                                        static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+                                        static_cast<uint16_t>(duty_cycles[i] * _period));
         }
     }
 
-    void set_duty_cycle(float duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_duty_cycle(float duty_cycle,
+                        CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
-                            static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                            static_cast<uint16_t>(duty_cycle * _period));
+                                        static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
+                                        static_cast<uint16_t>(duty_cycle * _period));
         }
     }
 
