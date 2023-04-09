@@ -56,8 +56,8 @@ void system_clock::run_tasks() {
 
     if (_delayed_task_delay.count() >= 0) {
         if (now() >= (_delayed_task_start + _delayed_task_delay)) {
-            _delayed_task();
             _delayed_task_delay = emb::chrono::milliseconds(-1);
+            _delayed_task();
         }
     }
 }
