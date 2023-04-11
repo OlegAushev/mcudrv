@@ -440,8 +440,10 @@ public:
         SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
     }
 
-#ifdef CPU1
     void init_tripzone(const gpio::Input& pin, XBAR_InputNum xbar_input) {
+#ifdef CPU2
+        assert(false);
+#else
         assert(static_cast<uint32_t>(xbar_input) <= static_cast<uint32_t>(XBAR_INPUT3));
 
         switch (pin.config().active_state.native_value()) {
@@ -479,8 +481,8 @@ public:
             // Enable tzSignal as one shot trip source
             EPWM_enableTripZoneSignals(_module.base[i], tripzone_signal);
         }
-    }
 #endif
+    }
 
 #ifdef CPU1
     static void transfer_control_to_cpu2(const emb::array<Peripheral, Phases>& peripherals,
