@@ -76,10 +76,10 @@ struct Irq {
 };
 
 
-void init_channels(emb::array<impl::Channel, ChannelName::count>& channels);
+void init_channels(emb::array<impl::Channel, ChannelId::count>& channels);
 
 
-void init_irqs(emb::array<impl::Irq, IrqName::count>& irqs);
+void init_irqs(emb::array<impl::Irq, IrqId::count>& irqs);
 
 } // namespace impl
 
@@ -91,8 +91,8 @@ private:
     impl::Module _module;
     const uint32_t sample_window_cycles;
 
-    static emb::array<impl::Channel, ChannelName::count> _channels;
-    static emb::array<impl::Irq, IrqName::count> _irqs;
+    static emb::array<impl::Channel, ChannelId::count> _channels;
+    static emb::array<impl::Irq, IrqId::count> _irqs;
     static bool _channels_and_irqs_initialized;
 public:
     Module(Peripheral peripheral, const adc::Config& config);
@@ -102,12 +102,12 @@ public:
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
 
-    void start(ChannelName channel) {
+    void start(ChannelId channel) {
         assert(_channels[channel.underlying_value()].peripheral == _peripheral);
         ADC_forceSOC(_module.base, _channels[channel.underlying_value()].soc);
     }
 
-    uint16_t read(ChannelName channel) const {
+    uint16_t read(ChannelId channel) const {
         assert(_channels[channel.underlying_value()].peripheral == _peripheral);
         return ADC_readResult(_module.result_base, _channels[channel.underlying_value()].soc);
     }
@@ -128,23 +128,23 @@ public:
         }
     }
 
-    void register_interrupt_handler(IrqName irq, void (*handler)(void)) {
+    void register_interrupt_handler(IrqId irq, void (*handler)(void)) {
         assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
         Interrupt_register(_irqs[irq.underlying_value()].pie_int_num, handler);
     }
 
-    void acknowledge_interrupt(IrqName irq) {
+    void acknowledge_interrupt(IrqId irq) {
         assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
         ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
         Interrupt_clearACKGroup(impl::adc_pie_int_groups[_irqs[irq.underlying_value()].int_num]);
     }
 
-    bool interrupt_pending(IrqName irq) const {
+    bool interrupt_pending(IrqId irq) const {
         assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
         return ADC_getInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
     }
 
-    void clear_interrupt_status(IrqName irq) {
+    void clear_interrupt_status(IrqId irq) {
         assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
         ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
     }
@@ -154,14 +154,14 @@ public:
 class Channel {
 private:
     Module* _adc;
-    ChannelName _channel;
+    ChannelId _channel;
 public:
-    Channel() : _adc(static_cast<Module*>(NULL)), _channel(ChannelName::count) {}
-    Channel(ChannelName channel) {
+    Channel() : _adc(static_cast<Module*>(NULL)), _channel(ChannelId::count) {}
+    Channel(ChannelId channel) {
         init(channel);
     }
 
-    void init(ChannelName channel) {
+    void init(ChannelId channel) {
         assert(Module::_channels_and_irqs_initialized);
         assert(Module::_channels[channel.underlying_value()].registered);
         _channel = channel;

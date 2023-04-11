@@ -11,8 +11,8 @@ const uint16_t impl::adc_pie_int_groups[4] = {INTERRUPT_ACK_GROUP1, INTERRUPT_AC
         INTERRUPT_ACK_GROUP10, INTERRUPT_ACK_GROUP10};
 
 
-emb::array<impl::Channel, ChannelName::count> Module::_channels;
-emb::array<impl::Irq, IrqName::count> Module::_irqs;
+emb::array<impl::Channel, ChannelId::count> Module::_channels;
+emb::array<impl::Irq, IrqId::count> Module::_irqs;
 bool Module::_channels_and_irqs_initialized = false;
 
 
