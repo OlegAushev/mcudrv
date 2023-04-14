@@ -516,7 +516,7 @@ public:
         }
     }
 
-    void set_phase_shift(const emb::array<uint16_t, Phases> phase_shift) {
+    void set_phase_shift(const emb::array<uint16_t, Phases>& phase_shift) {
         for (int i = 0; i < Phases; ++i) {
             EPWM_setPhaseShift(_module.base[i], phase_shift[i]);
         }
