@@ -36,6 +36,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 
 SCOPED_ENUM_DECLARE_BEGIN(PhaseCount) {
     one = 1,
+    two = 2,
     three = 3,
     six = 6
 } SCOPED_ENUM_DECLARE_END(PhaseCount)
@@ -106,6 +107,15 @@ struct Config {
 };
 
 
+template <PhaseCount::enum_type Phases>
+struct SyncConfig {
+    uint16_t sync_delay[Phases];    // delays from internal master module to slave modules, p.1876 of RM
+    EPWM_SyncOutPulseMode sync_out_mode[Phases];
+    bool enable_phase_shift[Phases];
+
+};
+
+
 namespace impl {
 
 template <PhaseCount::enum_type Phases>
@@ -139,14 +149,15 @@ private:
     float _switching_freq;
     uint16_t _deadtime_cycles;
 
-    uint16_t _period;		// TBPRD register value
+    uint16_t _period;               // TBPRD register value
     uint16_t _phase_shift[Phases];	// TBPHS registers values
+    uint16_t _sync_delay[Phases];   // delay from internal master module to slave modules, p.1876
 
     State _state;
 public:
     Module(const emb::array<Peripheral, Phases>& peripherals,
             const emb::array<mcu::gpio::Config, 2*Phases>& pins,
-            const pwm::Config& config)
+            const pwm::Config& config, const pwm::SyncConfig<Phases> sync_config)
             : _timebase_clk_freq(pwm_clk_freq / config.clock_prescaler)
             , _timebase_cycle_ns(pwm_clk_cycle_ns * config.clock_prescaler)
             , _counter_mode(config.counter_mode)
@@ -162,6 +173,7 @@ public:
 
         for (int i = 0; i < Phases; ++i) {
             _phase_shift[i] = 0;
+            _sync_delay[i] = sync_config.sync_delay[i];
         }
 
 #ifdef CPU1
@@ -222,80 +234,29 @@ public:
 
             /* ========================================================================== */
             // Sync out pulse event
-            switch (Phases) {
-            case PhaseCount::six:
-            case PhaseCount::three:
-                if ((i == 0) && (_module.base[i] == EPWM1_BASE)) {
-                    // EPWM1 is master
-                    EPWM_setSyncOutPulseMode(_module.base[i], EPWM_SYNC_OUT_PULSE_ON_COUNTER_ZERO);
-                } else {
-                    // other modules sync is pass-through
-                    EPWM_setSyncOutPulseMode(_module.base[i], EPWM_SYNC_OUT_PULSE_ON_EPWMxSYNCIN);
-                }
-                break;
-            case PhaseCount::one:
-                if (_module.base[i] == EPWM1_BASE) {
-                    EPWM_setSyncOutPulseMode(_module.base[i], EPWM_SYNC_OUT_PULSE_ON_COUNTER_ZERO);
-                } else {
-                    EPWM_setSyncOutPulseMode(_module.base[i], EPWM_SYNC_OUT_PULSE_ON_EPWMxSYNCIN);
-                }
-                break;
-            }
+            EPWM_setSyncOutPulseMode(_module.base[i], sync_config.sync_out_mode[i]);
 
             /* ========================================================================== */
             // Time-base counter synchronization and phase shift
-            switch (Phases) {
-            case PhaseCount::six:
-            case PhaseCount::three:
-                if ((i == 0) && (_module.base[i] == EPWM1_BASE)) {
-                    // EPWM1 is master, EPWM4,7,10 are synced to it
-                    // master has no phase shift
-                    EPWM_disablePhaseShiftLoad(_module.base[i]);
-                    EPWM_setPhaseShift(_module.base[i], 0);
-                } else {
-                    EPWM_enablePhaseShiftLoad(_module.base[i]);
-                    switch (config.counter_mode.native_value()) {
-                    case CounterMode::up:
-                        EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
-                        // 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
-                        EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
-                        break;
-                    case CounterMode::down:
-                        EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_DOWN_AFTER_SYNC);
-                        EPWM_setPhaseShift(_module.base[i], _phase_shift[i]);
-                        break;
-                    case CounterMode::updown:
-                        EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
-                        // 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
-                        EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
-                        break;
-                    }
+            if (!sync_config.enable_phase_shift[i]) {
+                EPWM_disablePhaseShiftLoad(_module.base[i]);
+                EPWM_setPhaseShift(_module.base[i], 0);
+            } else {
+                EPWM_enablePhaseShiftLoad(_module.base[i]);
+                switch (config.counter_mode.native_value()) {
+                case CounterMode::up:
+                    EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
+                    EPWM_setPhaseShift(_module.base[i], _sync_delay[i]);
+                    break;
+                case CounterMode::down:
+                    EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_DOWN_AFTER_SYNC);
+                    EPWM_setPhaseShift(_module.base[i], _period - _sync_delay[i]);
+                    break;
+                case CounterMode::updown:
+                    EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
+                    EPWM_setPhaseShift(_module.base[i], _sync_delay[i]);
+                    break;
                 }
-                break;
-            case PhaseCount::one:
-                if (_module.base[i] == EPWM1_BASE) {
-                    EPWM_disablePhaseShiftLoad(_module.base[i]);
-                    EPWM_setPhaseShift(_module.base[i], 0);
-                } else {
-                    EPWM_enablePhaseShiftLoad(_module.base[i]);
-                    switch (config.counter_mode.native_value()) {
-                    case CounterMode::up:
-                        EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
-                        // 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
-                        EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
-                        break;
-                    case CounterMode::down:
-                        EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_DOWN_AFTER_SYNC);
-                        EPWM_setPhaseShift(_module.base[i], _phase_shift[i]);
-                        break;
-                    case CounterMode::updown:
-                        EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
-                        // 2 x EPWMCLK - delay from internal master module to slave modules, p.1876
-                        EPWM_setPhaseShift(_module.base[i], 2 + _phase_shift[i]);
-                        break;
-                    }
-                }
-                break;
             }
 
             /* ========================================================================== */
