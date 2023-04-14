@@ -202,8 +202,8 @@ public:
             /* ========================================================================== */
             // Clock prescaler
             EPWM_setClockPrescaler(_module.base[i],
-                    static_cast<EPWM_ClockDivider>(config.clk_divider.underlying_value()),
-                    static_cast<EPWM_HSClockDivider>(config.hsclk_divider.underlying_value()));
+                                   static_cast<EPWM_ClockDivider>(config.clk_divider.underlying_value()),
+                                   static_cast<EPWM_HSClockDivider>(config.hsclk_divider.underlying_value()));
 
             /* ========================================================================== */
             // Compare values
@@ -212,7 +212,7 @@ public:
             /* ========================================================================== */
             // Counter mode
             EPWM_setTimeBaseCounterMode(_module.base[i],
-                    static_cast<EPWM_TimeBaseCountMode>(config.counter_mode.underlying_value()));
+                                        static_cast<EPWM_TimeBaseCountMode>(config.counter_mode.underlying_value()));
 
 #ifdef CPU1
             /* ========================================================================== */
@@ -273,21 +273,21 @@ public:
             switch (config.counter_mode.native_value()) {
             case CounterMode::up:
                 EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_A,
-                        EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);
+                                              EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_A,
-                        EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);
+                                              EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);
                 break;
             case CounterMode::down:
                 EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_A,
-                        EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);
+                                              EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_A,
-                        EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);
+                                              EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);
                 break;
             case CounterMode::updown:
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_A,
-                        EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);
+                                              EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPA);
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_A,
-                        EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);
+                                              EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPA);
                 break;
             }
 
@@ -295,21 +295,21 @@ public:
             switch (config.counter_mode.native_value()) {
             case CounterMode::up:
                 EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_B,
-                        EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);
+                                              EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_ZERO);
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
-                        EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);
+                                              EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);
                 break;
             case CounterMode::down:
                 EPWM_setActionQualifierAction(_module.base[i],	EPWM_AQ_OUTPUT_B,
-                        EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);
+                                              EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
-                        EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);
+                                              EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_PERIOD);
                 break;
             case CounterMode::updown:
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
                         EPWM_AQ_OUTPUT_HIGH, EPWM_AQ_OUTPUT_ON_TIMEBASE_DOWN_CMPB);
                 EPWM_setActionQualifierAction(_module.base[i], EPWM_AQ_OUTPUT_B,
-                        EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);
+                                              EPWM_AQ_OUTPUT_LOW, EPWM_AQ_OUTPUT_ON_TIMEBASE_UP_CMPB);
                 break;
             }
 
@@ -483,26 +483,16 @@ public:
         }
     }
 
-    void set_compare_values(const uint16_t cmp_values[],
-                            CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_compare_value(const emb::array<uint16_t, Phases>& cmp_value,
+                           CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                                        cmp_values[i]);
+                                        cmp_value[i]);
         }
     }
 
-    void set_compare_values(const emb::array<uint16_t, Phases>& cmp_values,
-                            CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (int i = 0; i < Phases; ++i) {
-            EPWM_setCounterCompareValue(_module.base[i],
-                            static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                            cmp_values[i]);
-        }
-    }
-
-    void set_compare_value(uint16_t cmp_value,
-                           CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_compare_value(uint16_t cmp_value, CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
@@ -510,21 +500,25 @@ public:
         }
     }
 
-    void set_duty_cycles(const emb::array<float, Phases>& duty_cycles,
-                         CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_duty_cycle(const emb::array<float, Phases>& duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                                        static_cast<uint16_t>(duty_cycles[i] * _period));
+                                        static_cast<uint16_t>(duty_cycle[i] * _period));
         }
     }
 
-    void set_duty_cycle(float duty_cycle,
-                        CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_duty_cycle(float duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         static_cast<uint16_t>(duty_cycle * _period));
+        }
+    }
+
+    void set_phase_shift(const emb::array<uint16_t, Phases> phase_shift) {
+        for (int i = 0; i < Phases; ++i) {
+            EPWM_setPhaseShift(_module.base[i], phase_shift[i]);
         }
     }
 
