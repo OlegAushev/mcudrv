@@ -9,7 +9,7 @@ namespace mcu {
 
 namespace crc {
 
-inline uint32_t calc_crc32(const uint16_t* buf, size_t bytes) {
+inline uint32_t calc_crc32(const uint16_t* buf, int bytes) {
     // CRC-32/MPEG-2
     CRC_Obj crc_obj;
 
@@ -28,7 +28,7 @@ inline uint32_t calc_crc32(const uint16_t* buf, size_t bytes) {
 }
 
 
-inline uint32_t calc_crc32_byte8(const uint8_t* buf, size_t len) {
+inline uint32_t calc_crc32_byte8(const uint8_t* buf, int len) {
     // calculate CRC with padding zeros
     return calc_crc32(buf, len*2);
 }

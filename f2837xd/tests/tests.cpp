@@ -156,7 +156,7 @@ void mcu::tests::chrono_test() {
 
     mcu::chrono::Timeout timeout(emb::chrono::milliseconds(20));
     EMB_ASSERT_TRUE(!timeout.expired());
-    for (size_t i = 0; i < 15; ++i) {
+    for (int i = 0; i < 15; ++i) {
         mcu::delay(emb::chrono::milliseconds(1));
         EMB_ASSERT_TRUE(!timeout.expired());
     }
@@ -165,7 +165,7 @@ void mcu::tests::chrono_test() {
 
     timeout.reset();
     EMB_ASSERT_TRUE(!timeout.expired());
-    for (size_t i = 0; i < 15; ++i) {
+    for (int i = 0; i < 15; ++i) {
         mcu::delay(emb::chrono::milliseconds(1));
         EMB_ASSERT_TRUE(!timeout.expired());
     }

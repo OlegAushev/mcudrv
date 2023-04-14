@@ -153,14 +153,14 @@ public:
             , _switching_freq(config.switching_freq)
             , _deadtime_cycles(config.deadtime_ns / _timebase_cycle_ns)
             , _state(State::off) {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             _peripheral[i] = peripherals[i];
             _module.base[i] = impl::pwm_bases[peripherals[i].underlying_value()];
         }
         _module.pie_event_int_num = impl::pwm_pie_event_int_nums[peripherals[0].underlying_value()];
         _module.pie_trip_int_num = impl::pwm_pie_trip_int_nums[peripherals[0].underlying_value()];
 
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             _phase_shift[i] = 0;
         }
 
@@ -183,7 +183,7 @@ public:
             break;
         }
 
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setTimeBasePeriod(_module.base[i], _period);
             EPWM_setTimeBaseCounter(_module.base[i], 0);
 
@@ -477,7 +477,7 @@ public:
             break;
         }
 
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             // Enable tzSignal as one shot trip source
             EPWM_enableTripZoneSignals(_module.base[i], tripzone_signal);
         }
@@ -489,11 +489,11 @@ public:
                                          const emb::array<mcu::gpio::Config, 2*Phases> pins) {
         SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);  // Disable sync(Freeze clock to PWM as well)
         _init_pins(pins);
-        for (size_t i = 0; i < pins.size(); ++i) {
+        for (int i = 0; i < pins.size(); ++i) {
             GPIO_setMasterCore(pins[i].no, GPIO_CORE_CPU2);
         }
 
-        for (size_t i = 0; i < peripherals.size(); ++i) {
+        for (int i = 0; i < peripherals.size(); ++i) {
             SysCtl_selectCPUForPeripheral(SYSCTL_CPUSEL0_EPWM, peripherals[i].underlying_value()+1, SYSCTL_CPUSEL_CPU2);
         }
 
@@ -517,14 +517,14 @@ public:
             break;
         }
 
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setTimeBasePeriod(_module.base[i], _period);
         }
     }
 
     void set_compare_values(const uint16_t cmp_values[],
                             CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         cmp_values[i]);
@@ -533,7 +533,7 @@ public:
 
     void set_compare_values(const emb::array<uint16_t, Phases>& cmp_values,
                             CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                             static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                             cmp_values[i]);
@@ -542,7 +542,7 @@ public:
 
     void set_compare_value(uint16_t cmp_value,
                            CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         cmp_value);
@@ -551,7 +551,7 @@ public:
 
     void set_duty_cycles(const emb::array<float, Phases>& duty_cycles,
                          CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         static_cast<uint16_t>(duty_cycles[i] * _period));
@@ -560,7 +560,7 @@ public:
 
     void set_duty_cycle(float duty_cycle,
                         CounterCompareModule cmp_module = CounterCompareModule::a) {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
                                         static_cast<uint16_t>(duty_cycle * _period));
@@ -569,13 +569,13 @@ public:
 
     void start() {
         _state = State::on;
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_clearTripZoneFlag(_module.base[i], EPWM_TZ_INTERRUPT | EPWM_TZ_FLAG_OST);
         }
     }
 
     void stop() {
-        for (size_t i = 0; i < Phases; ++i) {
+        for (int i = 0; i < Phases; ++i) {
             EPWM_forceTripZoneEvent(_module.base[i], EPWM_TZ_FORCE_EVENT_OST);
         }
         _state = State::off;
@@ -606,7 +606,7 @@ public:
 protected:
 #ifdef CPU1
     static void _init_pins(const emb::array<mcu::gpio::Config, 2*Phases> pins) {
-        for (size_t i = 0; i < pins.size(); ++i) {
+        for (int i = 0; i < pins.size(); ++i) {
             GPIO_setPadConfig(pins[i].no, GPIO_PIN_TYPE_STD);
             GPIO_setPinConfig(pins[i].mux);
         }

@@ -204,9 +204,9 @@ public:
 class InputDebouncer {
 private:
     const Input _pin;
-    const unsigned int _active_debounce_count;
-    const unsigned int _inactive_debounce_count;
-    unsigned int _count;
+    const int _active_debounce_count;
+    const int _inactive_debounce_count;
+    int _count;
     emb::gpio::State _state;
     bool _state_changed;
 public:

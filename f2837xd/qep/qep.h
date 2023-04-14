@@ -18,7 +18,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
-const size_t peripheral_count = 3;
+const int peripheral_count = 3;
 
 
 SCOPED_ENUM_DECLARE_BEGIN(InputMode) {

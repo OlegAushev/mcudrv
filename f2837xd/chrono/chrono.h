@@ -21,22 +21,22 @@ class system_clock : public emb::monostate<system_clock> {
 private:
     static volatile int64_t _time;
     static const emb::chrono::milliseconds time_step;
-    static const size_t task_count_max = 4;
+    static const int task_count_max = 4;
 private:
     struct Task {
         emb::chrono::milliseconds period;
         emb::chrono::milliseconds timepoint;
-        TaskStatus (*func)(size_t);
+        TaskStatus (*func)(int);
     };
     static TaskStatus empty_task() { return TaskStatus::success; }
     static emb::static_vector<Task, task_count_max> _tasks;
 public:
-    static void add_task(TaskStatus (*func)(size_t), emb::chrono::milliseconds period) {
+    static void add_task(TaskStatus (*func)(int), emb::chrono::milliseconds period) {
         Task task = {period, now(), func};
         _tasks.push_back(task);
     }
 
-    static void set_task_period(size_t index, emb::chrono::milliseconds period) {
+    static void set_task_period(int index, emb::chrono::milliseconds period) {
         if (index < _tasks.size()) {
             _tasks[index].period = period;
         }
@@ -64,7 +64,7 @@ public:
 
     static void reset() {
         _time = 0;
-        for (size_t i = 0; i < _tasks.size(); ++i) {
+        for (int i = 0; i < _tasks.size(); ++i) {
             _tasks[i].timepoint = now();
         }
     }

@@ -19,7 +19,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
-const size_t peripheral_count = 4;
+const int peripheral_count = 4;
 
 
 SCOPED_ENUM_UT_DECLARE_BEGIN(Baudrate, uint32_t) {
@@ -110,18 +110,18 @@ public:
         return 0;
     }
 
-    virtual int recv(char* buf, size_t bufLen) {
-        size_t i = 0;
+    virtual int recv(char* buf, int buf_len) {
+        int count = 0;
         char ch = 0;
 
-        while ((i < bufLen) && (getchar(ch) == 1)) {
-            buf[i++] = ch;
+        while ((count < buf_len) && (getchar(ch) == 1)) {
+            buf[count++] = ch;
         }
 
         if (has_rx_error()) {
             return -1;
         }
-        return i;
+        return count;
     }
 
     virtual int putchar(char ch) {

@@ -19,7 +19,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
-const size_t peripheral_count = 4;
+const int peripheral_count = 4;
 
 
 struct Config {
@@ -113,7 +113,7 @@ public:
     }
 
     void enable_interrupts() {
-        for (size_t i = 0; i < _irqs.size(); ++i) {
+        for (int i = 0; i < _irqs.size(); ++i) {
             if (_irqs[i].peripheral == _peripheral) {
                 Interrupt_enable(_irqs[i].pie_int_num);
             }
@@ -121,7 +121,7 @@ public:
     }
 
     void disable_interrupts() {
-        for (size_t i = 0; i < _irqs.size(); ++i) {
+        for (int i = 0; i < _irqs.size(); ++i) {
             if (_irqs[i].peripheral == _peripheral) {
                 Interrupt_disable(_irqs[i].pie_int_num);
             }
