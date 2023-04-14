@@ -245,11 +245,9 @@ public:
                 EPWM_enablePhaseShiftLoad(_module.base[i]);
                 switch (config.counter_mode.native_value()) {
                 case CounterMode::up:
-                    EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_UP_AFTER_SYNC);
                     EPWM_setPhaseShift(_module.base[i], _sync_delay[i]);
                     break;
                 case CounterMode::down:
-                    EPWM_setCountModeAfterSync(_module.base[i], EPWM_COUNT_MODE_DOWN_AFTER_SYNC);
                     EPWM_setPhaseShift(_module.base[i], _period - _sync_delay[i]);
                     break;
                 case CounterMode::updown:
