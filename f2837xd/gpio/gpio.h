@@ -138,6 +138,11 @@ public:
                 - (GPIO_readPin(_config.no) ^ static_cast<uint32_t>(_config.active_state.underlying_value())));
     }
 
+    virtual int read_level() const {
+        assert(_initialized);
+        return GPIO_readPin(_config.no);
+    }
+
 public:
 #ifdef CPU1
     void set_interrupt(GPIO_ExternalIntNum intNum) {
@@ -197,6 +202,16 @@ public:
     virtual void toggle() {
         assert(_initialized);
         GPIO_togglePin(_config.no);
+    }
+
+    virtual int read_level() const {
+        assert(_initialized);
+        return GPIO_readPin(_config.no);
+    }
+
+    virtual void set_level(int level) {
+        assert(_initialized);
+        GPIO_writePin(_config.no, level);
     }
 };
 
