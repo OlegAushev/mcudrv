@@ -7,6 +7,7 @@ namespace can {
 
 const uint32_t impl::can_bases[2] = {CANA_BASE, CANB_BASE};
 const uint32_t impl::can_pie_int_nums[2] = {INT_CANA0, INT_CANB0};
+const SysCtl_CPUSelPeriphInstance impl::can_cpusel_instances[2] = {SYSCTL_CPUSEL_CANA, SYSCTL_CPUSEL_CANB};
 
 void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint32_t, uint16_t);
 
@@ -48,7 +49,7 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config&
     _init_pins(rx_pin, tx_pin);
     GPIO_setMasterCore(rx_pin.no, GPIO_CORE_CPU2);
     GPIO_setMasterCore(tx_pin.no, GPIO_CORE_CPU2);
-    SysCtl_selectCPUForPeripheral(SYSCTL_CPUSEL8_CAN, peripheral.underlying_value()+1, SYSCTL_CPUSEL_CPU2);
+    SysCtl_selectCPUForPeripheralInstance(impl::can_cpusel_instances[peripheral.underlying_value()], SYSCTL_CPUSEL_CPU2);
 }
 #endif
 

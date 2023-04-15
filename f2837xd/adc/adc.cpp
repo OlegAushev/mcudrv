@@ -8,7 +8,9 @@ namespace adc {
 const uint32_t impl::adc_bases[4] = {ADCA_BASE, ADCB_BASE, ADCC_BASE, ADCD_BASE};
 const uint32_t impl::adc_result_bases[4]= {ADCARESULT_BASE, ADCBRESULT_BASE, ADCCRESULT_BASE, ADCDRESULT_BASE};
 const uint16_t impl::adc_pie_int_groups[4] = {INTERRUPT_ACK_GROUP1, INTERRUPT_ACK_GROUP10,
-        INTERRUPT_ACK_GROUP10, INTERRUPT_ACK_GROUP10};
+                                              INTERRUPT_ACK_GROUP10, INTERRUPT_ACK_GROUP10};
+const SysCtl_CPUSelPeriphInstance impl::adc_cpusel_instances[4] = {SYSCTL_CPUSEL_ADCA, SYSCTL_CPUSEL_ADCB,
+                                                                   SYSCTL_CPUSEL_ADCC, SYSCTL_CPUSEL_ADCD};
 
 
 emb::array<impl::Channel, ChannelId::count> Module::_channels;
@@ -59,23 +61,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
 
 #ifdef CPU1
 void Module::transfer_control_to_cpu2(Peripheral peripheral) {
-    SysCtl_CPUSelPeriphInstance peripheral_;
-    switch (peripheral.native_value()) {
-    case Peripheral::adca:
-        peripheral_ = SYSCTL_CPUSEL_ADCA;
-        break;
-    case Peripheral::adcb:
-        peripheral_ = SYSCTL_CPUSEL_ADCB;
-        break;
-    case Peripheral::adcc:
-        peripheral_ = SYSCTL_CPUSEL_ADCC;
-        break;
-    case Peripheral::adcd:
-        peripheral_ = SYSCTL_CPUSEL_ADCD;
-        break;
-    }
-
-    SysCtl_selectCPUForPeripheralInstance(peripheral_ ,SYSCTL_CPUSEL_CPU2);
+    SysCtl_selectCPUForPeripheralInstance(impl::adc_cpusel_instances[peripheral.underlying_value()], SYSCTL_CPUSEL_CPU2);
 }
 #endif
 

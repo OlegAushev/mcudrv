@@ -40,6 +40,7 @@ struct Module {
 extern const uint32_t adc_bases[4];
 extern const uint32_t adc_result_bases[4];
 extern const uint16_t adc_pie_int_groups[4];
+extern const SysCtl_CPUSelPeriphInstance adc_cpusel_instances[4];
 
 
 struct Channel {

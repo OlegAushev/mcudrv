@@ -64,6 +64,7 @@ struct Module {
 
 extern const uint32_t can_bases[2];
 extern const uint32_t can_pie_int_nums[2];
+extern const SysCtl_CPUSelPeriphInstance can_cpusel_instances[2];
 
 } // namespace impl
 
