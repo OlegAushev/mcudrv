@@ -2,6 +2,7 @@
 
 
 void mcu::tests::gpio_test() {
+#ifdef MCU_TESTS_ENABLED
 #ifdef _LAUNCHXL_F28379D
     mcu::gpio::Config led_blue_cfg(31, GPIO_31_GPIO31, mcu::gpio::Direction::output, emb::gpio::ActiveState::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
     mcu::gpio::Config led_red_cfg(34, GPIO_34_GPIO34, mcu::gpio::Direction::output, emb::gpio::ActiveState::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
@@ -133,6 +134,7 @@ void mcu::tests::gpio_test() {
 #elif defined(ON_TARGET_TESTS)
 #warning "LAUNCHXL is required for full testing."
 #endif
+#endif
 }
 
 
@@ -142,6 +144,7 @@ void TestingDelayedTask() {
 
 
 void mcu::tests::chrono_test() {
+#ifdef MCU_TESTS_ENABLED
     GPIO_writePin(34, 1);
 
     mcu::chrono::system_clock::register_delayed_task(TestingDelayedTask, emb::chrono::milliseconds(200));
@@ -171,10 +174,12 @@ void mcu::tests::chrono_test() {
     }
     mcu::delay(emb::chrono::milliseconds(6));
     EMB_ASSERT_TRUE(timeout.expired());
+#endif
 }
 
 
 void mcu::tests::crc_test() {
+#ifdef MCU_TESTS_ENABLED
     uint16_t input1[10] = {0x0201, 0x0403, 0x0605, 0x0807, 0x0A09, 0x0C0B, 0x0E0D, 0x000F, 0x55AA, 0xAA55};
     uint32_t crc1 = mcu::crc::calc_crc32(input1, 20);
     EMB_ASSERT_EQUAL(crc1, 0x7805DACE);
@@ -190,5 +195,6 @@ void mcu::tests::crc_test() {
     uint8_t input4[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
     uint32_t crc4 = mcu::crc::calc_crc32_byte8(input4, 5);
     EMB_ASSERT_EQUAL(crc4, 0x4EFF913E);
+#endif
 }
 
