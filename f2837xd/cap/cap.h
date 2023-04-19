@@ -3,139 +3,66 @@
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib_c28x/array.h>
-#include <emblib_c28x/core.h>
 
 
 namespace mcu {
 
-enum CapModule {
-    CAP1,
-    CAP2,
-    CAP3,
-    CAP4,
-    CAP5,
-    CAP6
-};
+namespace cap {
+
+SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+    cap1,
+    cap2,
+    cap3,
+    cap4,
+    cap5,
+    cap6
+} SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
-template <unsigned int ChannelCount>
-struct CapConfig {
-    CapModule module[ChannelCount];
-    mcu::gpio::Input inputPin[ChannelCount];
-};
+const int peripheral_count = 6;
 
 
 namespace impl {
 
-template <unsigned int ChannelCount>
-struct CapModuleImpl {
-    CapModule instance[ChannelCount];
-    uint32_t base[ChannelCount];
-    XBAR_InputNum xbarInput[ChannelCount];
-    uint32_t pieIntNum[ChannelCount];
+struct Module {
+    uint32_t base;
+    XBAR_InputNum xbar_input;
+    uint32_t pie_int_num;
+    Module(uint32_t base_, XBAR_InputNum xbar_input_, uint32_t pie_int_num_)
+            : base(base_), xbar_input(xbar_input_), pie_int_num(pie_int_num_) {}
 };
 
 
-extern const uint32_t capBases[6];
-extern const XBAR_InputNum capXbarInputs[6];
-extern const uint32_t capPieIntNums[6];
+extern const uint32_t cap_bases[6];
+extern const XBAR_InputNum cap_xbar_inputs[6];
+extern const uint32_t cap_pie_int_nums[6];
 
 } // namespace impl
 
 
-template <unsigned int ChannelCount>
-class Cap {
+class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
-    impl::CapModuleImpl<ChannelCount> m_module;
-private:
-    Cap(const Cap& other);			// no copy constructor
-    Cap& operator=(const Cap& other);	// no copy assignment operator
+    const Peripheral _peripheral;
+    impl::Module _module;
+    gpio::Input _pin;
 public:
-    Cap(const CapConfig<ChannelCount>& conf) {
-        EMB_STATIC_ASSERT(ChannelCount > 0);
-        EMB_STATIC_ASSERT(ChannelCount <= 6);
+    Module(Peripheral peripheral, const gpio::Config& pin_config);
+    Peripheral peripheral() const { return _peripheral; }
+    uint32_t base() const { return _module.base; }
 
-        // XBAR setup
-        for (size_t i = 0; i < ChannelCount; ++i) {
-            m_module.instance[i] = conf.module[i];
-            m_module.base[i] = impl::capBases[conf.module[i]];
-            m_module.xbarInput[i] = impl::capXbarInputs[conf.module[i]];
-            m_module.pieIntNum[i] = impl::capPieIntNums[conf.module[i]];
-            XBAR_setInputPin(m_module.xbarInput[i], conf.inputPin[i].config().no);
-        }
+    void rearm() { ECAP_reArm(_module.base); }
 
-        /* ECAP setup */
-        for (size_t i = 0; i < ChannelCount; ++i) {
-            ECAP_disableInterrupt(m_module.base[i],
-                                  (ECAP_ISR_SOURCE_CAPTURE_EVENT_1  |
-                                   ECAP_ISR_SOURCE_CAPTURE_EVENT_2  |
-                                   ECAP_ISR_SOURCE_CAPTURE_EVENT_3  |
-                                   ECAP_ISR_SOURCE_CAPTURE_EVENT_4  |
-                                   ECAP_ISR_SOURCE_COUNTER_OVERFLOW |
-                                   ECAP_ISR_SOURCE_COUNTER_PERIOD   |
-                                   ECAP_ISR_SOURCE_COUNTER_COMPARE));
-            ECAP_clearInterrupt(m_module.base[i],
-                                (ECAP_ISR_SOURCE_CAPTURE_EVENT_1  |
-                                 ECAP_ISR_SOURCE_CAPTURE_EVENT_2  |
-                                 ECAP_ISR_SOURCE_CAPTURE_EVENT_3  |
-                                 ECAP_ISR_SOURCE_CAPTURE_EVENT_4  |
-                                 ECAP_ISR_SOURCE_COUNTER_OVERFLOW |
-                                 ECAP_ISR_SOURCE_COUNTER_PERIOD   |
-                                 ECAP_ISR_SOURCE_COUNTER_COMPARE));
-
-            ECAP_disableTimeStampCapture(m_module.base[i]);
-
-            ECAP_stopCounter(m_module.base[i]);
-            ECAP_enableCaptureMode(m_module.base[i]);
-            ECAP_setCaptureMode(m_module.base[i], ECAP_CONTINUOUS_CAPTURE_MODE, ECAP_EVENT_2);
-
-
-            ECAP_setEventPolarity(m_module.base[i], ECAP_EVENT_1, ECAP_EVNT_RISING_EDGE);
-            ECAP_setEventPolarity(m_module.base[i], ECAP_EVENT_2, ECAP_EVNT_FALLING_EDGE);
-
-            ECAP_enableCounterResetOnEvent(m_module.base[i], ECAP_EVENT_1);
-            ECAP_enableCounterResetOnEvent(m_module.base[i], ECAP_EVENT_2);
-
-            ECAP_setSyncOutMode(m_module.base[i], ECAP_SYNC_OUT_DISABLED);
-            ECAP_startCounter(m_module.base[i]);
-            ECAP_enableTimeStampCapture(m_module.base[i]);
-            ECAP_reArm(m_module.base[i]);
-        }
+    void register_interrupt_handler(void (*handler)(void)) {
+        Interrupt_register(_module.pie_int_num, handler);
+        ECAP_enableInterrupt(_module.base, ECAP_ISR_SOURCE_CAPTURE_EVENT_1);
+        ECAP_enableInterrupt(_module.base, ECAP_ISR_SOURCE_CAPTURE_EVENT_2);
+        ECAP_enableInterrupt(_module.base, ECAP_ISR_SOURCE_COUNTER_OVERFLOW);
     }
-
-    void rearm() const {
-        for (int i = 0; i < ChannelCount; ++i) {
-            ECAP_reArm(m_module.base[i]);
-        }
-    }
-
-    void enableInterrupts() const {
-        for (int i = 0; i < ChannelCount; ++i) {
-            ECAP_enableInterrupt(m_module.base[i], ECAP_ISR_SOURCE_CAPTURE_EVENT_1);
-            ECAP_enableInterrupt(m_module.base[i], ECAP_ISR_SOURCE_CAPTURE_EVENT_2);
-            ECAP_enableInterrupt(m_module.base[i], ECAP_ISR_SOURCE_COUNTER_OVERFLOW);
-        }
-    }
-
-    void disableInterrupts() const {
-        for (int i = 0; i < ChannelCount; ++i) {
-            ECAP_disableInterrupt(m_module.base[i], ECAP_ISR_SOURCE_CAPTURE_EVENT_1);
-            ECAP_disableInterrupt(m_module.base[i], ECAP_ISR_SOURCE_CAPTURE_EVENT_2);
-            ECAP_disableInterrupt(m_module.base[i], ECAP_ISR_SOURCE_COUNTER_OVERFLOW);
-        }
-    }
-
-    void registerInterruptHandler(CapModule module, void (*handler)(void)) const {
-        for (int i = 0; i < ChannelCount; ++i) {
-            if (m_module.instance[i] == module) {
-                Interrupt_register(m_module.pieIntNum[i], handler);
-                Interrupt_enable(m_module.pieIntNum[i]);
-                return;
-            }
-        }
-    }
+    void enable_interrupts() { Interrupt_enable(_module.pie_int_num); }
+    void disable_interrupts() { Interrupt_disable(_module.pie_int_num); }
 };
+
+} // namespace cap
 
 } // namespace mcu
 
