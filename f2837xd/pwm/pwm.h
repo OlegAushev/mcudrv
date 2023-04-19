@@ -38,7 +38,8 @@ SCOPED_ENUM_DECLARE_BEGIN(PhaseCount) {
     one = 1,
     two = 2,
     three = 3,
-    six = 6
+    six = 6,
+    nine = 9,
 } SCOPED_ENUM_DECLARE_END(PhaseCount)
 
 
