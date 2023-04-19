@@ -49,6 +49,8 @@ public:
     Module(Peripheral peripheral, const gpio::Config& pin_config);
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
+    const gpio::Input& pin() const { return _pin; }
+    uint32_t counter() const { ECAP_getTimeBaseCounter(_module.base); }
 
     void rearm() { ECAP_reArm(_module.base); }
 
