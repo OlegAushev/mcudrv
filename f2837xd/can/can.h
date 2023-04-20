@@ -98,9 +98,10 @@ public:
     void register_interrupt_callback(void (*callback)(Module*, uint32_t, uint16_t));
     void enable_interrupts() { Interrupt_enable(_module.pie_int_num); }
     void disable_interrupts() { Interrupt_disable(_module.pie_int_num); }
+    uint32_t interrupt_cause() const { return CAN_getInterruptCause(_module.base); }
 
-    void acknowledge_interrupt(uint32_t int_cause) {
-        CAN_clearInterruptStatus(_module.base, int_cause);
+    void acknowledge_interrupt(uint32_t interrupt_cause) {
+        CAN_clearInterruptStatus(_module.base, interrupt_cause);
         CAN_clearGlobalInterruptStatus(_module.base, CAN_GLOBAL_INT_CANINT0);
         Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP9);
     }

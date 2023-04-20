@@ -50,18 +50,34 @@ public:
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
     const gpio::Input& pin() const { return _pin; }
-    uint32_t counter() const { ECAP_getTimeBaseCounter(_module.base); }
+    uint32_t counter() const { return ECAP_getTimeBaseCounter(_module.base); }
+    uint32_t event_timestamp(ECAP_Events event) const { return ECAP_getEventTimeStamp(_module.base, event); }
 
     void rearm() { ECAP_reArm(_module.base); }
 
-    void register_interrupt_handler(void (*handler)(void)) {
-        Interrupt_register(_module.pie_int_num, handler);
-        ECAP_enableInterrupt(_module.base, ECAP_ISR_SOURCE_CAPTURE_EVENT_1);
-        ECAP_enableInterrupt(_module.base, ECAP_ISR_SOURCE_CAPTURE_EVENT_2);
-        ECAP_enableInterrupt(_module.base, ECAP_ISR_SOURCE_COUNTER_OVERFLOW);
-    }
+    void register_interrupt_handler(void (*handler)(void));
+    void register_interrupt_callback(void (*callback)(Module*, uint16_t));
     void enable_interrupts() { Interrupt_enable(_module.pie_int_num); }
     void disable_interrupts() { Interrupt_disable(_module.pie_int_num); }
+    uint16_t interrupt_source() const { return ECAP_getInterruptSource(_module.base); }
+
+    void acknowledge_interrupt(uint16_t interrupt_source) {
+        ECAP_clearInterrupt(_module.base, interrupt_source);
+        ECAP_clearGlobalInterrupt(_module.base);
+        Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP4);
+    }
+protected:
+    static void (*_on_interrupt_callbacks[peripheral_count])(Module*, uint16_t);
+
+    template <Peripheral::enum_type Periph>
+    static interrupt void on_interrupt() {
+        Module* module = Module::instance(Periph);
+        uint16_t interrupt_source = ECAP_getInterruptSource(module->base());
+
+        _on_interrupt_callbacks[Periph](module, interrupt_source);
+
+        module->acknowledge_interrupt(interrupt_source);
+    }
 };
 
 } // namespace cap

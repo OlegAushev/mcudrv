@@ -68,6 +68,7 @@ void Module::register_interrupt_callback(void (*callback)(Module*, uint32_t, uin
         break;
     case Peripheral::canb:
         register_interrupt_handler(on_interrupt<Peripheral::canb>);
+        break;
     }
     _on_interrupt_callbacks[_peripheral.underlying_value()] = callback;
 }
