@@ -40,7 +40,7 @@ void system_clock::init() {
     Interrupt_enable(INT_TIMER0);
     CPUTimer_startTimer(CPUTIMER0_BASE);
 
-    _set_initialized();
+    set_initialized();
 }
 
 
@@ -84,7 +84,7 @@ void high_resolution_clock::init(emb::chrono::microseconds period) {
     CPUTimer_setPeriod(CPUTIMER1_BASE, _period);
     CPUTimer_setEmulationMode(CPUTIMER1_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 
-    _set_initialized();
+    set_initialized();
 }
 
 } // namespace chrono
