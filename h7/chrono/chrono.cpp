@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/chrono/chrono.h>
 
 
@@ -41,4 +43,6 @@ void system_clock::run_tasks() {
 } //namespace chrono
 
 } // namespace mcu
+
+#endif
 

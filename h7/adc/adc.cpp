@@ -1,10 +1,11 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/adc/adc.h>
 
 
 namespace mcu {
 
 namespace adc {
-
 
 Module::Module(Peripheral peripheral, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
@@ -68,4 +69,6 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *handle) {
     using namespace mcu::adc;
     Module::instance(impl::to_peripheral(handle->Instance))->on_error();
 }
+
+#endif
 

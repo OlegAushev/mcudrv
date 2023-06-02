@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include "tests.h"
 
 
@@ -29,3 +31,6 @@ void mcu::tests::chrono_test() {
         }
     }
 }
+
+#endif
+

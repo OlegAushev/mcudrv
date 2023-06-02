@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/system/system.h>
 
 
@@ -118,4 +120,6 @@ void assert_failed(uint8_t *file, uint32_t line) {
     emb::fatal_error(buf, line);
 }
 #endif // USE_FULL_ASSERT
+
+#endif
 

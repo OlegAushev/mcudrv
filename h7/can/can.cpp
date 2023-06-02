@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/can/can.h>
 
 
@@ -186,4 +188,6 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
         } while (HAL_FDCAN_GetRxFifoFillLevel(handle, FDCAN_RX_FIFO1) > 0); 
     }
 }
+
+#endif
 

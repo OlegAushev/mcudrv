@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/timers/timers_gp.h>
 
 
@@ -36,3 +38,6 @@ Timer::Timer(Peripheral peripheral, const Config& config)
 }
 
 } // namespace mcu
+
+#endif
+

@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/dma/dma.h>
 
 
@@ -24,4 +26,5 @@ extern "C" void DMA1_Stream3_IRQHandler(void) {
     HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream3)->peripheral_handle());
 }
 
+#endif
 

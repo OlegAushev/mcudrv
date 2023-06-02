@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include "tests.h"
 
 
@@ -30,4 +32,5 @@ void mcu::tests::gpio_test()
     bsp::nucleo::led_green.init(bsp::nucleo::led_green_config);
 }
 
+#endif
 

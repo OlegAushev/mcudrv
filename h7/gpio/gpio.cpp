@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/gpio/gpio.h>
 
 
@@ -55,4 +57,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     assert_param(pinNo <= 15);
     mcu::gpio::Input::on_interrupt[pinNo]();
 }
+
+#endif
 

@@ -1,3 +1,5 @@
+#ifdef STM32H7xx
+
 #include <mculib_stm32/h7/uart/uart.h>
 
 
@@ -42,4 +44,6 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 } // namespace uart
 
 } // namespace mcu
+
+#endif
 
