@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include <emblib_stm32/core.h>
@@ -88,4 +90,6 @@ protected:
 } // namespace chrono
 
 } // namespace mcu
+
+#endif
 

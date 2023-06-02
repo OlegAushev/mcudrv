@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include "../mcu_def.h"
 #include <emblib_stm32/core.h>
 #include <emblib_stm32/interfaces/gpio.h>
@@ -268,4 +270,6 @@ public:
 } // namespace gpio
 
 } // namespace mcu
+
+#endif
 

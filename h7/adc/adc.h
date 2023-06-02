@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef STM32H7xx
 
 #include "../mcu_def.h"
 #include "../system/system.h"
@@ -136,4 +137,6 @@ protected:
 } // namespace adc
 
 } // namespace mcu
+
+#endif
 

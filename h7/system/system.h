@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include "../mcu_def.h"
 #include <emblib_stm32/core.h>
 #include <cstdio>
@@ -79,4 +81,6 @@ inline float calculate_mcu_vref(uint32_t adcData) {
 }
 
 } // namespace mcu
+
+#endif
 

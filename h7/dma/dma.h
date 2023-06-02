@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include <array>
@@ -156,4 +158,6 @@ public:
 } // namespace dma
 
 } // namespace mcu
+
+#endif
 

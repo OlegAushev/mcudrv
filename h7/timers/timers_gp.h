@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
@@ -142,3 +144,6 @@ protected:
 } // namespace timers
 
 } // namespace mcu
+
+#endif
+

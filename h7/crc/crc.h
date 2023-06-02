@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 
@@ -46,4 +48,6 @@ public:
 } // namespace crc
 
 } // namespace mcu
+
+#endif
 

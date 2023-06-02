@@ -1,6 +1,8 @@
 #pragma once
 
 
+#ifdef STM32H7xx
+
 #include <emblib_stm32/testrunner/testrunner.h>
 
 #include "../system/system.h"
@@ -18,4 +20,6 @@ public:
 };
 
 } // namespace mcu
+
+#endif
 
