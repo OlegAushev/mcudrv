@@ -8,7 +8,7 @@
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include "../chrono/chrono.h"
-#include <bsp_stm32/nucleo_h743/leds/leds.h>
+#include <bsp_stm32/h743_nucleo/leds/leds.h>
 
 
 namespace mcu {
