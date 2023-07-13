@@ -41,8 +41,8 @@ public:
     }
 
     static HalStatus deinit() { return HAL_CRC_DeInit(&_handle); }
-    static uint32_t calculate(uint32_t* buf, uint32_t len) { return HAL_CRC_Accumulate(&_handle, buf, len); }
-    static uint32_t accumulate(uint32_t* buf, uint32_t len) { return HAL_CRC_Calculate(&_handle, buf, len); }
+    static uint32_t calculate(uint32_t* buf, uint32_t len) { return HAL_CRC_Calculate(&_handle, buf, len); }
+    static uint32_t accumulate(uint32_t* buf, uint32_t len) { return HAL_CRC_Accumulate(&_handle, buf, len); }
 };
 
 } // namespace crc
