@@ -30,7 +30,7 @@ void reset_device();
 void fatal_error(const char* hint, int code = 0);
 
 
-inline void delay_ms(std::chrono::milliseconds delay) {
+inline void delay(std::chrono::milliseconds delay) {
     HAL_Delay(static_cast<uint32_t>(delay.count()));
 }
 
