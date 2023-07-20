@@ -1,7 +1,7 @@
 #pragma once
 
 
-#ifdef STM32H7xx
+#ifdef STM32F4xx
 
 #include "../mcu_def.h"
 #include <emblib_stm32/core.h>
@@ -30,13 +30,12 @@ struct Config {
 
 namespace impl {
 
-constexpr int port_count = 11;
+constexpr int port_count = 8;
 
 
 inline constexpr std::array<GPIO_TypeDef*, port_count> gpio_ports = {
     GPIOA, GPIOB, GPIOC, GPIOD,
-    GPIOE, GPIOF, GPIOG, GPIOH,
-    GPIOI, GPIOJ, GPIOK
+    GPIOE, GPIOF, GPIOG, GPIOH
 };
 
 
@@ -48,10 +47,7 @@ inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
     [](){ __HAL_RCC_GPIOE_CLK_ENABLE(); },
     [](){ __HAL_RCC_GPIOF_CLK_ENABLE(); },
     [](){ __HAL_RCC_GPIOG_CLK_ENABLE(); },
-    [](){ __HAL_RCC_GPIOH_CLK_ENABLE(); },
-    [](){ __HAL_RCC_GPIOI_CLK_ENABLE(); },
-    [](){ __HAL_RCC_GPIOJ_CLK_ENABLE(); },
-    [](){ __HAL_RCC_GPIOK_CLK_ENABLE(); }	
+    [](){ __HAL_RCC_GPIOH_CLK_ENABLE(); }	
 };
 
 
