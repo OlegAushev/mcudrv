@@ -43,6 +43,17 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 }
 
 
+MessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
+    MessageAttribute attr = {};
+    // TODO
+    if (HAL_CAN_ConfigFilter(&_handle, &filter) != HAL_OK) {
+        fatal_error("CAN module Rx filter configuration failed");
+    }
+
+    return attr;
+}
+
+
 void Module::enable_clk() {
     auto can_idx = std::to_underlying(_peripheral);
     if (!_clk_enabled[can_idx]) {

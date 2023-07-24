@@ -88,6 +88,13 @@ inline std::array<void(*)(void), peripheral_count> can_clk_enable_funcs = {
 } // namespace impl
 
 
+struct MessageAttribute {
+    uint32_t location;
+    uint32_t filter_index;
+    bool operator==(const MessageAttribute&) const = default;
+};
+
+
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
@@ -97,8 +104,68 @@ private:
     mcu::gpio::Output _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
+
+    uint64_t _tx_error_counter = 0;
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
+    MessageAttribute register_message(CAN_FilterTypeDef& filter);
+    
+    Peripheral peripheral() const { return _peripheral; }
+    CAN_HandleTypeDef* handle() { return &_handle; }
+    static Module* instance(Peripheral peripheral) {
+        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+    }
+
+    void start() {
+        if (HAL_CAN_Start(&_handle) != HAL_OK) {
+            fatal_error("CAN module start failed");
+        }
+    }
+
+    void stop() {
+        if (HAL_CAN_Stop(&_handle) != HAL_OK) {
+            fatal_error("CAN module stop failed");
+        }
+    }
+
+    HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
+        CAN_TxHeaderTypeDef header = {
+            .StdId = frame.id,
+            .ExtId = 0,
+            .IDE = CAN_ID_STD,
+            .RTR = CAN_RTR_DATA,
+            .DLC = frame.len,
+            .TransmitGlobalTime = DISABLE
+        };
+
+        uint32_t mailbox = 0;
+
+        HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, frame.payload.data(), &mailbox);
+        if (status != HAL_OK) {
+            ++_tx_error_counter;
+        }
+
+        if (ret_mailbox) {
+            *ret_mailbox = mailbox;
+        }
+
+        return status;
+    }
+
+    HalStatus send(CAN_TxHeaderTypeDef& header, can_payload& payload, uint32_t* ret_mailbox = nullptr) {
+        uint32_t mailbox = 0;
+
+        HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, payload.data(), &mailbox);
+        if (status != HAL_OK) {
+            ++_tx_error_counter;
+        }
+
+        if (ret_mailbox) {
+            *ret_mailbox = mailbox;
+        }
+
+        return status;		
+    }
 protected:
     void enable_clk();
 };
