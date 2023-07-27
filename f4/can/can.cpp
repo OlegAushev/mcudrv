@@ -40,6 +40,9 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     if(HAL_CAN_Init(&_handle) != HAL_OK) {
         fatal_error("CAN module initialization failed");
     }
+
+    // Default interrupt config
+    init_interrupts(CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY);
 }
 
 
@@ -51,6 +54,14 @@ MessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
     }
 
     return attr;
+}
+
+
+void Module::init_interrupts(uint32_t interrupt_list)
+{
+    if (HAL_CAN_ActivateNotification(&_handle, interrupt_list) != HAL_OK) {
+        fatal_error("CAN interrupt configuration failed");
+    }
 }
 
 

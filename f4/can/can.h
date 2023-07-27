@@ -45,16 +45,22 @@ struct Config {
 
 namespace impl {
 
-// inline constexpr std::array<IRQn_Type, 2> irq0_numbers = {	
-//     CAN1_IT0_IRQn,
-//     CAN2_IT0_IRQn,
-// };
+inline constexpr std::array<IRQn_Type, peripheral_count> irq_fifo0_numbers = {	
+    CAN1_RX0_IRQn,
+    CAN2_RX0_IRQn,
+};
 
 
-// inline constexpr std::array<IRQn_Type, 2> irq1_numbers = {	
-//     CAN1_IT1_IRQn,
-//     CAN2_IT1_IRQn,
-// };
+inline constexpr std::array<IRQn_Type, peripheral_count> irq_fifo1_numbers = {	
+    CAN1_RX1_IRQn,
+    CAN2_RX1_IRQn,
+};
+
+
+inline constexpr std::array<IRQn_Type, peripheral_count> irq_tx_numbers = {	
+    CAN1_TX_IRQn,
+    CAN2_TX_IRQn,
+};
 
 
 inline constexpr std::array<CAN_TypeDef*, peripheral_count> can_instances = {CAN1, CAN2};
@@ -166,6 +172,39 @@ public:
 
         return status;		
     }
+
+    /* INTERRUPTS */
+private:
+    void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_txmailbox_free)() = [](){ emb::fatal_error("uninitialized callback"); };
+public:
+    void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo0_frame_received = callback; }
+    void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo1_frame_received = callback; }
+    void register_on_txmailbox_free_callback(void(*callback)()) { _on_txmailbox_free = callback; }
+
+    void init_interrupts(uint32_t interrupt_list);
+    void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
+
+    void set_interrupt_priority(InterruptPriority fifo0_priority, InterruptPriority fifo1_priority, InterruptPriority tx_priority) {
+        HAL_NVIC_SetPriority(impl::irq_fifo0_numbers[std::to_underlying(_peripheral)], fifo0_priority.get(), 0);
+        HAL_NVIC_SetPriority(impl::irq_fifo1_numbers[std::to_underlying(_peripheral)], fifo1_priority.get(), 0);
+        HAL_NVIC_SetPriority(impl::irq_tx_numbers[std::to_underlying(_peripheral)], tx_priority.get(), 0);
+
+    }
+
+    void enable_interrupts() {
+        HAL_NVIC_EnableIRQ(impl::irq_fifo0_numbers[std::to_underlying(_peripheral)]);
+        HAL_NVIC_EnableIRQ(impl::irq_fifo1_numbers[std::to_underlying(_peripheral)]);
+        HAL_NVIC_EnableIRQ(impl::irq_tx_numbers[std::to_underlying(_peripheral)]);
+    }
+
+    void disable_interrupts() {
+        HAL_NVIC_DisableIRQ(impl::irq_fifo0_numbers[std::to_underlying(_peripheral)]);
+        HAL_NVIC_DisableIRQ(impl::irq_fifo1_numbers[std::to_underlying(_peripheral)]);
+        HAL_NVIC_DisableIRQ(impl::irq_tx_numbers[std::to_underlying(_peripheral)]);
+    }
+
 protected:
     void enable_clk();
 };
