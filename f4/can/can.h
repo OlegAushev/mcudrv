@@ -102,6 +102,11 @@ struct MessageAttribute {
 
 
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+    friend void ::HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef*);
+    friend void ::HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef*);
+    friend void ::HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef*);
+    friend void ::HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef*);
+    friend void ::HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef*);
 private:
     const Peripheral _peripheral;
     CAN_HandleTypeDef _handle = {};
@@ -110,6 +115,14 @@ private:
     mcu::gpio::Output _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
+
+    static inline int _filter_count = 0;
+
+    #ifdef CAN2
+    static const int max_fitler_count = 28;
+    #else
+    static const int max_fitler_count = 14;
+    #endif
 
     uint64_t _tx_error_counter = 0;
 public:
@@ -177,11 +190,11 @@ public:
 private:
     void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
     void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
-    void (*_on_txmailbox_free)() = [](){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_txmailbox_free)(Module&) = [](auto){ emb::fatal_error("uninitialized callback"); };
 public:
     void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo0_frame_received = callback; }
     void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo1_frame_received = callback; }
-    void register_on_txmailbox_free_callback(void(*callback)()) { _on_txmailbox_free = callback; }
+    void register_on_txmailbox_free_callback(void(*callback)(Module&)) { _on_txmailbox_free = callback; }
 
     void init_interrupts(uint32_t interrupt_list);
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
