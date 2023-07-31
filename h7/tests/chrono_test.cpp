@@ -12,7 +12,7 @@ void mcu::tests::chrono_test() {
     mcu::chrono::system_clock::register_delayed_task([](){ bsp::nucleo::led_red.toggle(); }, std::chrono::milliseconds(200));
 
     for (auto i = 1; i <= 4; ++i) {
-        mcu::delay_ms(std::chrono::milliseconds(101));
+        mcu::delay(std::chrono::milliseconds(101));
         mcu::chrono::system_clock::run_tasks();
         if (i % 2 != 0) {
             EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::State::active);
