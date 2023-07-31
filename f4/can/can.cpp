@@ -53,7 +53,13 @@ MessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
         fatal_error("too many CAN Rx filters");
     }
 
-    filter.FilterBank = _filter_count++;
+    if (_peripheral == Peripheral::can1) {
+        filter.FilterBank = _filter_count++;
+    } else {
+        filter.FilterBank = 14 + _filter_count++;
+    }
+    filter.FilterActivation = ENABLE;
+    filter.SlaveStartFilterBank = 14;
     attr.filter_index = filter.FilterBank;
     attr.location = filter.FilterFIFOAssignment;
 

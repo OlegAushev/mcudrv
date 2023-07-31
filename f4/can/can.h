@@ -8,6 +8,7 @@
 #include "../gpio/gpio.h"
 #include <emblib_stm32/core.h>
 #include <emblib_stm32/interfaces/can.h>
+#include <emblib_stm32/queue.h>
 #include <utility>
 
 
@@ -116,13 +117,15 @@ private:
 
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 
-    static inline int _filter_count = 0;
+    int _filter_count = 0;
 
     #ifdef CAN2
     static const int max_fitler_count = 28;
     #else
     static const int max_fitler_count = 14;
     #endif
+
+    emb::queue<std::pair<CAN_TxHeaderTypeDef, can_payload>, 32> _tx_queue;
 
     uint64_t _tx_error_counter = 0;
 public:
@@ -147,6 +150,16 @@ public:
         }
     }
 
+    bool mailbox_ready() const {
+        uint32_t tsr = READ_REG(_handle.Instance->TSR);
+        if (((tsr & CAN_TSR_TME0) != 0U)
+         || ((tsr & CAN_TSR_TME1) != 0U)
+         || ((tsr & CAN_TSR_TME2) != 0U)) {
+            return true;
+        };
+        return false;
+    }
+
     HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
         CAN_TxHeaderTypeDef header = {
             .StdId = frame.id,
@@ -156,6 +169,14 @@ public:
             .DLC = frame.len,
             .TransmitGlobalTime = DISABLE
         };
+
+        if (!mailbox_ready()) {
+            if (_tx_queue.full()) {
+                return HalStatus::HAL_ERROR;
+            }
+            _tx_queue.push({header, frame.payload});
+            return HalStatus::HAL_BUSY;
+        }
 
         uint32_t mailbox = 0;
 
@@ -172,6 +193,14 @@ public:
     }
 
     HalStatus send(CAN_TxHeaderTypeDef& header, can_payload& payload, uint32_t* ret_mailbox = nullptr) {
+        if (!mailbox_ready()) {
+            if (_tx_queue.full()) {
+                return HalStatus::HAL_ERROR;
+            }
+            _tx_queue.push({header, payload});
+            return HalStatus::HAL_BUSY;
+        }
+        
         uint32_t mailbox = 0;
 
         HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, payload.data(), &mailbox);
@@ -191,6 +220,16 @@ private:
     void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
     void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
     void (*_on_txmailbox_free)(Module&) = [](auto){ emb::fatal_error("uninitialized callback"); };
+
+    static void on_txmailbox_free(Module& module) {
+        if (module._tx_queue.empty()) { return; }
+        auto header = module._tx_queue.front().first;
+        auto payload = module._tx_queue.front().second;
+
+        if (module.send(header, payload) == HalStatus::HAL_OK) {
+            module._tx_queue.pop();
+        }    
+    }
 public:
     void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo0_frame_received = callback; }
     void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo1_frame_received = callback; }
