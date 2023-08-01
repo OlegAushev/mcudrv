@@ -81,10 +81,12 @@ void Module::init_interrupts(uint32_t interrupt_list)
 
 void Module::enable_clk() {
     auto can_idx = std::to_underlying(_peripheral);
-    if (!_clk_enabled[can_idx]) {
-        impl::can_clk_enable_funcs[can_idx]();
-        _clk_enabled[can_idx] = true;
+    if (_clk_enabled[can_idx]) {
+        return;
     }
+        
+    impl::can_clk_enable_funcs[can_idx]();
+    _clk_enabled[can_idx] = true;
 }
 
 } // namespace can

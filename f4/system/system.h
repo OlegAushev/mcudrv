@@ -63,9 +63,9 @@ public:
 // }
 
 
-// inline float calculate_mcu_vref(uint32_t adcData) {
-//     return 3.3f * float(*VREFINT_CAL_ADDR) / float(adcData);
-// }
+inline float calculate_mcu_vref(uint32_t adc_data) {
+    return 3.3f * float(*VREFINT_CAL_ADDR) / float(adc_data);
+}
 
 } // namespace mcu
 
