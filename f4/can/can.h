@@ -219,7 +219,7 @@ public:
 private:
     void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
     void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
-    void (*_on_txmailbox_free)(Module&) = [](auto){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_txmailbox_free)(Module&) = on_txmailbox_free;
 
     static void on_txmailbox_free(Module& module) {
         if (module._tx_queue.empty()) { return; }
