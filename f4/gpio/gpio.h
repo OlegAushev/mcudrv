@@ -8,6 +8,7 @@
 #include <emblib_stm32/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
+#include <utility>
 
 
 extern "C" void EXTI0_IRQHandler();
@@ -175,14 +176,31 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert_param(_initialized);
+#ifdef USE_FAST_HAL
+        auto val = 0;
+        if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
+            val = 1;
+        }
+        return static_cast<emb::gpio::State>(1 - (val ^ std::to_underlying(_config.active_state)));
+#else
         return static_cast<emb::gpio::State>(1
                 - (HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)) ^ static_cast<uint32_t>(_config.active_state)));
+#endif
     }
 
     virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
         assert_param(_initialized);
+#ifdef USE_FAST_HAL
+        auto val = 1 - (std::to_underlying(state) ^ std::to_underlying(_config.active_state));
+        if(val != 0) {
+            mcu::write_reg(_config.port->BSRR, _config.pin.Pin);
+        } else {
+            mcu::write_reg(_config.port->BSRR, _config.pin.Pin << 16);
+        }
+#else
         HAL_GPIO_WritePin(_config.port, static_cast<uint16_t>(_config.pin.Pin),
                 static_cast<GPIO_PinState>(1 - (static_cast<uint32_t>(state) ^ static_cast<uint32_t>(_config.active_state))));
+#endif
     }
 
     virtual void reset() override {
