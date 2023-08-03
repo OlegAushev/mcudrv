@@ -8,6 +8,12 @@
 namespace mcu {
 
 template <typename T>
+bool is_bit_set(const volatile T& reg, T bit) { return (reg & bit) == bit; }
+
+template <typename T>
+bool is_bit_clr(const volatile T& reg, T bit) { return (reg & bit) == 0; }
+
+template <typename T>
 void set_bit(volatile T& reg, T bit) { reg |= bit; }
 
 template <typename T>

@@ -226,8 +226,8 @@ public:
     virtual void toggle() override {
         assert_param(_initialized);
 #ifdef USE_FAST_HAL
-        auto odr = mcu::read_reg(_config.port->ODR);
-        mcu::write_reg(_config.port->BSRR, ((odr & _config.pin.Pin) << 16) | (~odr & _config.pin.Pin));
+        auto odr_reg = mcu::read_reg(_config.port->ODR);
+        mcu::write_reg(_config.port->BSRR, ((odr_reg & _config.pin.Pin) << 16) | (~odr_reg & _config.pin.Pin));
 #else
         HAL_GPIO_TogglePin(_config.port, static_cast<uint16_t>(_config.pin.Pin));
 #endif

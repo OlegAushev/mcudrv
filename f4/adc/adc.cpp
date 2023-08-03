@@ -57,7 +57,13 @@ void Module::enable_clk() {
 
 
 extern "C" void ADC_IRQHandler(void) {
-    // TODO HAL_ADC_IRQHandler();
+    using namespace mcu::adc;
+    for (auto i = 0; i < peripheral_count; ++i) {
+        auto peripheral = static_cast<Peripheral>(i);
+        if (Module::regular_irq_pending(peripheral)) {
+            HAL_ADC_IRQHandler(Module::instance(peripheral)->handle());
+        }
+    }
 }
 
 

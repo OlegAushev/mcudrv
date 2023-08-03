@@ -114,6 +114,14 @@ public:
     void (*on_half_completed)() = [](){ emb::fatal_error("uninitialized callback"); };
     void (*on_completed)() = [](){ emb::fatal_error("uninitialized callback"); };
     void (*on_error)() = [](){ emb::fatal_error("uninitialized callback"); };
+
+    static bool regular_irq_pending(Peripheral peripheral) {
+        auto instance = impl::adc_instances[std::to_underlying(peripheral)];
+        if (mcu::is_bit_set(instance->SR, ADC_FLAG_EOC) && mcu::is_bit_set(instance->CR1, ADC_IT_EOC)) {
+            return true;
+        }
+        return false;
+    }
 protected:
     void enable_clk();
 };
