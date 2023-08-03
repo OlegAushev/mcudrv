@@ -56,6 +56,11 @@ void Module::enable_clk() {
 } // namespace mcu
 
 
+extern "C" void ADC_IRQHandler(void) {
+    // TODO HAL_ADC_IRQHandler();
+}
+
+
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* handle) {
     using namespace mcu::adc;
     Module::instance(impl::to_peripheral(handle->Instance))->on_half_completed();
