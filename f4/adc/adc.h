@@ -56,7 +56,7 @@ inline Peripheral to_peripheral(const ADC_TypeDef* instance) {
 
 
 inline std::array<void(*)(void), peripheral_count> adc_clk_enable_funcs = {
-    [](){ ; },
+    [](){ __HAL_RCC_ADC1_CLK_ENABLE(); },
     [](){ __HAL_RCC_ADC2_CLK_ENABLE(); },
     [](){ __HAL_RCC_ADC3_CLK_ENABLE(); }
 };
@@ -68,7 +68,7 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
 private:
     const Peripheral _peripheral;
     ADC_HandleTypeDef _handle = {};
-    static inline std::array<bool, peripheral_count> _clk_enabled = {true, false, false};
+    static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
     Module(Peripheral peripheral, const Config& config);
     Peripheral peripheral() const { return _peripheral; }
