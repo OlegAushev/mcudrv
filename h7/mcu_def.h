@@ -4,7 +4,6 @@
 #ifdef STM32H7xx
 
 #include "../common.h"
-#include "stm32h7xx.h"
 #include <cassert>
 
 
