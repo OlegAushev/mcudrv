@@ -231,9 +231,15 @@ private:
         }    
     }
 public:
-    void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo0_frame_received = callback; }
-    void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) { _on_fifo1_frame_received = callback; }
-    void register_on_txmailbox_free_callback(void(*callback)(Module&)) { _on_txmailbox_free = callback; }
+    void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
+        _on_fifo0_frame_received = callback;
+    }
+    void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
+        _on_fifo1_frame_received = callback;
+    }
+    void register_on_txmailbox_free_callback(void(*callback)(Module&)) {
+        _on_txmailbox_free = callback;
+    }
 
     void init_interrupts(uint32_t interrupt_list);
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);

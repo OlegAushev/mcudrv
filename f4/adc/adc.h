@@ -13,6 +13,7 @@ namespace mcu {
 
 namespace adc {
 
+
 inline constexpr bool strict_error_check = true;
 
 
@@ -65,6 +66,9 @@ inline std::array<void(*)(void), peripheral_count> adc_clk_enable_funcs = {
 
 
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+    friend void ::HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef*);
+    friend void ::HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef*);
+    friend void ::HAL_ADC_ErrorCallback(ADC_HandleTypeDef*);
 private:
     const Peripheral _peripheral;
     ADC_HandleTypeDef _handle = {};
@@ -110,10 +114,14 @@ public:
     uint32_t read_regular_conversion() { return HAL_ADC_GetValue(&_handle); }
 
     /* INTERRUPTS */
+private:
+    void (*_on_half_completed)(Module&) = [](Module&){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_completed)(Module&) = [](Module&){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_error)(Module&) = [](Module&){ emb::fatal_error("uninitialized callback"); };
 public:
-    void (*on_half_completed)() = [](){ emb::fatal_error("uninitialized callback"); };
-    void (*on_completed)() = [](){ emb::fatal_error("uninitialized callback"); };
-    void (*on_error)() = [](){ emb::fatal_error("uninitialized callback"); };
+    void register_on_half_completed_callback(void(*callback)(Module&)) { _on_half_completed = callback; }
+    void register_on_completed_callback(void(*callback)(Module&)) { _on_completed = callback; }
+    void register_on_error_callback(void(*callback)(Module&)) { _on_error = callback; }
 
     static bool regular_irq_pending(Peripheral peripheral) {
         auto instance = impl::adc_instances[std::to_underlying(peripheral)];
@@ -125,6 +133,7 @@ public:
 protected:
     void enable_clk();
 };
+
 
 } // namespace adc
 

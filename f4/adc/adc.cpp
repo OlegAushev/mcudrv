@@ -7,6 +7,7 @@ namespace mcu {
 
 namespace adc {
 
+
 Module::Module(Peripheral peripheral, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
@@ -51,6 +52,7 @@ void Module::enable_clk() {
     _clk_enabled[adc_idx] = true;
 }
 
+
 } // namespace adc
 
 } // namespace mcu
@@ -69,19 +71,19 @@ extern "C" void ADC_IRQHandler(void) {
 
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* handle) {
     using namespace mcu::adc;
-    Module::instance(impl::to_peripheral(handle->Instance))->on_half_completed();
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_half_completed();
 }
 
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle) {
     using namespace mcu::adc;
-    Module::instance(impl::to_peripheral(handle->Instance))->on_completed();
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_completed();
 }
 
 
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *handle) {
     using namespace mcu::adc;
-    Module::instance(impl::to_peripheral(handle->Instance))->on_error();
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_error();
 }
 
 #endif
