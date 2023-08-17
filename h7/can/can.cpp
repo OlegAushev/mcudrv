@@ -65,6 +65,7 @@ MessageAttribute Module::register_message(FDCAN_FilterTypeDef& filter) {
         filter.FilterIndex = _extfilter_count++;
     }
 
+    attr.id_type = filter.IdType;
     attr.filter_index = filter.FilterIndex;
 
     if (filter.FilterConfig == FDCAN_FILTER_TO_RXFIFO0 || filter.FilterConfig == FDCAN_FILTER_TO_RXFIFO0_HP) {
@@ -154,6 +155,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
 
             MessageAttribute attr;
             attr.location = FDCAN_RX_FIFO0;
+            attr.id_type = header.IdType;
             attr.filter_index = header.FilterIndex;
 
             auto module = Module::instance(impl::to_peripheral(handle->Instance));
@@ -181,6 +183,7 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
             
             MessageAttribute attr;
             attr.location = FDCAN_RX_FIFO1;
+            attr.id_type = header.IdType;
             attr.filter_index = header.FilterIndex;
             
             auto module = Module::instance(impl::to_peripheral(handle->Instance));
