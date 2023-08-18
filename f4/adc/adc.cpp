@@ -71,19 +71,22 @@ extern "C" void ADC_IRQHandler(void) {
 
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* handle) {
     using namespace mcu::adc;
-    Module::instance(impl::to_peripheral(handle->Instance))->_on_half_completed();
+    auto module = Module::instance(impl::to_peripheral(handle->Instance));
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_half_completed(*module);
 }
 
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle) {
     using namespace mcu::adc;
-    Module::instance(impl::to_peripheral(handle->Instance))->_on_completed();
+    auto module = Module::instance(impl::to_peripheral(handle->Instance));
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_completed(*module);
 }
 
 
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *handle) {
     using namespace mcu::adc;
-    Module::instance(impl::to_peripheral(handle->Instance))->_on_error();
+    auto module = Module::instance(impl::to_peripheral(handle->Instance));
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_error(*module);
 }
 
 #endif
