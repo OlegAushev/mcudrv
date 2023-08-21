@@ -28,6 +28,25 @@ struct Config {
 };
 
 
+enum class Channel {
+    channel1 = TIM_CHANNEL_1,
+    channel2 = TIM_CHANNEL_2,
+    channel3 = TIM_CHANNEL_3,
+    channel4 = TIM_CHANNEL_4,
+};
+
+struct ChannelConfig {
+    TIM_OC_InitTypeDef hal_init;
+};
+
+
+struct PwmPinConfig {
+    GPIO_TypeDef* port;
+    uint32_t pin;
+    uint32_t af_selection;
+};
+
+
 namespace impl {
 
 inline constexpr std::array<TIM_TypeDef*, adv_peripheral_count> adv_timer_instances = {TIM1, TIM8};
@@ -62,6 +81,25 @@ public:
     TIM_HandleTypeDef* handle() { return &_handle; }
     static AdvancedControlTimer* instance(AdvancedControlPeripheral peripheral) {
         return emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>::instance(std::to_underlying(peripheral));
+    }
+
+    void init_pwm_channel(Channel channel, ChannelConfig config, const PwmPinConfig& pin_config);
+
+    void start_pwm(Channel channel) {
+        if (HAL_TIM_PWM_Start(&_handle, std::to_underlying(channel)) != HAL_OK) {
+            fatal_error("timer pwm channel start failed");
+        }
+    }
+
+    void stop_pwm(Channel channel) {
+        if (HAL_TIM_PWM_Stop(&_handle, std::to_underlying(channel)) != HAL_OK) {
+            fatal_error("timer pwm channel start failed");
+        }
+    }
+
+    void set_duty_cycle(Channel channel, float duty_cycle) {
+        uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(__HAL_TIM_GET_AUTORELOAD(&_handle)));
+        __HAL_TIM_SET_COMPARE(&_handle, std::to_underlying(channel), compare_value);
     }
 private:
     void _enable_clk();

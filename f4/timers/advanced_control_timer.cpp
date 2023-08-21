@@ -48,6 +48,24 @@ void AdvancedControlTimer::_enable_clk() {
 }
 
 
+void AdvancedControlTimer::init_pwm_channel(Channel channel, ChannelConfig config, const PwmPinConfig& pin_config) {
+    mcu::gpio::Output({
+        .port = pin_config.port, 
+        .pin = {
+            .Pin = pin_config.pin,
+            .Mode = GPIO_MODE_AF_PP,
+            .Pull = GPIO_NOPULL,
+            .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+            .Alternate = pin_config.af_selection
+        },
+        .active_state = emb::gpio::ActiveState::high});
+
+    if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_init, std::to_underlying(channel)) != HAL_OK) {
+        fatal_error("timer pwm channel initialization failed");
+    }
+}
+
+
 } // namespace timers
 
 } // namespace mcu
