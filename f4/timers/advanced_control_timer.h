@@ -2,9 +2,7 @@
 
 #ifdef STM32F4xx
 
-#include "../mcu_def.h"
-#include "../system/system.h"
-#include "../gpio/gpio.h"
+#include "timers_def.h"
 #include <utility>
 
 
@@ -20,31 +18,6 @@ enum class AdvancedControlPeripheral {
 
 
 constexpr int adv_peripheral_count = 2;
-
-
-struct Config {
-    uint32_t freq;
-    TIM_Base_InitTypeDef hal_init;
-};
-
-
-enum class Channel {
-    channel1 = TIM_CHANNEL_1,
-    channel2 = TIM_CHANNEL_2,
-    channel3 = TIM_CHANNEL_3,
-    channel4 = TIM_CHANNEL_4,
-};
-
-struct ChannelConfig {
-    TIM_OC_InitTypeDef hal_init;
-};
-
-
-struct PwmPinConfig {
-    GPIO_TypeDef* port;
-    uint32_t pin;
-    uint32_t af_selection;
-};
 
 
 namespace impl {
@@ -83,7 +56,7 @@ public:
         return emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void init_pwm_channel(Channel channel, ChannelConfig config, const PwmPinConfig& pin_config);
+    void init_pwm_channel(Channel channel, ChannelConfig config, const PinConfig& pin_config);
 
     void start_pwm(Channel channel) {
         if (HAL_TIM_PWM_Start(&_handle, std::to_underlying(channel)) != HAL_OK) {
