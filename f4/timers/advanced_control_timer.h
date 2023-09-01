@@ -56,18 +56,12 @@ public:
         return emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void init_pwm_channel(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config);
+    void init_pwm(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config);
 
-    void start_pwm(Channel channel) {
-        HAL_TIM_PWM_Start(&_handle, std::to_underlying(channel));
-        HAL_TIMEx_PWMN_Start(&_handle, std::to_underlying(channel));
-    }
-
-    void stop_pwm(Channel channel) {
-        HAL_TIM_PWM_Stop(&_handle, std::to_underlying(channel));
-        HAL_TIMEx_PWMN_Stop(&_handle, std::to_underlying(channel));
-
-    }
+    void start_pwm(Channel channel) { HAL_TIM_PWM_Start(&_handle, std::to_underlying(channel)); }
+    void start_pwmn(Channel channel) { HAL_TIMEx_PWMN_Start(&_handle, std::to_underlying(channel)); }
+    void stop_pwm(Channel channel) { HAL_TIM_PWM_Stop(&_handle, std::to_underlying(channel)); }
+    void stop_pwmn(Channel channel) { HAL_TIMEx_PWMN_Stop(&_handle, std::to_underlying(channel)); }
 
     void set_duty_cycle(Channel channel, float duty_cycle) {
         uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(__HAL_TIM_GET_AUTORELOAD(&_handle)));

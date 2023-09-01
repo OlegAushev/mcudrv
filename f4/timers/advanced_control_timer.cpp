@@ -48,7 +48,7 @@ void AdvancedControlTimer::_enable_clk() {
 }
 
 
-void AdvancedControlTimer::init_pwm_channel(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config) {
+void AdvancedControlTimer::init_pwm(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config) {
     if (pin_ch_config) {
         mcu::gpio::Output({
             .port = pin_ch_config->port, 
