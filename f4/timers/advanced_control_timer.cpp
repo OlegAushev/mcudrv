@@ -48,17 +48,32 @@ void AdvancedControlTimer::_enable_clk() {
 }
 
 
-void AdvancedControlTimer::init_pwm_channel(Channel channel, ChannelConfig config, const PinConfig& pin_config) {
-    mcu::gpio::Output({
-        .port = pin_config.port, 
-        .pin = {
-            .Pin = pin_config.pin,
-            .Mode = GPIO_MODE_AF_PP,
-            .Pull = GPIO_NOPULL,
-            .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
-            .Alternate = pin_config.af_selection
-        },
-        .active_state = emb::gpio::ActiveState::high});
+void AdvancedControlTimer::init_pwm_channel(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config) {
+    if (pin_ch_config) {
+        mcu::gpio::Output({
+            .port = pin_ch_config->port, 
+            .pin = {
+                .Pin = pin_ch_config->pin,
+                .Mode = GPIO_MODE_AF_PP,
+                .Pull = GPIO_NOPULL,
+                .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+                .Alternate = pin_ch_config->af_selection
+            },
+            .active_state = emb::gpio::ActiveState::high});
+    }
+    
+    if (pin_chn_config) {
+        mcu::gpio::Output({
+            .port = pin_chn_config->port, 
+            .pin = {
+                .Pin = pin_chn_config->pin,
+                .Mode = GPIO_MODE_AF_PP,
+                .Pull = GPIO_NOPULL,
+                .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+                .Alternate = pin_chn_config->af_selection
+            },
+            .active_state = emb::gpio::ActiveState::high});
+    }
 
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.oc_hal_init, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("timer pwm channel initialization failed");
