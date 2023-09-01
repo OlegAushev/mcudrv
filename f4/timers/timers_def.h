@@ -15,6 +15,7 @@ namespace timers {
 struct Config {
     uint32_t freq;
     TIM_Base_InitTypeDef hal_init;
+    TIM_BreakDeadTimeConfigTypeDef bdt_hal_init;
 };
 
 

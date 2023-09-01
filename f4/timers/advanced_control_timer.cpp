@@ -34,6 +34,11 @@ AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral,
     if (HAL_TIM_PWM_Init(&_handle) != HAL_OK) {
         fatal_error("timer initialization failed");
     }
+
+    auto bdt_config = config.bdt_hal_init;
+    if (HAL_TIMEx_ConfigBreakDeadTime(&_handle, &bdt_config) != HAL_OK) {
+        fatal_error("timer dead-time initialization failed");
+    }
 }
 
 
@@ -78,6 +83,9 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChannelConfig config, const
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.oc_hal_init, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("timer pwm channel initialization failed");
     }
+
+    //TIM_CCxChannelCmd(_handle.Instance, std::to_underlying(channel), TIM_CCx_ENABLE);
+    //TIM_CCxNChannelCmd(_handle.Instance, std::to_underlying(channel), TIM_CCxN_ENABLE);
 }
 
 
