@@ -72,8 +72,28 @@ public:
 
     void set_duty_cycle(Channel channel, float duty_cycle) {
         uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(__HAL_TIM_GET_AUTORELOAD(&_handle)));
-        __HAL_TIM_SET_COMPARE(&_handle, std::to_underlying(channel), compare_value);
+        switch (channel) {
+        case Channel::channel1:
+            mcu::write_reg(_handle.Instance->CCR1, compare_value); 
+            break;
+        case Channel::channel2:
+            mcu::write_reg(_handle.Instance->CCR2, compare_value); 
+            break;
+        case Channel::channel3:
+            mcu::write_reg(_handle.Instance->CCR3, compare_value); 
+            break;
+        case Channel::channel4:
+            mcu::write_reg(_handle.Instance->CCR4, compare_value); 
+            break;
+        }
+        //__HAL_TIM_SET_COMPARE(&_handle, std::to_underlying(channel), compare_value);
     }
+
+    void init_interrupts();
+    void enable_interrupts();
+    void disable_interrupts();
+
+    
 private:
     void _enable_clk();
 };
