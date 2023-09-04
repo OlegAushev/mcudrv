@@ -14,8 +14,7 @@ namespace timers {
 
 struct Config {
     uint32_t freq;
-    TIM_Base_InitTypeDef hal_init;
-    TIM_BreakDeadTimeConfigTypeDef bdt_hal_init;
+    TIM_Base_InitTypeDef hal_base_init;
 };
 
 
@@ -28,11 +27,11 @@ enum class Channel {
 
 
 struct ChannelConfig {
-    TIM_OC_InitTypeDef oc_hal_init;
+    TIM_OC_InitTypeDef hal_oc_init;
 };
 
 
-struct PinConfig {
+struct ChPinConfig {
     GPIO_TypeDef* port;
     uint32_t pin;
     uint32_t af_selection;
@@ -41,14 +40,45 @@ struct PinConfig {
 
 class ChPin {
 public:
-    ChPin(const PinConfig& config) {
+    ChPin(const ChPinConfig& config) {
         mcu::gpio::Output({
             .port = config.port, 
             .pin = {
                 .Pin = config.pin,
                 .Mode = GPIO_MODE_AF_PP,
                 .Pull = GPIO_NOPULL,
-                .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+                .Speed = GPIO_SPEED_FREQ_HIGH,
+                .Alternate = config.af_selection
+            },
+            .active_state = emb::gpio::ActiveState::high});
+    }
+};
+
+
+struct BdtConfig {
+    uint32_t deadtime_ns;
+    TIM_BreakDeadTimeConfigTypeDef hal_bdt_init;
+};
+
+
+struct BkinPinConfig {
+    GPIO_TypeDef* port;
+    uint32_t pin;
+    uint32_t pull;
+    uint32_t af_selection;
+};
+
+
+class BkinPin {
+public:
+    BkinPin(const BkinPinConfig& config) {
+        mcu::gpio::Input({
+            .port = config.port, 
+            .pin = {
+                .Pin = config.pin,
+                .Mode = GPIO_MODE_AF_PP,
+                .Pull = config.pull,
+                .Speed = GPIO_SPEED_FREQ_HIGH,
                 .Alternate = config.af_selection
             },
             .active_state = emb::gpio::ActiveState::high});

@@ -48,6 +48,9 @@ private:
     TIM_HandleTypeDef _handle = {};
 
     static inline std::array<bool, adv_peripheral_count> _clk_enabled = {};
+
+    uint32_t _freq = 0;
+    float _t_dts_ns = 0;
 public:
     AdvancedControlTimer(AdvancedControlPeripheral peripheral, const Config& config);
     AdvancedControlPeripheral peripheral() const { return _peripheral; }
@@ -57,12 +60,13 @@ public:
     }
 
     void init_pwm(Channel channel, ChannelConfig config, ChPin* pin_ch, ChPin* pin_chn);
+    void init_bdt(BdtConfig config, BkinPin* pin_bkin);
 
-    void start_pwm(Channel channel) {
+    void start_pwm() {
         mcu::set_bit(_handle.Instance->BDTR, TIM_BDTR_MOE);
     }
 
-    void stop_pwm(Channel channel) {
+    void stop_pwm() {
         mcu::clear_bit(_handle.Instance->BDTR, TIM_BDTR_MOE);
     }
 
