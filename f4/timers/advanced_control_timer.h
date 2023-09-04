@@ -56,24 +56,14 @@ public:
         return emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void init_pwm(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config);
+    void init_pwm(Channel channel, ChannelConfig config, ChPin* pin_ch, ChPin* pin_chn);
 
     void start_pwm(Channel channel) {
-        HAL_TIM_PWM_Start(&_handle, std::to_underlying(channel));
-        __HAL_TIM_MOE_ENABLE(&_handle);
-    }
-
-    void start_pwmn(Channel channel) {
-        HAL_TIMEx_PWMN_Start(&_handle, std::to_underlying(channel));
+        mcu::set_bit(_handle.Instance->BDTR, TIM_BDTR_MOE);
     }
 
     void stop_pwm(Channel channel) {
-        __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&_handle);
-        //HAL_TIM_PWM_Stop(&_handle, std::to_underlying(channel));
-    }
-    
-    void stop_pwmn(Channel channel) {
-        //HAL_TIMEx_PWMN_Stop(&_handle, std::to_underlying(channel));
+        mcu::clear_bit(_handle.Instance->BDTR, TIM_BDTR_MOE);
     }
 
     void set_duty_cycle(Channel channel, float duty_cycle) {

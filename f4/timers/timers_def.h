@@ -39,6 +39,23 @@ struct PinConfig {
 };
 
 
+class ChPin {
+public:
+    ChPin(const PinConfig& config) {
+        mcu::gpio::Output({
+            .port = config.port, 
+            .pin = {
+                .Pin = config.pin,
+                .Mode = GPIO_MODE_AF_PP,
+                .Pull = GPIO_NOPULL,
+                .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+                .Alternate = config.af_selection
+            },
+            .active_state = emb::gpio::ActiveState::high});
+    }
+};
+
+
 } // namespace timers
 
 } // namepsace mcu

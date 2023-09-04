@@ -53,39 +53,20 @@ void AdvancedControlTimer::_enable_clk() {
 }
 
 
-void AdvancedControlTimer::init_pwm(Channel channel, ChannelConfig config, const PinConfig* pin_ch_config, const PinConfig* pin_chn_config) {
-    if (pin_ch_config) {
-        mcu::gpio::Output({
-            .port = pin_ch_config->port, 
-            .pin = {
-                .Pin = pin_ch_config->pin,
-                .Mode = GPIO_MODE_AF_PP,
-                .Pull = GPIO_NOPULL,
-                .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
-                .Alternate = pin_ch_config->af_selection
-            },
-            .active_state = emb::gpio::ActiveState::high});
-    }
-    
-    if (pin_chn_config) {
-        mcu::gpio::Output({
-            .port = pin_chn_config->port, 
-            .pin = {
-                .Pin = pin_chn_config->pin,
-                .Mode = GPIO_MODE_AF_PP,
-                .Pull = GPIO_NOPULL,
-                .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
-                .Alternate = pin_chn_config->af_selection
-            },
-            .active_state = emb::gpio::ActiveState::high});
-    }
-
+void AdvancedControlTimer::init_pwm(Channel channel, ChannelConfig config, ChPin* pin_ch, ChPin* pin_chn) {
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.oc_hal_init, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("timer pwm channel initialization failed");
     }
 
-    //TIM_CCxChannelCmd(_handle.Instance, std::to_underlying(channel), TIM_CCx_ENABLE);
-    //TIM_CCxNChannelCmd(_handle.Instance, std::to_underlying(channel), TIM_CCxN_ENABLE);
+    if (pin_ch) {
+        mcu::set_bit(_handle.Instance->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
+    }
+
+    if (pin_chn) {
+        mcu::set_bit(_handle.Instance->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
+    }
+
+    mcu::set_bit(_handle.Instance->CR1, TIM_CR1_CEN);
 }
 
 
