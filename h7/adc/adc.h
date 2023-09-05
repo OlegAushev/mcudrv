@@ -110,9 +110,9 @@ public:
 
     /* INTERRUPTS */
 public:
-    void (*on_half_completed)() = [](){ emb::fatal_error("uninitialized callback"); };
-    void (*on_completed)() = [](){ emb::fatal_error("uninitialized callback"); };
-    void (*on_error)() = [](){ emb::fatal_error("uninitialized callback"); };
+    void (*on_half_completed)() = [](){ fatal_error("uninitialized callback"); };
+    void (*on_completed)() = [](){ fatal_error("uninitialized callback"); };
+    void (*on_error)() = [](){ fatal_error("uninitialized callback"); };
 protected:
     void enable_clk() {
         switch (_peripheral) {

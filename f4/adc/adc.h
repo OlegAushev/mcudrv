@@ -115,9 +115,9 @@ public:
 
     /* INTERRUPTS */
 private:
-    void (*_on_half_completed)(Module&) = [](Module&){ emb::fatal_error("uninitialized callback"); };
-    void (*_on_completed)(Module&) = [](Module&){ emb::fatal_error("uninitialized callback"); };
-    void (*_on_error)(Module&) = [](Module&){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_half_completed)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
+    void (*_on_completed)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
+    void (*_on_error)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
 public:
     void register_on_half_completed_callback(void(*callback)(Module&)) { _on_half_completed = callback; }
     void register_on_completed_callback(void(*callback)(Module&)) { _on_completed = callback; }

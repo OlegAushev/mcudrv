@@ -23,7 +23,7 @@ Module::Module(Peripheral peripheral, const Config& config)
 void Module::calibrate() {
     /* Run the ADC calibration in single-ended mode */
     if (HAL_ADCEx_Calibration_Start(&_handle, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
-        fatal_error("ADC calibration failed");
+        fatal_error("ADC module calibration failed");
     }
 }
 

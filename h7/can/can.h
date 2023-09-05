@@ -162,9 +162,9 @@ public:
 
     /* INTERRUPTS */
 private:
-    void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
-    void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ emb::fatal_error("uninitialized callback"); };
-    void (*_on_buffer_frame_received)() = [](){ emb::fatal_error("uninitialized callback"); };
+    void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
+    void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
+    void (*_on_buffer_frame_received)() = [](){ fatal_error("uninitialized callback"); };
 public:
     void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
         _on_fifo0_frame_received = callback;

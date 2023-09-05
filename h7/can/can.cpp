@@ -106,7 +106,7 @@ void Module::init_interrupts(uint32_t interrupt_list, uint32_t interrupt_line)
 void Module::set_fifo_watermark(uint32_t fifo, uint32_t watermark)
 {
     if (HAL_FDCAN_ConfigFifoWatermark(&_handle, fifo, watermark) != HAL_OK) {
-        emb::fatal_error("CAN interrupt configuration failed");
+        fatal_error("CAN interrupt configuration failed");
     }
 }
 
