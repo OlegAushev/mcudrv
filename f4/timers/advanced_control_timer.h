@@ -86,14 +86,18 @@ public:
             mcu::write_reg(_handle.Instance->CCR4, compare_value); 
             break;
         }
-        //__HAL_TIM_SET_COMPARE(&_handle, std::to_underlying(channel), compare_value);
     }
 
     void init_interrupts();
     void enable_interrupts();
     void disable_interrupts();
-
-    
+protected:
+    static void _init_tim1_interrupts();
+    static void _init_tim8_interrupts();
+    static void _enable_tim1_interrupts();
+    static void _enable_tim8_interrupts();
+    static void _disable_tim1_interrupts();
+    static void _disable_tim8_interrupts();
 private:
     void _enable_clk();
 };

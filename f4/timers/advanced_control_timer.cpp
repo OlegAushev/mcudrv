@@ -106,8 +106,55 @@ void AdvancedControlTimer::init_bdt(BdtConfig config, BkinPin* pin_bkin) {
 }
 
 
+void AdvancedControlTimer::init_interrupts() {
+    switch (_peripheral) {
+    case AdvancedControlPeripheral::tim1:
+        _init_tim1_interrupts();
+        break;
+    case AdvancedControlPeripheral::tim8:
+        _init_tim8_interrupts();
+        break;
+    }
+}
+
+
+void AdvancedControlTimer::enable_interrupts() {
+    switch (_peripheral) {
+    case AdvancedControlPeripheral::tim1:
+        _enable_tim1_interrupts();
+        break;
+    case AdvancedControlPeripheral::tim8:
+        _enable_tim8_interrupts();
+        break;
+    }
+}
+
+
+void AdvancedControlTimer::disable_interrupts() {
+    switch (_peripheral) {
+    case AdvancedControlPeripheral::tim1:
+        _disable_tim1_interrupts();
+        break;
+    case AdvancedControlPeripheral::tim8:
+        _disable_tim8_interrupts();
+        break;
+    }
+}
+
+
 } // namespace timers
 
 } // namespace mcu
+
+
+extern "C" void TIM1_UP_TIM10_IRQHandler() {
+
+}
+
+
+extern "C" void TIM8_UP_TIM13_IRQHandler() {
+
+}
+
 
 #endif
