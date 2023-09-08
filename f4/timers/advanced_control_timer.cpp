@@ -142,19 +142,17 @@ void AdvancedControlTimer::disable_interrupts() {
 }
 
 
+__attribute__((weak)) void AdvancedControlTimer::_init_tim1_interrupts() { emb::invalid_function(); }
+__attribute__((weak)) void AdvancedControlTimer::_init_tim8_interrupts() { emb::invalid_function(); }
+__attribute__((weak)) void AdvancedControlTimer::_enable_tim1_interrupts() { emb::invalid_function(); }
+__attribute__((weak)) void AdvancedControlTimer::_enable_tim8_interrupts() { emb::invalid_function(); }
+__attribute__((weak)) void AdvancedControlTimer::_disable_tim1_interrupts() { emb::invalid_function(); }
+__attribute__((weak)) void AdvancedControlTimer::_disable_tim8_interrupts() { emb::invalid_function(); }
+
+
 } // namespace timers
 
 } // namespace mcu
-
-
-extern "C" void TIM1_UP_TIM10_IRQHandler() {
-
-}
-
-
-extern "C" void TIM8_UP_TIM13_IRQHandler() {
-
-}
 
 
 #endif
