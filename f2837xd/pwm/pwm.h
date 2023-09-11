@@ -467,7 +467,7 @@ public:
 
     void set_freq(float freq) {
         _switching_freq = freq;
-        switch (_counter_mode) {
+        switch (_counter_mode.native_value()) {
         case CounterMode::up:
         case CounterMode::down:
             _period = (_timebase_clk_freq / _switching_freq) - 1;
