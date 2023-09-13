@@ -192,6 +192,46 @@ void mcu::tests::crc_test() {
     uint32_t crc3 = mcu::crc::calc_crc32(input3, 1);
     EMB_ASSERT_EQUAL(crc3, 0x4AC9A203);
 
+    uint16_t input5[2] = {0x0201, 0x0403};
+    uint8_t crc5 = mcu::crc::calc_crc8(input5, 4, CRC_parity_even);
+    EMB_ASSERT_EQUAL(crc5, 0xE3);
+
+    uint16_t input6[4] = {0x0100, 0x0302, 0x0504, 0x0706};
+    uint8_t crc6 = mcu::crc::calc_crc8(input6, 7, CRC_parity_odd);
+    EMB_ASSERT_EQUAL(crc6, 0xD8);
+
+    uint16_t input7[4] = {0x0100, 0x0302, 0x0504, 0x0706};
+    uint8_t crc7 = mcu::crc::calc_crc8(input7, 7, CRC_parity_even);
+    EMB_ASSERT_EQUAL(crc7, 0x2F);
+
+    struct {
+        uint32_t crc : 8;
+        uint32_t a : 8;
+        uint32_t b : 8;
+        uint32_t c : 8;
+        uint32_t d : 8;
+        uint32_t e : 8;
+        uint32_t f : 8;
+        uint32_t g : 8;
+    } input8;
+    input8.a = 0x10; input8.b = 0x20; input8.c = 0x30; input8.d = 0x40; input8.e = 0x50; input8.f = 0x60; input8.g = 0x70;
+    uint8_t crc8 = mcu::crc::calc_crc8(reinterpret_cast<uint16_t*>(&input8), 7, CRC_parity_odd);
+    EMB_ASSERT_EQUAL(crc8, 0xA3);
+
+    struct {
+        uint32_t a : 8;
+        uint32_t b : 8;
+        uint32_t c : 8;
+        uint32_t d : 8;
+        uint32_t e : 8;
+        uint32_t f : 8;
+        uint32_t g : 8;
+        uint32_t crc : 8;
+    } input9;
+    input9.a = 0x10; input9.b = 0x20; input9.c = 0x30; input9.d = 0x40; input9.e = 0x50; input9.f = 0x60; input9.g = 0x70;
+    uint8_t crc9 = mcu::crc::calc_crc8(reinterpret_cast<uint16_t*>(&input9), 7, CRC_parity_even);
+    EMB_ASSERT_EQUAL(crc9, 0xA3);
+
     uint8_t input4[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
     uint32_t crc4 = mcu::crc::calc_crc32_byte8(input4, 5);
     EMB_ASSERT_EQUAL(crc4, 0x4EFF913E);
