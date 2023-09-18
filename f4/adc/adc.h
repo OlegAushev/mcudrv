@@ -34,17 +34,21 @@ struct PinConfig {
 
 
 struct Config {
-    ADC_InitTypeDef hal_init;
-    //ADC_ChannelConfTypeDef channel; 
+    ADC_InitTypeDef hal_cfg; 
 };
 
 
-struct ChannelConfig {
-    ADC_ChannelConfTypeDef hal_init;
+struct RegularChannelConfig {
+    ADC_ChannelConfTypeDef hal_cfg;
 };
 
+
+struct InjectedChannelConfig {
+    ADC_InjectionConfTypeDef hal_cfg;
+};
 
 namespace impl {
+
 
 inline constexpr std::array<ADC_TypeDef*, peripheral_count> adc_instances = {ADC1, ADC2, ADC3};
 
@@ -61,6 +65,7 @@ inline std::array<void(*)(void), peripheral_count> adc_clk_enable_funcs = {
     [](){ __HAL_RCC_ADC2_CLK_ENABLE(); },
     [](){ __HAL_RCC_ADC3_CLK_ENABLE(); }
 };
+
 
 } // namespace impl
 
@@ -81,13 +86,16 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void add_regular_channel(PinConfig pin_config, ChannelConfig channel_config);
-    void add_internal_channel(ChannelConfig channel_config);
+    void add_injected_channel(PinConfig pin_config, InjectedChannelConfig channel_config);
+    void add_regular_channel(PinConfig pin_config, RegularChannelConfig channel_config);
+    void add_injected_internal_channel(InjectedChannelConfig channel_config);
+    void add_regular_internal_channel(RegularChannelConfig channel_config);
 
-    // void enable_dma(dma::StreamController& dma_stream) {
-    //     _handle.DMA_Handle = dma_stream.handle();
-    //     dma_stream.handle()->Parent = &_handle;
-    // }
+    void start_injected() {
+        set_bit(_handle.Instance->CR2, ADC_CR2_JSWSTART);
+    }
+
+
 
     HalStatus start_regular_conversion() {
         return HAL_ADC_Start(&_handle);
@@ -97,23 +105,24 @@ public:
         return HAL_ADC_Start_IT(&_handle);
     }
 
-    // template <uint32_t DmaBufSize>
-    // HalStatus start_regular_conversion_with_dma(mcu::dma::Buffer<uint16_t, DmaBufSize>& buf) {
-    //     HalStatus status = HAL_ADC_Start_DMA(&_handle, reinterpret_cast<uint32_t*>(buf.data()), buf.size());
-    //     if constexpr (strict_error_check)
-    //     {
-    //         if (status != HAL_OK)
-    //         {
-    //             fatal_error("regular ADC conversion with DMA start failed");
-    //         }
-    //     }
-    //     return status;
-    // }
-
     HalStatus poll(uint32_t timeout = 0) { return HAL_ADC_PollForConversion(&_handle, timeout); }
     uint32_t read_regular_conversion() { return HAL_ADC_GetValue(&_handle); }
 
     /* INTERRUPTS */
+public:
+    void init_interrupts();
+    void enable_interrupts() { enable_interrupt(ADC_IRQn); }
+    void disable_interrupts() { disable_interrupt(ADC_IRQn); }
+protected:
+    static void _init_adc1_interrupts();
+    static void _init_adc2_interrupts();
+    static void _init_adc3_interrupts();
+    // static void _enable_adc1_interrupts();
+    // static void _enable_adc2_interrupts();
+    // static void _enable_adc3_interrupts();
+    // static void _disable_adc1_interrupts();
+    // static void _disable_adc2_interrupts();
+    // static void _disable_adc3_interrupts();
 private:
     void (*_on_half_completed)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
     void (*_on_completed)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
@@ -131,7 +140,7 @@ public:
         return false;
     }
 protected:
-    void enable_clk();
+    static void _enable_clk(Peripheral peripheral);
 };
 
 

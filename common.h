@@ -52,4 +52,22 @@ void modify_reg(volatile T& reg, T clearmask, T setmask) { reg = (reg & ~clearma
 inline uint32_t position_val(uint32_t val) { return __CLZ(__RBIT(val)); }
 
 
+class InterruptPriority {
+private:
+    uint32_t _value;
+public:
+    explicit InterruptPriority(uint32_t value)
+            : _value(value) {
+        assert_param(value <= 15);
+    }
+
+    uint32_t get() const { return _value; }
+};
+
+
+inline void set_interrupt_priority(IRQn_Type irqn, InterruptPriority priority) { HAL_NVIC_SetPriority(irqn, priority.get(), 0);}
+inline void enable_interrupt(IRQn_Type irqn) { HAL_NVIC_EnableIRQ(irqn); }
+inline void disable_interrupt(IRQn_Type irqn) { HAL_NVIC_DisableIRQ(irqn); }
+
+
 }
