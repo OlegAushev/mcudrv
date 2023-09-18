@@ -1,7 +1,7 @@
 #pragma once
 
 
-#ifdef STM32F4xx1 // FIXME
+#ifdef STM32F4xx
 
 #include "../mcu_def.h"
 #include "../system/system.h"
@@ -37,7 +37,7 @@ constexpr int stream_count = 16;
 
 
 struct Config {
-    DMA_InitTypeDef hal_init;
+    DMA_InitTypeDef hal_cfg;
 };
 
 
@@ -65,6 +65,7 @@ class StreamController : public emb::interrupt_invoker_array<StreamController, s
 private:
     const Stream _stream;
     DMA_HandleTypeDef _handle = {};
+    DMA_Stream_TypeDef* _stream_reg;
     DMA_HandleTypeDef* _peripheral_handle = nullptr;
 
     static inline std::array<bool, 2> _clk_enabled = {false, false};
@@ -72,9 +73,12 @@ public:
     StreamController(Stream stream, const Config& config)
             : emb::interrupt_invoker_array<StreamController, stream_count>(this, std::to_underlying(stream))
             , _stream(stream) {
-        enable_clk();
+        _enable_clk(stream);
         _handle.Instance = impl::dma_stream_instances[std::to_underlying(_stream)];
-        _handle.Init = config.hal_init;
+        _handle.Init = config.hal_cfg;
+
+        _stream_reg = _handle.Instance;
+
         if (HAL_DMA_DeInit(&_handle) != HAL_OK) {
             fatal_error("DMA stream deinitialization failed");
         }
@@ -84,6 +88,7 @@ public:
     }
 
     DMA_HandleTypeDef* handle() { return &_handle; }
+    DMA_Stream_TypeDef* stream_reg() { return _stream_reg; }
     DMA_HandleTypeDef* peripheral_handle() { return _peripheral_handle; }
     static StreamController* instance(Stream stream) {
         return emb::interrupt_invoker_array<StreamController, stream_count>::instance(std::to_underlying(stream));
@@ -103,8 +108,8 @@ public:
         HAL_NVIC_DisableIRQ(impl::irq_numbers[std::to_underlying(_stream)]);
     }
 protected:
-    void enable_clk() {
-        switch (_stream) {
+    static void _enable_clk(Stream stream) {
+        switch (stream) {
         case Stream::dma1_stream0:
         case Stream::dma1_stream1:
         case Stream::dma1_stream2:
@@ -129,31 +134,28 @@ protected:
             __HAL_RCC_DMA2_CLK_ENABLE();
             _clk_enabled[1] = true;
             break;
-        default:
-            fatal_error("invalid DMA stream");
-            break;
         }
     }
 };
 
 
-template <typename T, uint32_t Size>
-struct Buffer {
-private:
-    T _data[Size] __attribute__((aligned(32)));
-public:
-    T* data() { return _data; }
-    constexpr const T* data() const { return _data; }
+// template <typename T, uint32_t Size>
+// struct Buffer {
+// private:
+//     T _data[Size] __attribute__((aligned(32)));
+// public:
+//     T* data() { return _data; }
+//     constexpr const T* data() const { return _data; }
 
-    constexpr uint32_t size() const { return Size; }
+//     constexpr uint32_t size() const { return Size; }
 
-    T& operator[](size_t pos) { return _data[pos]; }
-    constexpr T& operator[](size_t pos) const { return _data[pos]; }
+//     T& operator[](size_t pos) { return _data[pos]; }
+//     constexpr T& operator[](size_t pos) const { return _data[pos]; }
 
-    void invalidate_dcache(size_t offset_, size_t size_) {
-        SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t*>(&_data[offset_]), size_ * sizeof(T));
-    }
-};
+//     void invalidate_dcache(size_t offset_, size_t size_) {
+//         SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t*>(&_data[offset_]), size_ * sizeof(T));
+//     }
+// };
 
 } // namespace dma
 
