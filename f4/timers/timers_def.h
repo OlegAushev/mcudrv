@@ -14,7 +14,7 @@ namespace timers {
 
 struct Config {
     uint32_t freq;
-    TIM_Base_InitTypeDef hal_base_cfg;
+    TIM_Base_InitTypeDef hal_base_config;
 };
 
 
@@ -27,7 +27,7 @@ enum class Channel {
 
 
 struct ChannelConfig {
-    TIM_OC_InitTypeDef hal_oc_cfg;
+    TIM_OC_InitTypeDef hal_oc_config;
 };
 
 
@@ -57,7 +57,7 @@ public:
 
 struct BdtConfig {
     uint32_t deadtime_ns;
-    TIM_BreakDeadTimeConfigTypeDef hal_bdt_cfg;
+    TIM_BreakDeadTimeConfigTypeDef hal_bdt_config;
 };
 
 

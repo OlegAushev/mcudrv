@@ -14,9 +14,6 @@ namespace mcu {
 namespace adc {
 
 
-inline constexpr bool strict_error_check = true;
-
-
 enum class Peripheral {
     adc1,
     adc2,
@@ -34,17 +31,17 @@ struct PinConfig {
 
 
 struct Config {
-    ADC_InitTypeDef hal_cfg; 
+    ADC_InitTypeDef hal_config; 
 };
 
 
 struct RegularChannelConfig {
-    ADC_ChannelConfTypeDef hal_cfg;
+    ADC_ChannelConfTypeDef hal_config;
 };
 
 
 struct InjectedChannelConfig {
-    ADC_InjectionConfTypeDef hal_cfg;
+    ADC_InjectionConfTypeDef hal_config;
 };
 
 
@@ -87,12 +84,16 @@ private:
     const Peripheral _peripheral;
     ADC_HandleTypeDef _handle = {};
     ADC_TypeDef* _reg;
+    static inline ADC_Common_TypeDef* _reg_common = ADC123_COMMON;
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
     Module(Peripheral peripheral, const Config& config);
+
     Peripheral peripheral() const { return _peripheral; }
     ADC_HandleTypeDef* handle() { return &_handle; }
     ADC_TypeDef* reg() { return _reg; }
+    static ADC_Common_TypeDef* reg_common() { return _reg_common; }
+
     static Module* instance(Peripheral peripheral) {
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
@@ -143,28 +144,6 @@ protected:
     static void _init_adc1_interrupts();
     static void _init_adc2_interrupts();
     static void _init_adc3_interrupts();
-    // static void _enable_adc1_interrupts();
-    // static void _enable_adc2_interrupts();
-    // static void _enable_adc3_interrupts();
-    // static void _disable_adc1_interrupts();
-    // static void _disable_adc2_interrupts();
-    // static void _disable_adc3_interrupts();
-private:
-    void (*_on_half_completed)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
-    void (*_on_completed)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
-    void (*_on_error)(Module&) = [](Module&){ fatal_error("uninitialized callback"); };
-public:
-    void register_on_half_completed_callback(void(*callback)(Module&)) { _on_half_completed = callback; }
-    void register_on_completed_callback(void(*callback)(Module&)) { _on_completed = callback; }
-    void register_on_error_callback(void(*callback)(Module&)) { _on_error = callback; }
-
-    static bool regular_irq_pending(Peripheral peripheral) {
-        auto instance = impl::adc_instances[std::to_underlying(peripheral)];
-        if (mcu::is_bit_set(instance->SR, ADC_FLAG_EOC) && mcu::is_bit_set(instance->CR1, ADC_IT_EOC)) {
-            return true;
-        }
-        return false;
-    }
 protected:
     static void _enable_clk(Peripheral peripheral);
 };
@@ -174,5 +153,5 @@ protected:
 
 } // namespace mcu
 
-#endif
 
+#endif
