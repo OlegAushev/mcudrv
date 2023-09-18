@@ -103,30 +103,18 @@ public:
         init(config);
     }
 
-    virtual emb::gpio::State read() const override {
-        assert_param(_initialized);
-#ifdef USE_FAST_HAL
-        auto level = 0;
-        if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
-            level = 1;
-        }
-        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
-#else
-        return static_cast<emb::gpio::State>(1
-                - (HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)) ^ static_cast<uint32_t>(_config.active_state)));
-#endif
-    }
-
     virtual int read_level() const override {
         assert_param(_initialized);
-#ifdef USE_FAST_HAL
         if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
             return 1;
         }
         return 0;
-#else
-        return static_cast<int>(HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)));
-#endif
+    }
+
+    virtual emb::gpio::State read() const override {
+        assert_param(_initialized);
+        auto level = read_level();
+        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
     }
 private:
     IRQn_Type _irqn = NonMaskableInt_IRQn;	// use NonMaskableInt_IRQn as value for not initialized interrupt
@@ -189,33 +177,33 @@ public:
         init(config);
     }
 
-    virtual emb::gpio::State read() const override {
+    virtual int read_level() const override {
         assert_param(_initialized);
-#ifdef USE_FAST_HAL
-        auto level = 0;
         if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
-            level = 1;
+            return 1;
         }
-        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
-#else
-        return static_cast<emb::gpio::State>(1
-                - (HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)) ^ static_cast<uint32_t>(_config.active_state)));
-#endif
+        return 0;
     }
 
-    virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
+    virtual void set_level(int level) override {
         assert_param(_initialized);
-#ifdef USE_FAST_HAL
-        auto level = 1 - (std::to_underlying(state) ^ std::to_underlying(_config.active_state));
         if(level != 0) {
             mcu::write_reg(_config.port->BSRR, _config.pin.Pin);
         } else {
             mcu::write_reg(_config.port->BSRR, _config.pin.Pin << 16);
         }
-#else
-        HAL_GPIO_WritePin(_config.port, static_cast<uint16_t>(_config.pin.Pin),
-                static_cast<GPIO_PinState>(1 - (static_cast<uint32_t>(state) ^ static_cast<uint32_t>(_config.active_state))));
-#endif
+    }
+
+    virtual emb::gpio::State read() const override {
+        assert_param(_initialized);
+        auto level = read_level();
+        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
+    }
+
+    virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
+        assert_param(_initialized);
+        auto level = 1 - (std::to_underlying(state) ^ std::to_underlying(_config.active_state));
+        set_level(level);
     }
 
     virtual void reset() override {
@@ -225,38 +213,8 @@ public:
 
     virtual void toggle() override {
         assert_param(_initialized);
-#ifdef USE_FAST_HAL
         auto odr_reg = mcu::read_reg(_config.port->ODR);
         mcu::write_reg(_config.port->BSRR, ((odr_reg & _config.pin.Pin) << 16) | (~odr_reg & _config.pin.Pin));
-#else
-        HAL_GPIO_TogglePin(_config.port, static_cast<uint16_t>(_config.pin.Pin));
-#endif
-    }
-
-    virtual int read_level() const override {
-        assert_param(_initialized);
-#ifdef USE_FAST_HAL
-        if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
-            return 1;
-        }
-        return 0;
-#else
-        return static_cast<int>(HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)));
-#endif
-    }
-
-    virtual void set_level(int level) override {
-        assert_param(_initialized);
-#ifdef USE_FAST_HAL
-        if(level != 0) {
-            mcu::write_reg(_config.port->BSRR, _config.pin.Pin);
-        } else {
-            mcu::write_reg(_config.port->BSRR, _config.pin.Pin << 16);
-        }
-#else
-        GPIO_PinState state = (level == 0) ? GPIO_PIN_RESET : GPIO_PIN_SET;
-        HAL_GPIO_WritePin(_config.port, static_cast<uint16_t>(_config.pin.Pin), state);
-#endif
     }
 };
 

@@ -47,6 +47,15 @@ struct InjectedChannelConfig {
     ADC_InjectionConfTypeDef hal_cfg;
 };
 
+
+enum class InjectedChannelRank {
+    rank1 = ADC_INJECTED_RANK_1,
+    rank2 = ADC_INJECTED_RANK_2,
+    rank3 = ADC_INJECTED_RANK_3,
+    rank4 = ADC_INJECTED_RANK_4
+};
+
+
 namespace impl {
 
 
@@ -77,11 +86,13 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
 private:
     const Peripheral _peripheral;
     ADC_HandleTypeDef _handle = {};
+    ADC_TypeDef* _reg;
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
     Module(Peripheral peripheral, const Config& config);
     Peripheral peripheral() const { return _peripheral; }
     ADC_HandleTypeDef* handle() { return &_handle; }
+    ADC_TypeDef* reg() { return _reg; }
     static Module* instance(Peripheral peripheral) {
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
@@ -92,10 +103,25 @@ public:
     void add_regular_internal_channel(RegularChannelConfig channel_config);
 
     void start_injected() {
-        set_bit(_handle.Instance->CR2, ADC_CR2_JSWSTART);
+        if (is_bit_set(_reg->SR, ADC_SR_JSTRT)) {
+            return; // injected channel conversion has been already started
+        }
+        set_bit(_reg->CR2, ADC_CR2_JSWSTART);
     }
 
-
+    uint32_t read_injected(InjectedChannelRank rank) {
+        switch (rank) {
+        case InjectedChannelRank::rank1:
+            return _reg->JDR1;
+        case InjectedChannelRank::rank2:
+            return _reg->JDR2;
+        case InjectedChannelRank::rank3:
+            return _reg->JDR3;
+        case InjectedChannelRank::rank4:
+            return _reg->JDR4;
+        }
+        return 0xFFFFFFFF;
+    }
 
     HalStatus start_regular_conversion() {
         return HAL_ADC_Start(&_handle);

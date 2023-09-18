@@ -46,6 +46,7 @@ class AdvancedControlTimer : public emb::interrupt_invoker_array<AdvancedControl
 private:
     const AdvancedControlPeripheral _peripheral;
     TIM_HandleTypeDef _handle = {};
+    TIM_TypeDef* _reg;
 
     static inline std::array<bool, adv_peripheral_count> _clk_enabled = {};
 
@@ -55,6 +56,7 @@ public:
     AdvancedControlTimer(AdvancedControlPeripheral peripheral, const Config& config);
     AdvancedControlPeripheral peripheral() const { return _peripheral; }
     TIM_HandleTypeDef* handle() { return &_handle; }
+    TIM_TypeDef* reg() { return _reg; }
     static AdvancedControlTimer* instance(AdvancedControlPeripheral peripheral) {
         return emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>::instance(std::to_underlying(peripheral));
     }
@@ -63,27 +65,27 @@ public:
     void init_bdt(BdtConfig config, BkinPin* pin_bkin);
 
     void start_pwm() {
-        mcu::set_bit(_handle.Instance->BDTR, TIM_BDTR_MOE);
+        mcu::set_bit(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void stop_pwm() {
-        mcu::clear_bit(_handle.Instance->BDTR, TIM_BDTR_MOE);
+        mcu::clear_bit(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void set_duty_cycle(Channel channel, float duty_cycle) {
         uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(__HAL_TIM_GET_AUTORELOAD(&_handle)));
         switch (channel) {
         case Channel::channel1:
-            mcu::write_reg(_handle.Instance->CCR1, compare_value); 
+            mcu::write_reg(_reg->CCR1, compare_value); 
             break;
         case Channel::channel2:
-            mcu::write_reg(_handle.Instance->CCR2, compare_value); 
+            mcu::write_reg(_reg->CCR2, compare_value); 
             break;
         case Channel::channel3:
-            mcu::write_reg(_handle.Instance->CCR3, compare_value); 
+            mcu::write_reg(_reg->CCR3, compare_value); 
             break;
         case Channel::channel4:
-            mcu::write_reg(_handle.Instance->CCR4, compare_value); 
+            mcu::write_reg(_reg->CCR4, compare_value); 
             break;
         }
     }

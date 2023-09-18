@@ -14,12 +14,14 @@ Module::Module(Peripheral peripheral, const Config& config)
     _enable_clk(peripheral);
     _handle.Instance = impl::adc_instances[std::to_underlying(_peripheral)];
     _handle.Init = config.hal_cfg;
+    
+    _reg = _handle.Instance;
 
     if (HAL_ADC_Init(&_handle) != HAL_OK) {
         fatal_error("ADC module initialization failed");
     }
 
-    set_bit(_handle.Instance->CR2, ADC_CR2_ADON);
+    set_bit(_reg->CR2, ADC_CR2_ADON);
     auto counter = (ADC_STAB_DELAY_US * (core_clk_freq() / 1000000));
     while(counter != 0)
     {

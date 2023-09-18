@@ -16,6 +16,8 @@ AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral,
     _handle.Instance = impl::adv_timer_instances[std::to_underlying(_peripheral)];
     _handle.Init = config.hal_base_cfg;
 
+    _reg = _handle.Instance;
+
     if (config.hal_base_cfg.Period == 0 && config.freq != 0) {
         // period specified by freq
         _freq = config.freq;
@@ -70,14 +72,14 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChannelConfig config, ChPin
     }
 
     if (pin_ch) {
-        mcu::set_bit(_handle.Instance->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
+        mcu::set_bit(_reg->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
     }
 
     if (pin_chn) {
-        mcu::set_bit(_handle.Instance->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
+        mcu::set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
     }
 
-    mcu::set_bit(_handle.Instance->CR1, TIM_CR1_CEN);
+    mcu::set_bit(_reg->CR1, TIM_CR1_CEN);
 }
 
 
