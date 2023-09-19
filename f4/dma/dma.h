@@ -69,7 +69,6 @@ private:
     const StreamId _stream_id;
     DMA_HandleTypeDef _handle = {};
     DMA_Stream_TypeDef* _stream_reg;
-    DMA_HandleTypeDef* _peripheral_handle = nullptr;
 
     static inline std::array<bool, 2> _clk_enabled = {false, false};
 public:
@@ -77,25 +76,62 @@ public:
 
     DMA_HandleTypeDef* handle() { return &_handle; }
     DMA_Stream_TypeDef* stream_reg() { return _stream_reg; }
-    DMA_HandleTypeDef* peripheral_handle() { return _peripheral_handle; }
     static Stream* instance(StreamId stream_id) {
         return emb::interrupt_invoker_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
     }
 
-    void init_interrupts(DMA_HandleTypeDef* peripheral_handle, mcu::InterruptPriority priority) {
-        _peripheral_handle = peripheral_handle;
-        HAL_NVIC_SetPriority(impl::dma_irq_numbers[std::to_underlying(_stream_id)], priority.get(), 0);
+    void init_interrupts(mcu::InterruptPriority priority) {
+        set_bit(_stream_reg->CR, DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
+        set_interrupt_priority(impl::dma_irq_numbers[std::to_underlying(_stream_id)], priority);
     }
 
     void enable_interrupts() {
-        HAL_NVIC_EnableIRQ(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);
+        enable_interrupt(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);
     }
 
     void disable_interrupts() {
-        HAL_NVIC_DisableIRQ(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);
+        disable_interrupt(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);
+    }
+
+    void enable() {
+        set_bit(_stream_reg->CR, DMA_SxCR_EN);
     }
 protected:
     static void _enable_clk(StreamId stream_id);
+};
+
+
+template <typename T, size_t Size>
+class MemoryBuffer {
+private:
+    std::array<T, Size> _data __attribute__((aligned(32)));
+    Stream& _stream;
+public:
+    MemoryBuffer(Stream& stream) : _stream(stream) {
+        write_reg(_stream.stream_reg()->NDTR, uint32_t(_data.size()));
+        write_reg(_stream.stream_reg()->M0AR, uint32_t(_data.data()));
+    }
+
+    constexpr const T* data() const { return _data.data(); }
+    constexpr uint32_t size() const { return _data.size(); }
+    T& operator[](size_t pos) { return _data[pos]; }
+    constexpr T& operator[](size_t pos) const { return _data[pos]; }
+};
+
+
+template <typename T, size_t Size>
+class MemoryDoubleBuffer {
+private:
+    Stream& _stream;
+public:
+    MemoryBuffer<T, Size> buf0;
+    MemoryBuffer<T, Size> buf1;
+    MemoryDoubleBuffer(Stream& stream) : _stream(stream), buf0(stream), buf1(stream) {
+        set_bit(_stream.stream_reg()->CR, DMA_SxCR_DBM);
+        write_reg(_stream.stream_reg()->NDTR, uint32_t(Size));
+        write_reg(_stream.stream_reg()->M0AR, uint32_t(buf0.data()));
+        write_reg(_stream.stream_reg()->M1AR, uint32_t(buf1.data()));
+    }
 };
 
 

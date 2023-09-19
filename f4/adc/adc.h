@@ -31,7 +31,7 @@ struct PinConfig {
 
 
 struct Config {
-    ADC_InitTypeDef hal_config; 
+    ADC_InitTypeDef hal_config;
 };
 
 
@@ -87,7 +87,7 @@ private:
     static inline ADC_Common_TypeDef* _reg_common = ADC123_COMMON;
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
-    Module(Peripheral peripheral, const Config& config);
+    Module(Peripheral peripheral, const Config& config, dma::Stream* dma = nullptr);
 
     Peripheral peripheral() const { return _peripheral; }
     ADC_HandleTypeDef* handle() { return &_handle; }
@@ -105,7 +105,7 @@ public:
 
     void start_injected() {
         if (is_bit_set(_reg->SR, ADC_SR_JSTRT)) {
-            return; // injected channel conversion has been already started
+            return; // there is ongoing injected channel conversion
         }
         set_bit(_reg->CR2, ADC_CR2_JSWSTART);
     }
@@ -124,16 +124,28 @@ public:
         return 0xFFFFFFFF;
     }
 
-    HalStatus start_regular_conversion() {
-        return HAL_ADC_Start(&_handle);
+    void acknowledge_injected() {
+        clear_bit(_reg->SR, ADC_SR_JEOC | ADC_SR_JSTRT);
     }
 
-    HalStatus start_regular_conversion_it() {
-        return HAL_ADC_Start_IT(&_handle);
+    void start_regular() {
+        if (is_bit_set(_reg->SR, ADC_SR_STRT)) {
+            return; // there is ongoing regular channel conversion
+        }
+        set_bit(_reg->CR2, ADC_CR2_SWSTART);
     }
 
-    HalStatus poll(uint32_t timeout = 0) { return HAL_ADC_PollForConversion(&_handle, timeout); }
-    uint32_t read_regular_conversion() { return HAL_ADC_GetValue(&_handle); }
+    bool regular_ready() const {
+        return is_bit_set(_reg->SR, ADC_SR_EOC);
+    }
+
+    uint32_t read_regular() {
+        return _reg->DR;
+    }
+
+    void acknowledge_regular() {
+        clear_bit(_reg->SR, ADC_SR_EOC | ADC_SR_STRT);
+    }
 
     /* INTERRUPTS */
 public:

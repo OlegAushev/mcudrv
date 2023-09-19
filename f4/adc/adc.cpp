@@ -8,7 +8,7 @@ namespace mcu {
 namespace adc {
 
 
-Module::Module(Peripheral peripheral, const Config& config)
+Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk(peripheral);
@@ -26,6 +26,11 @@ Module::Module(Peripheral peripheral, const Config& config)
     while(counter != 0)
     {
         --counter;
+    }
+
+    if (dma) {
+        set_bit(_reg->CR2, ADC_CR2_DMA);
+        write_reg(dma->stream_reg()->PAR, uint32_t(&(_reg->DR)));
     }
 }
 
