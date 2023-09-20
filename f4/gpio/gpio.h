@@ -3,7 +3,7 @@
 
 #ifdef STM32F4xx
 
-#include "../mcu_def.h"
+#include "../mcudef.h"
 #include <emblib_stm32/core.h>
 #include <emblib_stm32/interfaces/gpio.h>
 #include <algorithm>
@@ -125,7 +125,7 @@ private:
         emb::invalid_function, emb::invalid_function, emb::invalid_function, emb::invalid_function,
     };
 public:
-    void init_interrupt(void(*handler)(void), InterruptPriority priority) {
+    void init_interrupt(void(*handler)(void), IrqPriority priority) {
         switch (_config.pin.Pin) {
         case GPIO_PIN_0:
             _irqn = EXTI0_IRQn;

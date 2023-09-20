@@ -179,7 +179,7 @@ public:
     void init_interrupts(uint32_t interrupt_list, uint32_t interrupt_line);
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
 
-    void set_interrupt_priority(InterruptPriority line0_priority, InterruptPriority line1_priority) {
+    void set_interrupt_priority(IrqPriority line0_priority, IrqPriority line1_priority) {
         HAL_NVIC_SetPriority(impl::irq0_numbers[static_cast<size_t>(_peripheral)], line0_priority.get(), 0);
         HAL_NVIC_SetPriority(impl::irq1_numbers[static_cast<size_t>(_peripheral)], line1_priority.get(), 0);
     }

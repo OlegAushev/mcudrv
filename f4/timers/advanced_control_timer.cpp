@@ -9,7 +9,7 @@ namespace timers {
 
 
 AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral, const Config& config)
-        : emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk();
 
@@ -108,54 +108,17 @@ void AdvancedControlTimer::init_bdt(BdtConfig config, BkinPin* pin_bkin) {
 }
 
 
-void AdvancedControlTimer::init_interrupts() {
-    switch (_peripheral) {
-    case AdvancedControlPeripheral::tim1:
-        _init_tim1_interrupts();
-        break;
-    case AdvancedControlPeripheral::tim8:
-        _init_tim8_interrupts();
-        break;
-    }
-
-    if (mcu::is_bit_set(_reg->DIER, TIM_DIER_BIE)) {
-        _brk_enabled = true;
-    }
+void AdvancedControlTimer::init_update_interrupts(IrqPriority priority) {
+    mcu::set_bit(_reg->DIER, TIM_DIER_UIE);
+    mcu::set_irq_priority(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)], priority);
 }
 
 
-void AdvancedControlTimer::enable_interrupts() {
-    mcu::clear_bit(_reg->SR, TIM_SR_UIF);
-    
-    switch (_peripheral) {
-    case AdvancedControlPeripheral::tim1:
-        _enable_tim1_interrupts();
-        break;
-    case AdvancedControlPeripheral::tim8:
-        _enable_tim8_interrupts();
-        break;
-    }
+void AdvancedControlTimer::init_break_interrupts(IrqPriority priority) {
+    mcu::set_bit(_reg->DIER, TIM_DIER_BIE);
+    mcu::set_irq_priority(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)], priority);
+    _brk_enabled = true;
 }
-
-
-void AdvancedControlTimer::disable_interrupts() {
-    switch (_peripheral) {
-    case AdvancedControlPeripheral::tim1:
-        _disable_tim1_interrupts();
-        break;
-    case AdvancedControlPeripheral::tim8:
-        _disable_tim8_interrupts();
-        break;
-    }
-}
-
-
-__attribute__((weak)) void AdvancedControlTimer::_init_tim1_interrupts() { emb::invalid_function(); }
-__attribute__((weak)) void AdvancedControlTimer::_init_tim8_interrupts() { emb::invalid_function(); }
-__attribute__((weak)) void AdvancedControlTimer::_enable_tim1_interrupts() { emb::invalid_function(); }
-__attribute__((weak)) void AdvancedControlTimer::_enable_tim8_interrupts() { emb::invalid_function(); }
-__attribute__((weak)) void AdvancedControlTimer::_disable_tim1_interrupts() { emb::invalid_function(); }
-__attribute__((weak)) void AdvancedControlTimer::_disable_tim8_interrupts() { emb::invalid_function(); }
 
 
 } // namespace timers

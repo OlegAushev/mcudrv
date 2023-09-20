@@ -88,10 +88,10 @@ void Module::_enable_clk(Peripheral peripheral) {
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority) {
+void Module::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) {
     clear_bit(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
     set_bit(_reg->CR1, interrupt_list);
-     mcu::set_interrupt_priority(ADC_IRQn, priority);
+     mcu::set_irq_priority(ADC_IRQn, priority);
 }
 
 

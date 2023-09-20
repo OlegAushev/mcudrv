@@ -2,7 +2,7 @@
 
 #ifdef STM32F4xx
 
-#include "../mcu_def.h"
+#include "../mcudef.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include "../dma/dma.h"
@@ -149,9 +149,9 @@ public:
 
     /* INTERRUPTS */
 public:
-    void init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority);
-    void enable_interrupts() { enable_interrupt(ADC_IRQn); }
-    void disable_interrupts() { disable_interrupt(ADC_IRQn); }
+    void init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority);
+    void enable_interrupts() { enable_irq(ADC_IRQn); }
+    void disable_interrupts() { disable_irq(ADC_IRQn); }
 protected:
     static void _enable_clk(Peripheral peripheral);
 };

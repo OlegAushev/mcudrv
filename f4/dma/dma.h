@@ -3,7 +3,7 @@
 
 #ifdef STM32F4xx
 
-#include "../mcu_def.h"
+#include "../mcudef.h"
 #include "../system/system.h"
 #include <array>
 #include <utility>
@@ -51,7 +51,7 @@ inline std::array<void(*)(void), 2> dma_clk_enable_funcs = {
 };
 
 
-inline constexpr std::array<IRQn_Type, stream_count> dma_irq_numbers = {	
+inline constexpr std::array<IRQn_Type, stream_count> dma_irqn = {	
     DMA1_Stream0_IRQn, DMA1_Stream1_IRQn, DMA1_Stream2_IRQn, DMA1_Stream3_IRQn,
     DMA1_Stream4_IRQn, DMA1_Stream5_IRQn, DMA1_Stream6_IRQn, DMA1_Stream7_IRQn,
     DMA2_Stream0_IRQn, DMA2_Stream1_IRQn, DMA2_Stream2_IRQn, DMA2_Stream3_IRQn,
@@ -96,14 +96,14 @@ public:
         return emb::interrupt_invoker_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
     }
 
-    void init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority);
+    void init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
 
     void enable_interrupts() {
-        enable_interrupt(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);
+        enable_irq(impl::dma_irqn[std::to_underlying(_stream_id)]);
     }
 
     void disable_interrupts() {
-        disable_interrupt(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);
+        disable_irq(impl::dma_irqn[std::to_underlying(_stream_id)]);
     }
 
     void enable() {

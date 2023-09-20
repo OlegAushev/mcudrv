@@ -90,7 +90,7 @@ public:
     }
 
 
-    void init_interrupts(DMA_HandleTypeDef* peripheral_handle, mcu::InterruptPriority priority) {
+    void init_interrupts(DMA_HandleTypeDef* peripheral_handle, mcu::IrqPriority priority) {
         _peripheral_handle = peripheral_handle;
         HAL_NVIC_SetPriority(impl::irq_numbers[std::to_underlying(_stream)], priority.get(), 0);
     }

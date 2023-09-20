@@ -2,7 +2,7 @@
 
 #ifdef STM32F4xx
 
-#include "timers_def.h"
+#include "timerdef.h"
 #include <utility>
 
 
@@ -17,12 +17,12 @@ enum class AdvancedControlPeripheral {
 };
 
 
-constexpr int adv_peripheral_count = 2;
+constexpr int adv_timer_peripheral_count = 2;
 
 
 namespace impl {
 
-inline constexpr std::array<TIM_TypeDef*, adv_peripheral_count> adv_timer_instances = {TIM1, TIM8};
+inline constexpr std::array<TIM_TypeDef*, adv_timer_peripheral_count> adv_timer_instances = {TIM1, TIM8};
 
 
 inline AdvancedControlPeripheral to_peripheral(const TIM_TypeDef* instance) {
@@ -34,22 +34,26 @@ inline AdvancedControlPeripheral to_peripheral(const TIM_TypeDef* instance) {
 }
 
 
-inline std::array<void(*)(void), adv_peripheral_count> adv_timer_clk_enable_funcs = {
+inline std::array<void(*)(void), adv_timer_peripheral_count> adv_timer_clk_enable_funcs = {
     [](){ __HAL_RCC_TIM1_CLK_ENABLE(); },
     [](){ __HAL_RCC_TIM8_CLK_ENABLE(); },
 };
 
 
+inline constexpr std::array<IRQn_Type, adv_timer_peripheral_count> adv_timer_up_irqn = {TIM1_UP_TIM10_IRQn, TIM8_UP_TIM13_IRQn};
+inline constexpr std::array<IRQn_Type, adv_timer_peripheral_count> adv_timer_brk_irqn = {TIM1_BRK_TIM9_IRQn, TIM8_BRK_TIM12_IRQn};
+
+
 }
 
 
-class AdvancedControlTimer : public emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>, public emb::noncopyable {
+class AdvancedControlTimer : public emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>, public emb::noncopyable {
 private:
     const AdvancedControlPeripheral _peripheral;
     TIM_HandleTypeDef _handle = {};
     TIM_TypeDef* _reg;
 
-    static inline std::array<bool, adv_peripheral_count> _clk_enabled = {};
+    static inline std::array<bool, adv_timer_peripheral_count> _clk_enabled = {};
 
     uint32_t _freq = 0;
     float _t_dts_ns = 0;
@@ -61,7 +65,7 @@ public:
     TIM_HandleTypeDef* handle() { return &_handle; }
     TIM_TypeDef* reg() { return _reg; }
     static AdvancedControlTimer* instance(AdvancedControlPeripheral peripheral) {
-        return emb::interrupt_invoker_array<AdvancedControlTimer, adv_peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void init_pwm(Channel channel, ChannelConfig config, ChPin* pin_ch, ChPin* pin_chn);
@@ -101,16 +105,29 @@ public:
         }
     }
 
-    void init_interrupts();
-    void enable_interrupts();
-    void disable_interrupts();
-protected:
-    static void _init_tim1_interrupts();
-    static void _init_tim8_interrupts();
-    static void _enable_tim1_interrupts();
-    static void _enable_tim8_interrupts();
-    static void _disable_tim1_interrupts();
-    static void _disable_tim8_interrupts();
+    void init_update_interrupts(IrqPriority priority);
+
+    void enable_update_interrupts() {
+        mcu::clear_bit(_reg->SR, TIM_SR_UIF);
+        mcu::clear_pending_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
+        mcu::enable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
+    }
+
+    void disable_update_interrupts() {
+        mcu::disable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
+    }
+
+    void init_break_interrupts(IrqPriority priority);
+
+    void enable_break_interrupts() {
+        mcu::clear_bit(_reg->SR, TIM_SR_BIF);
+        mcu::clear_pending_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
+        mcu::enable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
+    }
+    
+    void disable_break_interrupts() {
+        mcu::disable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
+    }
 private:
     void _enable_clk();
 };

@@ -62,10 +62,10 @@ void Stream::_enable_clk(StreamId stream_id) {
 }
 
 
-void Stream::init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority) {
+void Stream::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) {
     write_reg(_base_reg->IFCR, 0x3FUL << _handle.StreamIndex); // clear all interrupt flags
     set_bit(_stream_reg->CR, interrupt_list);
-    set_interrupt_priority(impl::dma_irq_numbers[std::to_underlying(_stream_id)], priority);
+    set_irq_priority(impl::dma_irqn[std::to_underlying(_stream_id)], priority);
 }
 
 
