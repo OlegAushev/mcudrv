@@ -88,24 +88,11 @@ void Module::_enable_clk(Peripheral peripheral) {
 }
 
 
-void Module::init_interrupts() {
-    switch (_peripheral) {
-    case Peripheral::adc1:
-        _init_adc1_interrupts();
-        break;
-    case Peripheral::adc2:
-        _init_adc2_interrupts();
-        break;
-    case Peripheral::adc3:
-        _init_adc3_interrupts();
-        break;
-    }
+void Module::init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority) {
+    clear_bit(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
+    set_bit(_reg->CR1, interrupt_list);
+     mcu::set_interrupt_priority(ADC_IRQn, priority);
 }
-
-
-__attribute__((weak)) void Module::_init_adc1_interrupts() {}
-__attribute__((weak)) void Module::_init_adc2_interrupts() {}
-__attribute__((weak)) void Module::_init_adc3_interrupts() {}
 
 
 } // namespace adc

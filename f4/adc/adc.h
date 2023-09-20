@@ -149,13 +149,9 @@ public:
 
     /* INTERRUPTS */
 public:
-    void init_interrupts();
+    void init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority);
     void enable_interrupts() { enable_interrupt(ADC_IRQn); }
     void disable_interrupts() { disable_interrupt(ADC_IRQn); }
-protected:
-    static void _init_adc1_interrupts();
-    static void _init_adc2_interrupts();
-    static void _init_adc3_interrupts();
 protected:
     static void _enable_clk(Peripheral peripheral);
 };

@@ -61,6 +61,15 @@ inline constexpr std::array<DMA_Stream_TypeDef*, stream_count> dma_stream_instan
 };
 
 
+// already defined in stm32f4xx_hal_dma.c, but is private
+struct DMA_Base_Registers
+{
+  __IO uint32_t ISR;   /*!< DMA interrupt status register */
+  __IO uint32_t Reserved0;
+  __IO uint32_t IFCR;  /*!< DMA interrupt flag clear register */
+};
+
+
 } // namespace impl
 
 
@@ -69,6 +78,7 @@ private:
     const StreamId _stream_id;
     DMA_HandleTypeDef _handle = {};
     DMA_Stream_TypeDef* _stream_reg;
+    impl::DMA_Base_Registers* _base_reg;
 
     static inline std::array<bool, 2> _clk_enabled = {false, false};
 public:
@@ -80,10 +90,7 @@ public:
         return emb::interrupt_invoker_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
     }
 
-    void init_interrupts(mcu::InterruptPriority priority) {
-        set_bit(_stream_reg->CR, DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
-        set_interrupt_priority(impl::dma_irq_numbers[std::to_underlying(_stream_id)], priority);
-    }
+    void init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority);
 
     void enable_interrupts() {
         enable_interrupt(impl::dma_irq_numbers[std::to_underlying(_stream_id)]);

@@ -23,6 +23,8 @@ Stream::Stream(const Config& config)
     if (HAL_DMA_Init(&_handle) != HAL_OK) {
         fatal_error("DMA stream initialization failed");
     }
+
+    _base_reg = reinterpret_cast<impl::DMA_Base_Registers*>(_handle.StreamBaseAddress);
 }
 
 
@@ -53,6 +55,13 @@ void Stream::_enable_clk(StreamId stream_id) {
         _clk_enabled[1] = true;
         break;
     }
+}
+
+
+void Stream::init_interrupts(uint32_t interrupt_list,mcu::InterruptPriority priority) {
+    write_reg(_base_reg->IFCR, 0x3FUL << _handle.StreamIndex); // clear all interrupt flags
+    set_bit(_stream_reg->CR, interrupt_list);
+    set_interrupt_priority(impl::dma_irq_numbers[std::to_underlying(_stream_id)], priority);
 }
 
 
