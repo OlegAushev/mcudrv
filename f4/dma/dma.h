@@ -45,6 +45,12 @@ struct Config {
 namespace impl {
 
 
+inline std::array<void(*)(void), 2> dma_clk_enable_funcs = {
+    [](){ __HAL_RCC_DMA1_CLK_ENABLE(); },
+    [](){ __HAL_RCC_DMA2_CLK_ENABLE(); },
+};
+
+
 inline constexpr std::array<IRQn_Type, stream_count> dma_irq_numbers = {	
     DMA1_Stream0_IRQn, DMA1_Stream1_IRQn, DMA1_Stream2_IRQn, DMA1_Stream3_IRQn,
     DMA1_Stream4_IRQn, DMA1_Stream5_IRQn, DMA1_Stream6_IRQn, DMA1_Stream7_IRQn,

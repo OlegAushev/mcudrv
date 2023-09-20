@@ -117,10 +117,16 @@ void AdvancedControlTimer::init_interrupts() {
         _init_tim8_interrupts();
         break;
     }
+
+    if (mcu::is_bit_set(_reg->DIER, TIM_DIER_BIE)) {
+        _brk_enabled = true;
+    }
 }
 
 
 void AdvancedControlTimer::enable_interrupts() {
+    mcu::clear_bit(_reg->SR, TIM_SR_UIF);
+    
     switch (_peripheral) {
     case AdvancedControlPeripheral::tim1:
         _enable_tim1_interrupts();

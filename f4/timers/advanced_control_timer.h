@@ -39,6 +39,7 @@ inline std::array<void(*)(void), adv_peripheral_count> adv_timer_clk_enable_func
     [](){ __HAL_RCC_TIM8_CLK_ENABLE(); },
 };
 
+
 }
 
 
@@ -52,6 +53,8 @@ private:
 
     uint32_t _freq = 0;
     float _t_dts_ns = 0;
+
+    bool _brk_enabled = false;
 public:
     AdvancedControlTimer(AdvancedControlPeripheral peripheral, const Config& config);
     AdvancedControlPeripheral peripheral() const { return _peripheral; }
@@ -65,11 +68,19 @@ public:
     void init_bdt(BdtConfig config, BkinPin* pin_bkin);
 
     void start_pwm() {
+        if (_brk_enabled) {
+            mcu::clear_bit(_reg->SR, TIM_SR_BIF);
+            mcu::set_bit(TIM1->DIER, TIM_DIER_BIE);
+        }
         mcu::set_bit(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void stop_pwm() {
         mcu::clear_bit(_reg->BDTR, TIM_BDTR_MOE);
+        if (_brk_enabled) {
+            // disable break interrupts to prevent instant call of BRK ISR
+            mcu::clear_bit(TIM1->DIER, TIM_DIER_BIE);
+        }
     }
 
     void set_duty_cycle(Channel channel, float duty_cycle) {

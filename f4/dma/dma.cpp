@@ -38,8 +38,10 @@ void Stream::_enable_clk(StreamId stream_id) {
     case StreamId::dma1_stream5:
     case StreamId::dma1_stream6:
     case StreamId::dma1_stream7:
-        if (_clk_enabled[0]) return;
-        __HAL_RCC_DMA1_CLK_ENABLE();
+        if (_clk_enabled[0]) {
+            return;
+        }
+        impl::dma_clk_enable_funcs[0];
         _clk_enabled[0] = true;
         break;
     case StreamId::dma2_stream0:
@@ -50,8 +52,10 @@ void Stream::_enable_clk(StreamId stream_id) {
     case StreamId::dma2_stream5:
     case StreamId::dma2_stream6:
     case StreamId::dma2_stream7:
-        if (_clk_enabled[1]) return;
-        __HAL_RCC_DMA2_CLK_ENABLE();
+        if (_clk_enabled[1]) {
+            return;
+        }
+        impl::dma_clk_enable_funcs[1]();
         _clk_enabled[1] = true;
         break;
     }

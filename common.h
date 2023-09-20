@@ -68,6 +68,7 @@ public:
 inline void set_interrupt_priority(IRQn_Type irqn, InterruptPriority priority) { HAL_NVIC_SetPriority(irqn, priority.get(), 0);}
 inline void enable_interrupt(IRQn_Type irqn) { HAL_NVIC_EnableIRQ(irqn); }
 inline void disable_interrupt(IRQn_Type irqn) { HAL_NVIC_DisableIRQ(irqn); }
+inline void clear_pending_interrupt(IRQn_Type irqn) { HAL_NVIC_ClearPendingIRQ(irqn); }
 
 
 }
