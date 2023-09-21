@@ -71,6 +71,10 @@ public:
     void init_pwm(Channel channel, ChannelConfig config, ChPin* pin_ch, ChPin* pin_chn);
     void init_bdt(BdtConfig config, BkinPin* pin_bkin);
 
+    bool pwm_active() const {
+        return mcu::is_bit_set(_reg->BDTR, TIM_BDTR_MOE);
+    }
+
     void start_pwm() {
         if (_brk_enabled) {
             mcu::clear_bit(_reg->SR, TIM_SR_BIF);
