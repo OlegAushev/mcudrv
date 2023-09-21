@@ -13,7 +13,7 @@ Module::Module(Peripheral peripheral,
                const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
                const gpio::Config& clk_pin, const gpio::Config& cs_pin,
                const Config& config)
-        : emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::spi_bases[peripheral.underlying_value()], impl::spi_rx_pie_int_nums[peripheral.underlying_value()]) {
     assert((config.data_size >= 1) && (config.data_size <= 16));

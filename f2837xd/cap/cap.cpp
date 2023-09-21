@@ -13,7 +13,7 @@ void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint16_t);
 
 
 Module::Module(Peripheral peripheral, const gpio::Config& pin_config)
-        : emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::cap_bases[peripheral.underlying_value()],
                   impl::cap_xbar_inputs[peripheral.underlying_value()],

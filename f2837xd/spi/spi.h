@@ -73,7 +73,7 @@ extern const uint32_t spi_rx_pie_int_nums[3];
 } // namespace impl
 
 
-class Module : public emb::c28x::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     impl::Module _module;

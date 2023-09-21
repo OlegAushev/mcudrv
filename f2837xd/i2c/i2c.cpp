@@ -9,7 +9,7 @@ const uint32_t impl::i2c_bases[2] = {I2CA_BASE, I2CB_BASE};
 
 
 Module::Module(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin, const i2c::Config& config)
-        : emb::c28x::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::i2c_bases[peripheral.underlying_value()]) {
 #ifdef CPU1
