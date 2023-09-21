@@ -3,8 +3,8 @@
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib_c28x/array.h>
-#include <emblib_c28x/core.h>
+#include <emblib/array.h>
+#include <emblib/core.h>
 #include <math.h>
 
 

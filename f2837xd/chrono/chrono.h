@@ -2,9 +2,9 @@
 
 
 #include "../system/system.h"
-#include <emblib_c28x/core.h>
-#include <emblib_c28x/chrono.h>
-#include <emblib_c28x/staticvector.h>
+#include <emblib/core.h>
+#include <emblib/chrono.h>
+#include <emblib/staticvector.h>
 
 
 namespace mcu {

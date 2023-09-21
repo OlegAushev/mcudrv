@@ -3,7 +3,7 @@
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib_c28x/core.h>
+#include <emblib/core.h>
 
 
 namespace mcu {

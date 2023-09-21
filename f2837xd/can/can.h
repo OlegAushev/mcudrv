@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <emblib_c28x/core.h>
+#include <emblib/core.h>
 #include <mculib_c28x/f2837xd/gpio/gpio.h>
 #include <mculib_c28x/f2837xd/system/system.h>
 

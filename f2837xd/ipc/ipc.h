@@ -2,7 +2,7 @@
 
 
 #include "../system/system.h"
-#include <emblib_c28x/core.h>
+#include <emblib/core.h>
 #include "F2837xD_Ipc_drivers.h"
 
 

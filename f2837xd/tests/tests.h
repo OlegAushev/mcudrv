@@ -2,7 +2,7 @@
 
 
 #include <tests/tests_config.h>
-#include <emblib_c28x/testrunner/testrunner.h>
+#include <emblib/testrunner/testrunner.h>
 #include "../system/system.h"
 #include "mculib_c28x/f2837xd/gpio/gpio.h"
 #include "mculib_c28x/f2837xd/chrono/chrono.h"
