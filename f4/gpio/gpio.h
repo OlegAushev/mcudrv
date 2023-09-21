@@ -4,8 +4,8 @@
 #ifdef STM32F4xx
 
 #include "../mcudef.h"
-#include <emblib_stm32/core.h>
-#include <emblib_stm32/interfaces/gpio.h>
+#include <emblib/core.h>
+#include <emblib/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
 #include <utility>

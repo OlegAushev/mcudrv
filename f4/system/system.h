@@ -4,7 +4,7 @@
 #ifdef STM32F4xx
 
 #include "../mcudef.h"
-#include <emblib_stm32/core.h>
+#include <emblib/core.h>
 #include <cstdio>
 #include <chrono>
 

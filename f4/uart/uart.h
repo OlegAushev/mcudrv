@@ -6,8 +6,8 @@
 #include "../mcudef.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib_stm32/core.h>
-#include <emblib_stm32/interfaces/uart.h>
+#include <emblib/core.h>
+#include <emblib/interfaces/uart.h>
 
 #include <utility>
 

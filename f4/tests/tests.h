@@ -3,7 +3,7 @@
 
 #ifdef STM32F4xx
 
-#include <emblib_stm32/testrunner/testrunner.h>
+#include <emblib/testrunner/testrunner.h>
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
