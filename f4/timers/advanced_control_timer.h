@@ -109,6 +109,8 @@ public:
         }
     }
 
+    uint32_t freq() const { return _freq; }
+
     void init_update_interrupts(IrqPriority priority);
 
     void enable_update_interrupts() {
