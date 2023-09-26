@@ -139,10 +139,10 @@ class Module : private emb::noncopyable {
 private:
     // there is a divider ( EPWMCLKDIV ) of the system clock
     // which defaults to EPWMCLK = SYSCLKOUT/2, fclk(epwm)max = 100 MHz
-    static const uint32_t pwm_clk_freq = DEVICE_SYSCLK_FREQ / 2;
-    static const uint32_t pwm_clk_cycle_ns = 1000000000 / pwm_clk_freq;
-    const uint32_t _timebase_clk_freq;
-    const uint32_t _timebase_cycle_ns;
+    static const float pwm_clk_freq = DEVICE_SYSCLK_FREQ / 2;
+    static const float pwm_clk_cycle_ns = 1000000000.f / pwm_clk_freq;
+    const float _timebase_clk_freq;
+    const float _timebase_cycle_ns;
 
     Peripheral _peripheral[Phases];
     impl::Module<Phases> _module;
