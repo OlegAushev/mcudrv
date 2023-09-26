@@ -41,7 +41,7 @@ void Stream::_enable_clk(StreamId stream_id) {
         if (_clk_enabled[0]) {
             return;
         }
-        impl::dma_clk_enable_funcs[0];
+        impl::dma_clk_enable_funcs[0]();
         _clk_enabled[0] = true;
         break;
     case StreamId::dma2_stream0:
