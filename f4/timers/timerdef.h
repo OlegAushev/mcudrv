@@ -13,7 +13,7 @@ namespace timers {
 
 
 struct Config {
-    uint32_t freq;
+    float freq;
     TIM_Base_InitTypeDef hal_base_config;
 };
 
@@ -56,7 +56,7 @@ public:
 
 
 struct BdtConfig {
-    uint32_t deadtime_ns;
+    float deadtime_ns;
     TIM_BreakDeadTimeConfigTypeDef hal_bdt_config;
 };
 

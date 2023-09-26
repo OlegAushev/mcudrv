@@ -55,7 +55,7 @@ private:
 
     static inline std::array<bool, adv_timer_peripheral_count> _clk_enabled = {};
 
-    uint32_t _freq = 0;
+    float _freq = 0;
     float _t_dts_ns = 0;
 
     bool _brk_enabled = false;
@@ -109,7 +109,7 @@ public:
         }
     }
 
-    uint32_t freq() const { return _freq; }
+    float freq() const { return _freq; }
 
     void init_update_interrupts(IrqPriority priority);
 

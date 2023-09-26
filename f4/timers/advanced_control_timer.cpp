@@ -21,28 +21,30 @@ AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral,
     if (config.hal_base_config.Period == 0 && config.freq != 0) {
         // period specified by freq
         _freq = config.freq;
+        float timebase_freq = static_cast<float>(core_clk_freq()) / static_cast<float>(config.hal_base_config.Prescaler+1);
+
         switch (config.hal_base_config.CounterMode) {
         case TIM_COUNTERMODE_UP:
         case TIM_COUNTERMODE_DOWN:
-            _handle.Init.Period = ((core_clk_freq() / (config.hal_base_config.Prescaler+1)) / config.freq) - 1;
+            _handle.Init.Period = static_cast<uint32_t>((timebase_freq / config.freq) - 1);
             break;
         case TIM_COUNTERMODE_CENTERALIGNED1:
         case TIM_COUNTERMODE_CENTERALIGNED2:
         case TIM_COUNTERMODE_CENTERALIGNED3:
-            _handle.Init.Period = (core_clk_freq() / (config.hal_base_config.Prescaler+1)) / (2 * config.freq);
+            _handle.Init.Period = static_cast<uint32_t>((timebase_freq / config.freq) / 2);
             break;
         }
     }
 
     switch (config.hal_base_config.ClockDivision) {
     case TIM_CLOCKDIVISION_DIV1:
-        _t_dts_ns = (config.hal_base_config.Prescaler+1) * 1000000000.f / core_clk_freq();
+        _t_dts_ns = static_cast<float>(config.hal_base_config.Prescaler+1) * 1000000000.f / static_cast<float>(core_clk_freq());
         break;
     case TIM_CLOCKDIVISION_DIV2:
-        _t_dts_ns = 2 * (config.hal_base_config.Prescaler+1) * 1000000000.f / core_clk_freq();
+        _t_dts_ns = 2 * static_cast<float>(config.hal_base_config.Prescaler+1) * 1000000000.f / static_cast<float>(core_clk_freq());
         break;
     case TIM_CLOCKDIVISION_DIV4:
-        _t_dts_ns = 4 * (config.hal_base_config.Prescaler+1) * 1000000000.f / core_clk_freq();
+        _t_dts_ns = 4 * static_cast<float>(config.hal_base_config.Prescaler+1) * 1000000000.f / static_cast<float>(core_clk_freq());
         break;
     default:
         fatal_error("timer initialization failed");
@@ -87,15 +89,15 @@ void AdvancedControlTimer::init_bdt(BdtConfig config, BkinPin* pin_bkin) {
     if (config.hal_bdt_config.DeadTime == 0 && config.deadtime_ns != 0) {
         // deadtime specified by deadtime_ns
         if (config.deadtime_ns <= 0X7F * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = config.deadtime_ns / _t_dts_ns;
+            config.hal_bdt_config.DeadTime = static_cast<uint32_t>(config.deadtime_ns / _t_dts_ns);
         } else if (config.deadtime_ns <= 127 * 2 * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = (config.deadtime_ns - 64 * 2 * _t_dts_ns) / (2 * _t_dts_ns);
+            config.hal_bdt_config.DeadTime = static_cast<uint32_t>((config.deadtime_ns - 64 * 2 * _t_dts_ns) / (2 * _t_dts_ns));
             config.hal_bdt_config.DeadTime |= 0x80;
         } else if (config.deadtime_ns <= 63 * 8 * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = (config.deadtime_ns - 32 * 8 * _t_dts_ns) / (8 * _t_dts_ns);
+            config.hal_bdt_config.DeadTime = static_cast<uint32_t>((config.deadtime_ns - 32 * 8 * _t_dts_ns) / (8 * _t_dts_ns));
             config.hal_bdt_config.DeadTime |= 0xC0;
         } else if (config.deadtime_ns <= 63 * 16 * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = (config.deadtime_ns - 32 * 16 * _t_dts_ns) / (16 * _t_dts_ns);
+            config.hal_bdt_config.DeadTime = static_cast<uint32_t>((config.deadtime_ns - 32 * 16 * _t_dts_ns) / (16 * _t_dts_ns));
             config.hal_bdt_config.DeadTime |= 0xE0;
         } else {
             fatal_error("timer dead-time initialization failed");
