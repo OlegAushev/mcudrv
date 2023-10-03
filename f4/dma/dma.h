@@ -10,7 +10,6 @@
 
 
 namespace mcu {
-
 namespace dma {
 
 enum class StreamId {
@@ -149,7 +148,6 @@ public:
 
 
 } // namespace dma
-
 } // namespace mcu
 
 

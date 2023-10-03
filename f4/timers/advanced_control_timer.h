@@ -7,7 +7,6 @@
 
 
 namespace mcu {
-
 namespace timers {
 
 
@@ -68,8 +67,8 @@ public:
         return emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void init_pwm(Channel channel, ChannelConfig config, ChPin* pin_ch, ChPin* pin_chn);
-    void init_bdt(BdtConfig config, BkinPin* pin_bkin);
+    void init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config);
+    void init_bdt(BkinPin* pin_bkin, BdtConfig config);
 
     bool pwm_active() const {
         return mcu::is_bit_set(_reg->BDTR, TIM_BDTR_MOE);
@@ -135,12 +134,11 @@ public:
         mcu::disable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
     }
 private:
-    void _enable_clk();
+    static void _enable_clk(AdvancedControlPeripheral peripheral);
 };
 
 
 } // namespace timers
-
 } // namepsace mcu
 
 #endif

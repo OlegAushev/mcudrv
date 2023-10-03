@@ -4,7 +4,6 @@
 
 
 namespace mcu {
-
 namespace adc {
 
 
@@ -12,10 +11,9 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk(peripheral);
-    _handle.Instance = impl::adc_instances[std::to_underlying(_peripheral)];
+    _reg = impl::adc_instances[std::to_underlying(_peripheral)];
+    _handle.Instance = _reg;
     _handle.Init = config.hal_config;
-    
-    _reg = _handle.Instance;
 
     if (HAL_ADC_Init(&_handle) != HAL_OK) {
         fatal_error("ADC module initialization failed");
@@ -35,7 +33,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
 }
 
 
-void Module::add_injected_channel(PinConfig pin_config, InjectedChannelConfig channel_config) {
+void Module::add_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -49,7 +47,7 @@ void Module::add_injected_channel(PinConfig pin_config, InjectedChannelConfig ch
 }
 
 
-void Module::add_regular_channel(PinConfig pin_config, RegularChannelConfig channel_config) {
+void Module::add_regular_channel(const PinConfig& pin_config, RegularChannelConfig channel_config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -96,7 +94,6 @@ void Module::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) 
 
 
 } // namespace adc
-
 } // namespace mcu
 
 

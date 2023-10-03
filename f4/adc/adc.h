@@ -10,7 +10,6 @@
 
 
 namespace mcu {
-
 namespace adc {
 
 
@@ -77,9 +76,6 @@ inline std::array<void(*)(void), peripheral_count> adc_clk_enable_funcs = {
 
 
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
-    friend void ::HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef*);
-    friend void ::HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef*);
-    friend void ::HAL_ADC_ErrorCallback(ADC_HandleTypeDef*);
 private:
     const Peripheral _peripheral;
     ADC_HandleTypeDef _handle = {};
@@ -98,8 +94,8 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void add_injected_channel(PinConfig pin_config, InjectedChannelConfig channel_config);
-    void add_regular_channel(PinConfig pin_config, RegularChannelConfig channel_config);
+    void add_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config);
+    void add_regular_channel(const PinConfig& pin_config, RegularChannelConfig channel_config);
     void add_injected_internal_channel(InjectedChannelConfig channel_config);
     void add_regular_internal_channel(RegularChannelConfig channel_config);
 
@@ -158,7 +154,6 @@ protected:
 
 
 } // namespace adc
-
 } // namespace mcu
 
 

@@ -4,7 +4,6 @@
 
 
 namespace mcu {
-
 namespace dma {
 
 
@@ -12,10 +11,9 @@ Stream::Stream(const Config& config)
         : emb::interrupt_invoker_array<Stream, stream_count>(this, std::to_underlying(config.stream_id))
         , _stream_id(config.stream_id) {
     _enable_clk(_stream_id);
-    _handle.Instance = impl::dma_stream_instances[std::to_underlying(_stream_id)];
+    _stream_reg = impl::dma_stream_instances[std::to_underlying(_stream_id)];
+    _handle.Instance = _stream_reg;
     _handle.Init = config.hal_config;
-
-    _stream_reg = _handle.Instance;
 
     if (HAL_DMA_DeInit(&_handle) != HAL_OK) {
         fatal_error("DMA stream deinitialization failed");
@@ -70,7 +68,6 @@ void Stream::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) 
 
 
 } // namespace dma
-
 } // namespace mcu
 
 
