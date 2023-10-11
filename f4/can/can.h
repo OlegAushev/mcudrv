@@ -63,19 +63,6 @@ inline std::array<void(*)(void), peripheral_count> can_clk_enable_funcs = {
 };
 
 
-// inline constexpr std::array<uint32_t, 9> data_len_codes = {	
-//     FDCAN_DLC_BYTES_0,
-//     FDCAN_DLC_BYTES_1,
-//     FDCAN_DLC_BYTES_2,
-//     FDCAN_DLC_BYTES_3,
-//     FDCAN_DLC_BYTES_4,
-//     FDCAN_DLC_BYTES_5,
-//     FDCAN_DLC_BYTES_6,
-//     FDCAN_DLC_BYTES_7,
-//     FDCAN_DLC_BYTES_8
-// };
-
-
 inline constexpr std::array<IRQn_Type, peripheral_count> can_fifo0_irqn = {CAN1_RX0_IRQn, CAN2_RX0_IRQn};
 inline constexpr std::array<IRQn_Type, peripheral_count> can_fifo1_irqn = {CAN1_RX1_IRQn, CAN2_RX1_IRQn};
 inline constexpr std::array<IRQn_Type, peripheral_count> can_tx_irqn = {CAN1_TX_IRQn, CAN2_TX_IRQn};
