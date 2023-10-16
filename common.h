@@ -49,7 +49,7 @@ template <typename T>
 void modify_reg(volatile T& reg, T clearmask, T setmask) { reg = (reg & ~clearmask) | setmask; }
 
 
-inline uint32_t position_val(uint32_t val) { return __CLZ(__RBIT(val)); }
+inline uint32_t position_val(uint32_t val) { return __builtin_clz(__RBIT(val)); }
 
 
 class IrqPriority {
