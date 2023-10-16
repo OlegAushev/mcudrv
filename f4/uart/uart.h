@@ -74,13 +74,13 @@ inline std::array<void(*)(void), peripheral_count> uart_clk_enable_funcs = {
 class Module : public emb::uart::UartInterface, public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
-    UART_HandleTypeDef _handle = {};
+    UART_HandleTypeDef _handle{};
     mcu::gpio::Input _rx_pin;
     mcu::gpio::Output _tx_pin;
 
-    static inline std::array<bool, peripheral_count> _clk_enabled = {};
+    static inline std::array<bool, peripheral_count> _clk_enabled{};
 
-    static constexpr uint32_t timeout_ms = 1000;
+    static constexpr uint32_t timeout_ms{1000};
 public:
     Module(Peripheral peripheral, const RxPinConfig& rxPinConf, const TxPinConfig& txPinConf, const Config& conf);
     Peripheral peripheral() const { return _peripheral; }

@@ -40,7 +40,7 @@ struct PinConfig {
 
 
 struct ChannelConfig {
-    DAC_ChannelConfTypeDef haL_config;
+    DAC_ChannelConfTypeDef hal_config;
 };
 
 
@@ -68,9 +68,9 @@ inline std::array<void(*)(void), peripheral_count> dac_clk_enable_funcs = {
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
-    DAC_HandleTypeDef _handle = {};
+    DAC_HandleTypeDef _handle{};
     DAC_TypeDef* _reg;
-    static inline std::array<bool, peripheral_count> _clk_enabled = {};
+    static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
     Module(Peripheral peripheral);
     void init_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config);

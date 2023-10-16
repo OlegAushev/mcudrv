@@ -49,15 +49,15 @@ inline constexpr std::array<IRQn_Type, adv_timer_peripheral_count> adv_timer_brk
 class AdvancedControlTimer : public emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>, public emb::noncopyable {
 private:
     const AdvancedControlPeripheral _peripheral;
-    TIM_HandleTypeDef _handle = {};
+    TIM_HandleTypeDef _handle{};
     TIM_TypeDef* _reg;
 
-    static inline std::array<bool, adv_timer_peripheral_count> _clk_enabled = {};
+    static inline std::array<bool, adv_timer_peripheral_count> _clk_enabled{};
 
-    float _freq = 0;
-    float _t_dts_ns = 0;
+    float _freq{0};
+    float _t_dts_ns{0};
 
-    bool _brk_enabled = false;
+    bool _brk_enabled{false};
 public:
     AdvancedControlTimer(AdvancedControlPeripheral peripheral, const Config& config);
     AdvancedControlPeripheral peripheral() const { return _peripheral; }

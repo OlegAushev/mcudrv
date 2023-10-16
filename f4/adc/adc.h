@@ -78,10 +78,10 @@ inline std::array<void(*)(void), peripheral_count> adc_clk_enable_funcs = {
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
-    ADC_HandleTypeDef _handle = {};
+    ADC_HandleTypeDef _handle{};
     ADC_TypeDef* _reg;
-    static inline ADC_Common_TypeDef* _reg_common = ADC123_COMMON;
-    static inline std::array<bool, peripheral_count> _clk_enabled = {};
+    static inline ADC_Common_TypeDef* _reg_common{ADC123_COMMON};
+    static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
     Module(Peripheral peripheral, const Config& config, dma::Stream* dma = nullptr);
 

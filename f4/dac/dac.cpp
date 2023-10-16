@@ -29,7 +29,7 @@ void Module::init_channel(Channel channel, const PinConfig& pin_config, ChannelC
     cfg.pin.Pull = GPIO_NOPULL;
     mcu::gpio::Output output(cfg);
     
-    if (HAL_DAC_ConfigChannel(&_handle, &config.haL_config, std::to_underlying(channel)) != HAL_OK) {
+    if (HAL_DAC_ConfigChannel(&_handle, &config.hal_config, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("DAC channel initialization failed");
     }
 

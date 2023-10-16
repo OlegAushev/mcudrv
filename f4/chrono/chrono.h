@@ -30,9 +30,9 @@ public:
     system_clock() = delete;
     static void init();
 private:
-    static inline volatile int64_t _time = 0;
-    static constexpr std::chrono::milliseconds time_step = std::chrono::milliseconds(1);
-    static constexpr int_fast8_t task_count_max = 4;
+    static inline volatile int64_t _time{0};
+    static constexpr std::chrono::milliseconds time_step{1};
+    static constexpr int_fast8_t task_count_max{4};
 
 /* periodic tasks */
 private:
@@ -58,8 +58,8 @@ public:
         }
     }
 private:
-    static inline std::chrono::milliseconds _delayed_task_start = std::chrono::milliseconds(0);
-    static inline std::chrono::milliseconds _delayed_task_delay = std::chrono::milliseconds(0);
+    static inline std::chrono::milliseconds _delayed_task_start{0};
+    static inline std::chrono::milliseconds _delayed_task_delay{0};
     static void empty_delayed_task() {}
     static inline void (*_delayed_task)() = empty_delayed_task;
 public:

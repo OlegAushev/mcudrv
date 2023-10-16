@@ -55,10 +55,10 @@ inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
 class Gpio
 {
 private:
-    static inline std::array<bool, port_count> _clk_enabled = {};
+    static inline std::array<bool, port_count> _clk_enabled{};
 protected:
     Config _config;
-    bool _initialized = false;
+    bool _initialized{false};
     Gpio() = default;
 public:
     void init(const Config& config) {

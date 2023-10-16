@@ -81,11 +81,11 @@ struct DMA_Base_Registers
 class Stream : public emb::interrupt_invoker_array<Stream, stream_count>, public emb::noncopyable {
 private:
     const StreamId _stream_id;
-    DMA_HandleTypeDef _handle = {};
+    DMA_HandleTypeDef _handle{};
     DMA_Stream_TypeDef* _stream_reg;
     impl::DMA_Base_Registers* _base_reg;
 
-    static inline std::array<bool, 2> _clk_enabled = {false, false};
+    static inline std::array<bool, 2> _clk_enabled{false, false};
 public:
     Stream(const Config& config);
 

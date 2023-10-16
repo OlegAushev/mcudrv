@@ -86,24 +86,24 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
     friend void ::HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef*);
 private:
     const Peripheral _peripheral;
-    CAN_HandleTypeDef _handle = {};
+    CAN_HandleTypeDef _handle{};
 
     mcu::gpio::Input _rx_pin;
     mcu::gpio::Output _tx_pin;
 
-    static inline std::array<bool, peripheral_count> _clk_enabled = {};
+    static inline std::array<bool, peripheral_count> _clk_enabled{};
 
-    int _filter_count = 0;
+    int _filter_count{0};
 
     #ifdef CAN2
-    static const int max_fitler_count = 28;
+    static const int max_fitler_count{28};
     #else
-    static const int max_fitler_count = 14;
+    static const int max_fitler_count{14};
     #endif
 
     emb::queue<std::pair<CAN_TxHeaderTypeDef, can_payload>, 32> _tx_queue;
 
-    uint64_t _tx_error_counter = 0;
+    uint64_t _tx_error_counter{0};
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
     MessageAttribute register_message(CAN_FilterTypeDef& filter);
