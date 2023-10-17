@@ -131,6 +131,10 @@ public:
         set_bit(_reg->CR2, ADC_CR2_SWSTART);
     }
 
+    bool busy() const {
+        return is_bit_set(_reg->SR, ADC_SR_STRT);
+    }
+
     bool regular_ready() const {
         return is_bit_set(_reg->SR, ADC_SR_EOC);
     }
