@@ -6,6 +6,7 @@
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include "../dma/dma.h"
+#include <initializer_list>
 #include <utility>
 
 
@@ -95,7 +96,7 @@ public:
     }
 
     void add_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config);
-    void add_regular_channel(const PinConfig& pin_config, RegularChannelConfig channel_config);
+    void add_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config, std::initializer_list<uint32_t> ranks);
     void add_injected_internal_channel(InjectedChannelConfig channel_config);
     void add_regular_internal_channel(RegularChannelConfig channel_config);
 

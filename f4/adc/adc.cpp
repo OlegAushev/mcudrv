@@ -47,7 +47,7 @@ void Module::add_injected_channel(const PinConfig& pin_config, InjectedChannelCo
 }
 
 
-void Module::add_regular_channel(const PinConfig& pin_config, RegularChannelConfig channel_config) {
+void Module::add_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config, std::initializer_list<uint32_t> ranks) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -55,8 +55,12 @@ void Module::add_regular_channel(const PinConfig& pin_config, RegularChannelConf
     cfg.pin.Pull = GPIO_NOPULL;
     mcu::gpio::Input input(cfg);
 
-    if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
-        fatal_error("ADC regular channel initialization failed");
+    for (auto rank : ranks) {
+        auto config = channel_config;
+        config.hal_config.Rank = rank;
+        if (HAL_ADC_ConfigChannel(&_handle, &config.hal_config) != HAL_OK) {
+            fatal_error("ADC regular channel initialization failed");
+        }
     }
 }
 
