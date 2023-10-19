@@ -136,37 +136,37 @@ public:
         return false;
     }
 
-    HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
-        CAN_TxHeaderTypeDef header = {
-            .StdId = frame.id,
-            .ExtId = 0,
-            .IDE = CAN_ID_STD,
-            .RTR = CAN_RTR_DATA,
-            .DLC = frame.len,
-            .TransmitGlobalTime = DISABLE
-        };
+    // HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
+    //     CAN_TxHeaderTypeDef header = {
+    //         .StdId = frame.id,
+    //         .ExtId = 0,
+    //         .IDE = CAN_ID_STD,
+    //         .RTR = CAN_RTR_DATA,
+    //         .DLC = frame.len,
+    //         .TransmitGlobalTime = DISABLE
+    //     };
 
-        if (!mailbox_ready()) {
-            if (_tx_queue.full()) {
-                return HalStatus::HAL_ERROR;
-            }
-            _tx_queue.push({header, frame.payload});
-            return HalStatus::HAL_BUSY;
-        }
+    //     if (!mailbox_ready()) {
+    //         if (_tx_queue.full()) {
+    //             return HalStatus::HAL_ERROR;
+    //         }
+    //         _tx_queue.push({header, frame.payload});
+    //         return HalStatus::HAL_BUSY;
+    //     }
 
-        uint32_t mailbox = 0;
+    //     uint32_t mailbox = 0;
 
-        HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, frame.payload.data(), &mailbox);
-        if (status != HAL_OK) {
-            ++_tx_error_counter;
-        }
+    //     HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, frame.payload.data(), &mailbox);
+    //     if (status != HAL_OK) {
+    //         ++_tx_error_counter;
+    //     }
 
-        if (ret_mailbox) {
-            *ret_mailbox = mailbox;
-        }
+    //     if (ret_mailbox) {
+    //         *ret_mailbox = mailbox;
+    //     }
 
-        return status;
-    }
+    //     return status;
+    // }
 
     HalStatus send(CAN_TxHeaderTypeDef& header, can_payload& payload, uint32_t* ret_mailbox = nullptr) {
         if (!mailbox_ready()) {
@@ -192,31 +192,17 @@ public:
     }
 
     /* INTERRUPTS */
-private:
-    void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
-    void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
-    void (*_on_txmailbox_free)(Module&) = on_txmailbox_free;
+public:
+    void on_txmailbox_free() {
+        if (_tx_queue.empty()) { return; }
+        auto header = _tx_queue.front().first;
+        auto payload = _tx_queue.front().second;
 
-    static void on_txmailbox_free(Module& module) {
-        if (module._tx_queue.empty()) { return; }
-        auto header = module._tx_queue.front().first;
-        auto payload = module._tx_queue.front().second;
-
-        if (module.send(header, payload) == HalStatus::HAL_OK) {
-            module._tx_queue.pop();
+        if (send(header, payload) == HalStatus::HAL_OK) {
+            _tx_queue.pop();
         }    
     }
 public:
-    void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
-        _on_fifo0_frame_received = callback;
-    }
-    void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
-        _on_fifo1_frame_received = callback;
-    }
-    void register_on_txmailbox_free_callback(void(*callback)(Module&)) {
-        _on_txmailbox_free = callback;
-    }
-
     void init_interrupts(uint32_t interrupt_list);
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
 
