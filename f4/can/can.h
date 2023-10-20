@@ -12,6 +12,16 @@
 #include <utility>
 
 
+extern "C" {
+void CAN1_RX0_IRQHandler();
+void CAN1_RX1_IRQHandler();
+void CAN1_TX_IRQHandler();
+void CAN2_RX0_IRQHandler();
+void CAN2_RX1_IRQHandler();
+void CAN2_TX_IRQHandler();
+}
+
+
 namespace mcu {
 
 namespace can {
@@ -79,11 +89,12 @@ struct MessageAttribute {
 
 
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
-    friend void ::HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef*);
-    friend void ::HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef*);
-    friend void ::HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef*);
-    friend void ::HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef*);
-    friend void ::HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef*);
+    friend void ::CAN1_RX0_IRQHandler();
+    friend void ::CAN1_RX1_IRQHandler();
+    friend void ::CAN1_TX_IRQHandler();
+    friend void ::CAN2_RX0_IRQHandler();
+    friend void ::CAN2_RX1_IRQHandler();
+    friend void ::CAN2_TX_IRQHandler();  
 private:
     const Peripheral _peripheral;
     CAN_HandleTypeDef _handle{};
@@ -136,37 +147,18 @@ public:
         return false;
     }
 
-    // HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
-    //     CAN_TxHeaderTypeDef header = {
-    //         .StdId = frame.id,
-    //         .ExtId = 0,
-    //         .IDE = CAN_ID_STD,
-    //         .RTR = CAN_RTR_DATA,
-    //         .DLC = frame.len,
-    //         .TransmitGlobalTime = DISABLE
-    //     };
+    HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
+        CAN_TxHeaderTypeDef header = {
+            .StdId = frame.id,
+            .ExtId = 0,
+            .IDE = CAN_ID_STD,
+            .RTR = CAN_RTR_DATA,
+            .DLC = frame.len,
+            .TransmitGlobalTime = DISABLE
+        };
 
-    //     if (!mailbox_ready()) {
-    //         if (_tx_queue.full()) {
-    //             return HalStatus::HAL_ERROR;
-    //         }
-    //         _tx_queue.push({header, frame.payload});
-    //         return HalStatus::HAL_BUSY;
-    //     }
-
-    //     uint32_t mailbox = 0;
-
-    //     HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, frame.payload.data(), &mailbox);
-    //     if (status != HAL_OK) {
-    //         ++_tx_error_counter;
-    //     }
-
-    //     if (ret_mailbox) {
-    //         *ret_mailbox = mailbox;
-    //     }
-
-    //     return status;
-    // }
+        return send(header, frame.payload, ret_mailbox);
+    }
 
     HalStatus send(CAN_TxHeaderTypeDef& header, can_payload& payload, uint32_t* ret_mailbox = nullptr) {
         if (!mailbox_ready()) {
@@ -192,7 +184,7 @@ public:
     }
 
     /* INTERRUPTS */
-public:
+private:
     void on_txmailbox_free() {
         if (_tx_queue.empty()) { return; }
         auto header = _tx_queue.front().first;
@@ -226,7 +218,7 @@ public:
     }
 
 protected:
-    void enable_clk();
+    static void _enable_clk(Peripheral peripheral);
 };
 
 

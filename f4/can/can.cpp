@@ -9,7 +9,8 @@ namespace can {
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
-        , _peripheral(peripheral) {
+        , _peripheral(peripheral)
+{
     _rx_pin.init({
     .port = rx_pin_config.port,
     .pin = {
@@ -32,7 +33,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         },
         .active_state = emb::gpio::ActiveState::high});
 
-    enable_clk();
+    _enable_clk(peripheral);
 
     _handle.Instance = impl::can_instances[static_cast<size_t>(_peripheral)];
     _handle.Init = config.hal_init;
@@ -71,16 +72,15 @@ MessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list)
-{
+void Module::init_interrupts(uint32_t interrupt_list) {
     if (HAL_CAN_ActivateNotification(&_handle, interrupt_list) != HAL_OK) {
         fatal_error("CAN interrupt configuration failed");
     }
 }
 
 
-void Module::enable_clk() {
-    auto can_idx = std::to_underlying(_peripheral);
+void Module::_enable_clk(Peripheral peripheral) {
+    auto can_idx = std::to_underlying(peripheral);
     if (_clk_enabled[can_idx]) {
         return;
     }
