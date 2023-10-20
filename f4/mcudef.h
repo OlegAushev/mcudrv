@@ -11,7 +11,14 @@
 namespace mcu {
 
 
-using HalStatus = HAL_StatusTypeDef;
+enum class Error {
+    none,
+    busy,
+    timeout,
+    invalid_argument,
+    overflow,
+    internal
+};
 
 
 } // namespace mcu

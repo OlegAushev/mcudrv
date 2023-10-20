@@ -24,7 +24,9 @@ void CAN2_TX_IRQHandler();
 
 namespace mcu {
 
+
 namespace can {
+
 
 enum class Peripheral {
     can1,
@@ -98,6 +100,7 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
 private:
     const Peripheral _peripheral;
     CAN_HandleTypeDef _handle{};
+    CAN_TypeDef* _reg;
 
     mcu::gpio::Input _rx_pin;
     mcu::gpio::Output _tx_pin;
@@ -105,22 +108,20 @@ private:
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 
     int _filter_count{0};
-
     #ifdef CAN2
     static const int max_fitler_count{28};
     #else
     static const int max_fitler_count{14};
     #endif
 
-    emb::queue<std::pair<CAN_TxHeaderTypeDef, can_payload>, 32> _tx_queue;
-
-    uint64_t _tx_error_counter{0};
+    emb::queue<can_frame, 32> _txqueue;
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
     MessageAttribute register_message(CAN_FilterTypeDef& filter);
     
     Peripheral peripheral() const { return _peripheral; }
     CAN_HandleTypeDef* handle() { return &_handle; }
+    CAN_TypeDef* reg() { return _reg; }
     static Module* instance(Peripheral peripheral) {
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
@@ -137,63 +138,24 @@ public:
         }
     }
 
-    bool mailbox_ready() const {
-        uint32_t tsr = READ_REG(_handle.Instance->TSR);
-        if (((tsr & CAN_TSR_TME0) != 0U)
-         || ((tsr & CAN_TSR_TME1) != 0U)
-         || ((tsr & CAN_TSR_TME2) != 0U)) {
-            return true;
-        };
-        return false;
+    bool mailbox_empty() const {
+        if (is_bit_clr(_reg->TSR, CAN_TSR_TME)) {
+            return false;
+        }
+        return true;
     }
 
-    HalStatus send(can_frame& frame, uint32_t* ret_mailbox = nullptr) {
-        CAN_TxHeaderTypeDef header = {
-            .StdId = frame.id,
-            .ExtId = 0,
-            .IDE = CAN_ID_STD,
-            .RTR = CAN_RTR_DATA,
-            .DLC = frame.len,
-            .TransmitGlobalTime = DISABLE
-        };
+    Error send(const can_frame& frame);
 
-        return send(header, frame.payload, ret_mailbox);
-    }
-
-    HalStatus send(CAN_TxHeaderTypeDef& header, can_payload& payload, uint32_t* ret_mailbox = nullptr) {
-        if (!mailbox_ready()) {
-            if (_tx_queue.full()) {
-                return HalStatus::HAL_ERROR;
-            }
-            _tx_queue.push({header, payload});
-            return HalStatus::HAL_BUSY;
-        }
-        
-        uint32_t mailbox = 0;
-
-        HalStatus status = HAL_CAN_AddTxMessage(&_handle, &header, payload.data(), &mailbox);
-        if (status != HAL_OK) {
-            ++_tx_error_counter;
-        }
-
-        if (ret_mailbox) {
-            *ret_mailbox = mailbox;
-        }
-
-        return status;		
+private:
+    void on_txmailbox_empty() {
+        if (_txqueue.empty()) { return; }
+        auto frame = _txqueue.front();
+        _txqueue.pop();
+        send(frame);   
     }
 
     /* INTERRUPTS */
-private:
-    void on_txmailbox_free() {
-        if (_tx_queue.empty()) { return; }
-        auto header = _tx_queue.front().first;
-        auto payload = _tx_queue.front().second;
-
-        if (send(header, payload) == HalStatus::HAL_OK) {
-            _tx_queue.pop();
-        }    
-    }
 public:
     void init_interrupts(uint32_t interrupt_list);
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
@@ -222,15 +184,10 @@ protected:
 };
 
 
-
-
-
-
-
-
-
 } // namespace can
 
+
 } // namespace mcu
+
 
 #endif

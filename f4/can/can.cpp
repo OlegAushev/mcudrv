@@ -34,8 +34,8 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         .active_state = emb::gpio::ActiveState::high});
 
     _enable_clk(peripheral);
-
-    _handle.Instance = impl::can_instances[static_cast<size_t>(_peripheral)];
+    _reg = impl::can_instances[static_cast<size_t>(_peripheral)];
+    _handle.Instance = _reg;
     _handle.Init = config.hal_init;
 
     if(HAL_CAN_Init(&_handle) != HAL_OK) {
@@ -76,6 +76,51 @@ void Module::init_interrupts(uint32_t interrupt_list) {
     if (HAL_CAN_ActivateNotification(&_handle, interrupt_list) != HAL_OK) {
         fatal_error("CAN interrupt configuration failed");
     }
+}
+
+
+Error Module::send(const can_frame& frame) {
+    if (!mailbox_empty()) {
+        if (_txqueue.full()) {
+            return Error::overflow;
+        }
+        _txqueue.push(frame);
+        return Error::busy;
+    }
+    
+    uint32_t mailboxid = read_bit(_reg->TSR, CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
+    if (mailboxid > 2) {
+        return Error::internal;
+    }
+
+    // set up id
+    if (frame.id <= 0x7FF) {
+        write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_STID_Pos));
+    } else if (frame.id <=0x1FFFFFFF) {
+        write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_EXID_Pos));
+    } else {
+        return Error::invalid_argument;
+    }
+
+    // set up dlc
+    write_reg(_reg->sTxMailBox[mailboxid].TDTR, static_cast<uint32_t>(frame.len));
+
+    // set up data field
+    write_reg(_reg->sTxMailBox[mailboxid].TDLR,
+        (uint32_t(frame.payload[0]) << CAN_TDL0R_DATA0_Pos) |
+        (uint32_t(frame.payload[1]) << CAN_TDL0R_DATA1_Pos) |
+        (uint32_t(frame.payload[2]) << CAN_TDL0R_DATA2_Pos) |
+        (uint32_t(frame.payload[3]) << CAN_TDL0R_DATA3_Pos));
+    write_reg(_reg->sTxMailBox[mailboxid].TDHR,
+        (uint32_t(frame.payload[4]) << CAN_TDH0R_DATA4_Pos) |
+        (uint32_t(frame.payload[5]) << CAN_TDH0R_DATA5_Pos) |
+        (uint32_t(frame.payload[6]) << CAN_TDH0R_DATA6_Pos) |
+        (uint32_t(frame.payload[7]) << CAN_TDH0R_DATA7_Pos));
+    
+    // request transmission
+    set_bit(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_TXRQ);
+
+    return Error::none;
 }
 
 
