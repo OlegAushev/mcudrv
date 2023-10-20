@@ -5,7 +5,9 @@
 
 namespace mcu {
 
+
 namespace can {
+
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
@@ -47,8 +49,8 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 }
 
 
-MessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
-    MessageAttribute attr = {};
+RxMessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
+    RxMessageAttribute attr = {};
     
     if (_filter_count >= max_fitler_count) {
         fatal_error("too many CAN Rx filters");
@@ -61,8 +63,9 @@ MessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
     }
     filter.FilterActivation = ENABLE;
     filter.SlaveStartFilterBank = 14;
-    attr.filter_index = filter.FilterBank;
-    attr.location = filter.FilterFIFOAssignment;
+
+    attr.filter_idx = filter.FilterBank;
+    attr.fifo = RxFifo(filter.FilterFIFOAssignment);
 
     if (HAL_CAN_ConfigFilter(&_handle, &filter) != HAL_OK) {
         fatal_error("CAN module Rx filter configuration failed");
@@ -124,6 +127,61 @@ Error Module::send(const can_frame& frame) {
 }
 
 
+std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) const {
+    if (rxfifo_level(fifo) == 0) {
+        return {};
+    }
+
+    auto fifo_idx = std::to_underlying(fifo);
+
+    // get id, len, filter
+    if (is_bit_clr(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_IDE)) {
+        frame.id = read_bit(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_STID) >> CAN_TI0R_STID_Pos;
+    } else {
+        frame.id = read_bit(_reg->sFIFOMailBox[fifo_idx].RIR, (CAN_RI0R_EXID | CAN_RI0R_STID)) >> CAN_RI0R_EXID_Pos;
+    }
+
+    frame.len = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos);
+
+    RxMessageAttribute attr;
+    attr.filter_idx = read_bit(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_FMI) >> CAN_RDT0R_FMI_Pos;
+    attr.fifo = fifo;
+
+    // get data
+    frame.payload[0] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA0) >> CAN_RDL0R_DATA0_Pos);
+    frame.payload[1] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA1) >> CAN_RDL0R_DATA1_Pos);
+    frame.payload[2] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA2) >> CAN_RDL0R_DATA2_Pos);
+    frame.payload[3] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA3) >> CAN_RDL0R_DATA3_Pos);
+    frame.payload[4] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA4) >> CAN_RDH0R_DATA4_Pos);
+    frame.payload[5] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA5) >> CAN_RDH0R_DATA5_Pos);
+    frame.payload[6] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA6) >> CAN_RDH0R_DATA6_Pos);
+    frame.payload[7] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA7) >> CAN_RDH0R_DATA7_Pos);
+
+    // release fifo
+    switch (fifo) {
+    case RxFifo::fifo0:
+        set_bit(_reg->RF0R, CAN_RF0R_RFOM0);
+        break;
+    case RxFifo::fifo1:
+        set_bit(_reg->RF1R, CAN_RF1R_RFOM1);
+        break;
+    }    
+
+    return {attr};
+}
+
+
+uint32_t Module::rxfifo_level(RxFifo fifo) const {
+    switch (fifo) {
+    case RxFifo::fifo0:
+        return read_bit(_reg->RF0R, CAN_RF0R_FMP0);
+    case RxFifo::fifo1:
+        return read_bit(_reg->RF1R, CAN_RF1R_FMP1);
+    }
+    return 0;
+}
+
+
 void Module::_enable_clk(Peripheral peripheral) {
     auto can_idx = std::to_underlying(peripheral);
     if (_clk_enabled[can_idx]) {
@@ -134,7 +192,9 @@ void Module::_enable_clk(Peripheral peripheral) {
     _clk_enabled[can_idx] = true;
 }
 
+
 } // namespace can
+
 
 } // namespace mcu
 

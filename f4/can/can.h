@@ -9,6 +9,7 @@
 #include <emblib/core.h>
 #include <emblib/interfaces/can.h>
 #include <emblib/queue.h>
+#include <optional>
 #include <utility>
 
 
@@ -83,10 +84,16 @@ inline constexpr std::array<IRQn_Type, peripheral_count> can_tx_irqn = {CAN1_TX_
 } // namespace impl
 
 
-struct MessageAttribute {
-    uint32_t location;
-    uint32_t filter_index;
-    bool operator==(const MessageAttribute&) const = default;
+enum class RxFifo {
+    fifo0,
+    fifo1
+};
+
+
+struct RxMessageAttribute {
+    RxFifo fifo;
+    uint32_t filter_idx;
+    bool operator==(const RxMessageAttribute&) const = default;
 };
 
 
@@ -117,7 +124,7 @@ private:
     emb::queue<can_frame, 32> _txqueue;
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
-    MessageAttribute register_message(CAN_FilterTypeDef& filter);
+    RxMessageAttribute register_message(CAN_FilterTypeDef& filter);
     
     Peripheral peripheral() const { return _peripheral; }
     CAN_HandleTypeDef* handle() { return &_handle; }
@@ -146,7 +153,8 @@ public:
     }
 
     Error send(const can_frame& frame);
-
+    std::optional<RxMessageAttribute> recv(can_frame& frame, RxFifo fifo) const;
+    uint32_t rxfifo_level(RxFifo fifo) const;
 private:
     void on_txmailbox_empty() {
         if (_txqueue.empty()) { return; }
