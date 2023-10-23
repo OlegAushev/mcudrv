@@ -5,8 +5,6 @@
 
 
 namespace mcu {
-
-
 namespace can {
 
 
@@ -44,9 +42,6 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     if(HAL_CAN_Init(&_handle) != HAL_OK) {
         fatal_error("CAN module initialization failed");
     }
-
-    // Default interrupt config
-    // init_interrupts(CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY);
 }
 
 
@@ -224,8 +219,6 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace can
-
-
 } // namespace mcu
 
 
@@ -251,68 +244,6 @@ extern "C" void CAN2_TX_IRQHandler() {
     using namespace mcu::can;
     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
 }
-
-
-//------------------------------------------------------------------------------
-
-
-// void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* handle) {
-//     using namespace mcu::can;
-//     do {
-//             CAN_RxHeaderTypeDef header;
-//             can_frame frame;
-//             HAL_CAN_GetRxMessage(handle, CAN_RX_FIFO0, &header, frame.payload.data());
-//             frame.id = header.StdId;
-//             frame.len = header.DLC;
-
-//             MessageAttribute attr;
-//             attr.location = CAN_RX_FIFO0;
-//             attr.filter_index = header.FilterMatchIndex;
-
-//             auto module = Module::instance(impl::to_peripheral(handle->Instance));
-//             module->_on_fifo0_frame_received(*module, attr, frame);
-//     } while (HAL_CAN_GetRxFifoFillLevel(handle, CAN_RX_FIFO0) > 0);
-// }
-
-
-// void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef* handle) {
-//     using namespace mcu::can;
-//     do {
-//             CAN_RxHeaderTypeDef header;
-//             can_frame frame;
-//             HAL_CAN_GetRxMessage(handle, CAN_RX_FIFO1, &header, frame.payload.data());
-//             frame.id = header.StdId;
-//             frame.len = header.DLC;
-
-//             MessageAttribute attr;
-//             attr.location = CAN_RX_FIFO1;
-//             attr.filter_index = header.FilterMatchIndex;
-
-//             auto module = Module::instance(impl::to_peripheral(handle->Instance));
-//             module->_on_fifo0_frame_received(*module, attr, frame);
-//     } while (HAL_CAN_GetRxFifoFillLevel(handle, CAN_RX_FIFO1) > 0);
-// }
-
-
-// void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef* handle) {
-//     using namespace mcu::can;
-//     auto module = Module::instance(impl::to_peripheral(handle->Instance));
-//     module->_on_txmailbox_free(*module);
-// }
-
-
-// void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef* handle) {
-//     using namespace mcu::can;
-//     auto module = Module::instance(impl::to_peripheral(handle->Instance));
-//     module->_on_txmailbox_free(*module);
-// }
-
-
-// void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef* handle) {
-//     using namespace mcu::can;
-//     auto module = Module::instance(impl::to_peripheral(handle->Instance));
-//     module->_on_txmailbox_free(*module);
-// }
 
 
 #endif

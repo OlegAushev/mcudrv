@@ -148,11 +148,11 @@ public:
         clear_bit(_reg->SR, ADC_SR_EOC | ADC_SR_STRT);
     }
 
-    /* INTERRUPTS */
 public:
-    void init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority);
+    void init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
     void enable_interrupts() { enable_irq(ADC_IRQn); }
     void disable_interrupts() { disable_irq(ADC_IRQn); }
+    
 protected:
     static void _enable_clk(Peripheral peripheral);
 };

@@ -24,8 +24,6 @@ void CAN2_TX_IRQHandler();
 
 
 namespace mcu {
-
-
 namespace can {
 
 
@@ -176,8 +174,6 @@ private:
 
 
 } // namespace can
-
-
 } // namespace mcu
 
 

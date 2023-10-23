@@ -79,6 +79,13 @@ void Module::add_regular_internal_channel(RegularChannelConfig channel_config) {
 }
 
 
+void Module::init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
+    clear_bit(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
+    set_bit(_reg->CR1, interrupt_list);
+     mcu::set_irq_priority(ADC_IRQn, priority);
+}
+
+
 void Module::_enable_clk(Peripheral peripheral) {
     auto adc_idx = std::to_underlying(peripheral);
     if (_clk_enabled[adc_idx]) {
@@ -87,13 +94,6 @@ void Module::_enable_clk(Peripheral peripheral) {
 
     impl::adc_clk_enable_funcs[adc_idx]();
     _clk_enabled[adc_idx] = true;
-}
-
-
-void Module::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) {
-    clear_bit(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
-    set_bit(_reg->CR1, interrupt_list);
-     mcu::set_irq_priority(ADC_IRQn, priority);
 }
 
 
