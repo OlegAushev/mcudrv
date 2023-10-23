@@ -71,15 +71,15 @@ public:
     void init_bdt(BkinPin* pin_bkin, BdtConfig config);
 
     bool pwm_active() const {
-        return mcu::is_bit_set(_reg->BDTR, TIM_BDTR_MOE);
+        return bit_is_set(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void start_pwm() {
         if (_brk_enabled) {
-            mcu::clear_bit(_reg->SR, TIM_SR_BIF);
-            mcu::set_bit(TIM1->DIER, TIM_DIER_BIE);
+            clear_bit(_reg->SR, TIM_SR_BIF);
+            set_bit(TIM1->DIER, TIM_DIER_BIE);
         }
-        mcu::set_bit(_reg->BDTR, TIM_BDTR_MOE);
+        set_bit(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void stop_pwm() {
@@ -94,16 +94,16 @@ public:
         uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(__HAL_TIM_GET_AUTORELOAD(&_handle)));
         switch (channel) {
         case Channel::channel1:
-            mcu::write_reg(_reg->CCR1, compare_value); 
+            write_reg(_reg->CCR1, compare_value); 
             break;
         case Channel::channel2:
-            mcu::write_reg(_reg->CCR2, compare_value); 
+            write_reg(_reg->CCR2, compare_value); 
             break;
         case Channel::channel3:
-            mcu::write_reg(_reg->CCR3, compare_value); 
+            write_reg(_reg->CCR3, compare_value); 
             break;
         case Channel::channel4:
-            mcu::write_reg(_reg->CCR4, compare_value); 
+            write_reg(_reg->CCR4, compare_value); 
             break;
         }
     }
@@ -113,25 +113,25 @@ public:
     void init_update_interrupts(IrqPriority priority);
 
     void enable_update_interrupts() {
-        mcu::clear_bit(_reg->SR, TIM_SR_UIF);
-        mcu::clear_pending_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
-        mcu::enable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
+        clear_bit(_reg->SR, TIM_SR_UIF);
+        clear_pending_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
+        enable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
     }
 
     void disable_update_interrupts() {
-        mcu::disable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
+        disable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
     }
 
     void init_break_interrupts(IrqPriority priority);
 
     void enable_break_interrupts() {
-        mcu::clear_bit(_reg->SR, TIM_SR_BIF);
-        mcu::clear_pending_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
-        mcu::enable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
+        clear_bit(_reg->SR, TIM_SR_BIF);
+        clear_pending_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
+        enable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
     }
     
     void disable_break_interrupts() {
-        mcu::disable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
+        disable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
     }
 private:
     static void _enable_clk(AdvancedControlPeripheral peripheral);

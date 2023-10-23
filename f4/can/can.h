@@ -103,7 +103,7 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
     friend void ::CAN1_TX_IRQHandler();
     friend void ::CAN2_RX0_IRQHandler();
     friend void ::CAN2_RX1_IRQHandler();
-    friend void ::CAN2_TX_IRQHandler();  
+    friend void ::CAN2_TX_IRQHandler();
 private:
     const Peripheral _peripheral;
     CAN_HandleTypeDef _handle{};
@@ -124,7 +124,7 @@ private:
     emb::queue<can_frame, 32> _txqueue;
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
-    RxMessageAttribute register_message(CAN_FilterTypeDef& filter);
+    RxMessageAttribute register_rxmessage(CAN_FilterTypeDef& filter);
     
     Peripheral peripheral() const { return _peripheral; }
     CAN_HandleTypeDef* handle() { return &_handle; }
@@ -133,28 +133,35 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void start() {
-        if (HAL_CAN_Start(&_handle) != HAL_OK) {
-            fatal_error("CAN module start failed");
-        }
-    }
-
-    void stop() {
-        if (HAL_CAN_Stop(&_handle) != HAL_OK) {
-            fatal_error("CAN module stop failed");
-        }
-    }
+    void start();
+    void stop();
 
     bool mailbox_empty() const {
-        if (is_bit_clr(_reg->TSR, CAN_TSR_TME)) {
+        if (bit_is_clear(_reg->TSR, CAN_TSR_TME)) {
             return false;
         }
         return true;
     }
 
+    uint32_t rxfifo_level(RxFifo fifo) const {
+        switch (fifo) {
+        case RxFifo::fifo0:
+            return read_bit(_reg->RF0R, CAN_RF0R_FMP0);
+        case RxFifo::fifo1:
+            return read_bit(_reg->RF1R, CAN_RF1R_FMP1);
+        }
+        return 0;
+    }
+
     Error send(const can_frame& frame);
     std::optional<RxMessageAttribute> recv(can_frame& frame, RxFifo fifo) const;
-    uint32_t rxfifo_level(RxFifo fifo) const;
+
+public:
+    void init_interrupts(uint32_t interrupt_list);
+    void set_interrupt_priority(IrqPriority fifo0_priority, IrqPriority fifo1_priority, IrqPriority tx_priority);
+    void enable_interrupts();
+    void disable_interrupts();
+
 private:
     void on_txmailbox_empty() {
         if (_txqueue.empty()) { return; }
@@ -163,31 +170,7 @@ private:
         send(frame);   
     }
 
-    /* INTERRUPTS */
-public:
-    void init_interrupts(uint32_t interrupt_list);
-    void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
-
-    void set_interrupt_priority(IrqPriority fifo0_priority, IrqPriority fifo1_priority, IrqPriority tx_priority) {
-        HAL_NVIC_SetPriority(impl::can_fifo0_irqn[std::to_underlying(_peripheral)], fifo0_priority.get(), 0);
-        HAL_NVIC_SetPriority(impl::can_fifo1_irqn[std::to_underlying(_peripheral)], fifo1_priority.get(), 0);
-        HAL_NVIC_SetPriority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority.get(), 0);
-
-    }
-
-    void enable_interrupts() {
-        HAL_NVIC_EnableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
-        HAL_NVIC_EnableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
-        HAL_NVIC_EnableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
-    }
-
-    void disable_interrupts() {
-        HAL_NVIC_DisableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
-        HAL_NVIC_DisableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
-        HAL_NVIC_DisableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
-    }
-
-protected:
+private:
     static void _enable_clk(Peripheral peripheral);
 };
 

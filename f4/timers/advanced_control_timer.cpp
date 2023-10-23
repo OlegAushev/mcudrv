@@ -72,14 +72,14 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_c
     }
 
     if (pin_ch) {
-        mcu::set_bit(_reg->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
+        set_bit(_reg->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
     }
 
     if (pin_chn) {
-        mcu::set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
+        set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
     }
 
-    mcu::set_bit(_reg->CR1, TIM_CR1_CEN);
+    set_bit(_reg->CR1, TIM_CR1_CEN);
 }
 
 
@@ -109,20 +109,19 @@ void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
 
 
 void AdvancedControlTimer::init_update_interrupts(IrqPriority priority) {
-    mcu::set_bit(_reg->DIER, TIM_DIER_UIE);
-    mcu::set_irq_priority(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)], priority);
+    set_bit(_reg->DIER, TIM_DIER_UIE);
+    set_irq_priority(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)], priority);
 }
 
 
 void AdvancedControlTimer::init_break_interrupts(IrqPriority priority) {
-    mcu::set_bit(_reg->DIER, TIM_DIER_BIE);
-    mcu::set_irq_priority(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)], priority);
+    set_bit(_reg->DIER, TIM_DIER_BIE);
+    set_irq_priority(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;
 }
 
 
 } // namespace timers
 } // namespace mcu
-
 
 #endif

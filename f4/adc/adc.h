@@ -101,7 +101,7 @@ public:
     void add_regular_internal_channel(RegularChannelConfig channel_config);
 
     void start_injected() {
-        if (is_bit_set(_reg->SR, ADC_SR_JSTRT)) {
+        if (bit_is_set(_reg->SR, ADC_SR_JSTRT)) {
             return; // there is ongoing injected channel conversion
         }
         set_bit(_reg->CR2, ADC_CR2_JSWSTART);
@@ -126,18 +126,18 @@ public:
     }
 
     void start_regular() {
-        if (is_bit_set(_reg->SR, ADC_SR_STRT)) {
+        if (bit_is_set(_reg->SR, ADC_SR_STRT)) {
             return; // there is ongoing regular channel conversion
         }
         set_bit(_reg->CR2, ADC_CR2_SWSTART);
     }
 
     bool busy() const {
-        return is_bit_set(_reg->SR, ADC_SR_STRT);
+        return bit_is_set(_reg->SR, ADC_SR_STRT);
     }
 
     bool regular_ready() const {
-        return is_bit_set(_reg->SR, ADC_SR_EOC);
+        return bit_is_set(_reg->SR, ADC_SR_EOC);
     }
 
     uint32_t read_regular() {

@@ -1,6 +1,7 @@
 #ifdef STM32F4xx
 
 #include <mculib_stm32/f4/can/can.h>
+#include <mculib_stm32/f4/chrono/chrono.h>
 
 
 namespace mcu {
@@ -49,7 +50,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 }
 
 
-RxMessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
+RxMessageAttribute Module::register_rxmessage(CAN_FilterTypeDef& filter) {
     RxMessageAttribute attr = {};
     
     if (_filter_count >= max_fitler_count) {
@@ -75,9 +76,24 @@ RxMessageAttribute Module::register_message(CAN_FilterTypeDef& filter) {
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list) {
-    if (HAL_CAN_ActivateNotification(&_handle, interrupt_list) != HAL_OK) {
-        fatal_error("CAN interrupt configuration failed");
+void Module::start() {
+    clear_bit(_reg->MCR, CAN_MCR_INRQ);
+    mcu::chrono::Timeout start_timeout(std::chrono::milliseconds(2));
+    while (bit_is_set(_reg->MSR, CAN_MSR_INAK)) {
+        if (start_timeout.expired()) {
+             fatal_error("CAN module start failed");
+        }
+    }
+}
+
+
+void Module::stop() {
+    set_bit(_reg->MCR, CAN_MCR_INRQ);
+    mcu::chrono::Timeout stop_timeout(std::chrono::milliseconds(2));
+    while (bit_is_set(_reg->MSR, CAN_MSR_INAK)) {
+        if (stop_timeout.expired()) {
+             fatal_error("CAN module start failed");
+        }
     }
 }
 
@@ -135,7 +151,7 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
     auto fifo_idx = std::to_underlying(fifo);
 
     // get id, len, filter
-    if (is_bit_clr(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_IDE)) {
+    if (bit_is_clear(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_IDE)) {
         frame.id = read_bit(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_STID) >> CAN_TI0R_STID_Pos;
     } else {
         frame.id = read_bit(_reg->sFIFOMailBox[fifo_idx].RIR, (CAN_RI0R_EXID | CAN_RI0R_STID)) >> CAN_RI0R_EXID_Pos;
@@ -171,14 +187,28 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
 }
 
 
-uint32_t Module::rxfifo_level(RxFifo fifo) const {
-    switch (fifo) {
-    case RxFifo::fifo0:
-        return read_bit(_reg->RF0R, CAN_RF0R_FMP0);
-    case RxFifo::fifo1:
-        return read_bit(_reg->RF1R, CAN_RF1R_FMP1);
-    }
-    return 0;
+void Module::init_interrupts(uint32_t interrupt_list) {
+    set_bit(_reg->IER, interrupt_list);
+}
+
+
+void Module::set_interrupt_priority(IrqPriority fifo0_priority, IrqPriority fifo1_priority, IrqPriority tx_priority) {
+    HAL_NVIC_SetPriority(impl::can_fifo0_irqn[std::to_underlying(_peripheral)], fifo0_priority.get(), 0);
+    HAL_NVIC_SetPriority(impl::can_fifo1_irqn[std::to_underlying(_peripheral)], fifo1_priority.get(), 0);
+    HAL_NVIC_SetPriority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority.get(), 0);
+
+}
+
+void Module::enable_interrupts() {
+    HAL_NVIC_EnableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
+    HAL_NVIC_EnableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
+    HAL_NVIC_EnableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
+}
+
+void Module::disable_interrupts() {
+    HAL_NVIC_DisableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
+    HAL_NVIC_DisableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
+    HAL_NVIC_DisableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
 }
 
 

@@ -14,11 +14,11 @@ namespace mcu {
 
 
 template <typename T>
-bool is_bit_set(const volatile T& reg, T bit) { return (reg & bit) == bit; }
+bool bit_is_set(const volatile T& reg, T bit) { return (reg & bit) == bit; }
 
 
 template <typename T>
-bool is_bit_clr(const volatile T& reg, T bit) { return (reg & bit) == 0; }
+bool bit_is_clear(const volatile T& reg, T bit) { return (reg & bit) == 0; }
 
 
 template <typename T>
