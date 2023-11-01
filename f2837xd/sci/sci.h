@@ -110,7 +110,7 @@ public:
         return 0;
     }
 
-    virtual int recv(char* buf, int buf_len) {
+    virtual int recv(char* buf, size_t buf_len) {
         int count = 0;
         char ch = 0;
 
@@ -132,7 +132,7 @@ public:
         return 0;
     }
 
-    virtual int send(const char* buf, uint16_t len) {
+    virtual int send(const char* buf, size_t len) {
         SCI_writeCharArray(_module.base, reinterpret_cast<const uint16_t*>(buf), len);
         return len;
     }
