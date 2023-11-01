@@ -19,7 +19,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
-const int peripheral_count = 4;
+const size_t peripheral_count = 4;
 
 
 SCOPED_ENUM_UT_DECLARE_BEGIN(Baudrate, uint32_t) {

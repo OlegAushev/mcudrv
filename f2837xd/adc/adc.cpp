@@ -39,7 +39,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
     // Configure SOCs
     // For 12-bit resolution, a sampling window of (5 x sample_window_cycles)ns
     // at a 200MHz SYSCLK rate will be used
-    for (int i = 0; i < _channels.size(); ++i) {
+    for (size_t i = 0; i < _channels.size(); ++i) {
         if (_channels[i].peripheral == _peripheral) {
             ADC_setupSOC(_module.base, _channels[i].soc, _channels[i].trigger, _channels[i].channel, sample_window_cycles);
             _channels[i].registered = true;
@@ -48,7 +48,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
     }
 
     // Interrupt config
-    for (int i = 0; i < _irqs.size(); ++i) {
+    for (size_t i = 0; i < _irqs.size(); ++i) {
         if (_irqs[i].peripheral == _peripheral) {
             ADC_setInterruptSource(_module.base, _irqs[i].int_num, _irqs[i].soc);
             ADC_enableInterrupt(_module.base, _irqs[i].int_num);

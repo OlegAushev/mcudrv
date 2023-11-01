@@ -21,7 +21,7 @@ class system_clock : public emb::monostate<system_clock> {
 private:
     static volatile int64_t _time;
     static const emb::chrono::milliseconds time_step;
-    static const int task_count_max = 4;
+    static const size_t task_count_max = 4;
 private:
     struct Task {
         emb::chrono::milliseconds period;
@@ -64,7 +64,7 @@ public:
 
     static void reset() {
         _time = 0;
-        for (int i = 0; i < _tasks.size(); ++i) {
+        for (size_t i = 0; i < _tasks.size(); ++i) {
             _tasks[i].timepoint = now();
         }
     }

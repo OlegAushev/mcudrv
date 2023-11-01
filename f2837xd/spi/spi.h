@@ -17,7 +17,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
 
-const int peripheral_count = 3;
+const size_t peripheral_count = 3;
 
 
 SCOPED_ENUM_DECLARE_BEGIN(Protocol) {
@@ -101,14 +101,14 @@ public:
         switch (_word_len.native_value()) {
         case WordLen::Word8Bit:
             uint8_t byte8[sizeof(T)*2];
-            for (int i = 0; i < sizeof(T)*2; ++i) {
+            for (size_t i = 0; i < sizeof(T)*2; ++i) {
                 byte8[i] = SPI_readDataBlockingFIFO(_module.base) & 0x00FF;
             }
             emb::c28x::from_bytes<T>(data, byte8);
             break;
         case WordLen::Word16Bit:
             uint16_t byte16[sizeof(T)];
-            for (int i = 0; i < sizeof(T); ++i) {
+            for (size_t i = 0; i < sizeof(T); ++i) {
                 byte16[i] = SPI_readDataBlockingFIFO(_module.base);
             }
             memcpy(&data, byte16, sizeof(T));
@@ -122,14 +122,14 @@ public:
         case WordLen::Word8Bit:
             uint8_t byte8[sizeof(T)*2];
             emb::c28x::to_bytes<T>(byte8, data);
-            for (int i = 0; i < sizeof(T)*2; ++i) {
+            for (size_t i = 0; i < sizeof(T)*2; ++i) {
                 SPI_writeDataBlockingFIFO(_module.base, byte8[i] << 8);
             }
             break;
         case WordLen::Word16Bit:
             uint16_t byte16[sizeof(T)];
             memcpy(byte16, &data, sizeof(T));
-            for (int i = 0; i < sizeof(T); ++i) {
+            for (size_t i = 0; i < sizeof(T); ++i) {
                 SPI_writeDataBlockingFIFO(_module.base, byte16[i]);
             }
             break;
