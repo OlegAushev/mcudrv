@@ -26,12 +26,12 @@ private:
     struct Task {
         emb::chrono::milliseconds period;
         emb::chrono::milliseconds timepoint;
-        TaskStatus (*func)(int);
+        TaskStatus (*func)(size_t);
     };
     static TaskStatus empty_task() { return TaskStatus::success; }
     static emb::static_vector<Task, task_count_max> _tasks;
 public:
-    static void add_task(TaskStatus (*func)(int), emb::chrono::milliseconds period) {
+    static void add_task(TaskStatus (*func)(size_t), emb::chrono::milliseconds period) {
         Task task = {period, now(), func};
         _tasks.push_back(task);
     }

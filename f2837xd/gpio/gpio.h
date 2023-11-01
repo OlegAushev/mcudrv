@@ -138,7 +138,7 @@ public:
                 - (GPIO_readPin(_config.no) ^ static_cast<uint32_t>(_config.active_state.underlying_value())));
     }
 
-    virtual int read_level() const {
+    virtual unsigned int read_level() const {
         assert(_initialized);
         return GPIO_readPin(_config.no);
     }
@@ -204,12 +204,12 @@ public:
         GPIO_togglePin(_config.no);
     }
 
-    virtual int read_level() const {
+    virtual unsigned int read_level() const {
         assert(_initialized);
         return GPIO_readPin(_config.no);
     }
 
-    virtual void set_level(int level) {
+    virtual void set_level(unsigned int level) {
         assert(_initialized);
         GPIO_writePin(_config.no, level);
     }
