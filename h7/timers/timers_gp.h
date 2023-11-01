@@ -22,7 +22,7 @@ enum class Peripheral {
 };
 
 
-constexpr int peripheral_count = 4;
+constexpr size_t peripheral_count = 4;
 
 
 struct Config {

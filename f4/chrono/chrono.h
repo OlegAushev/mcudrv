@@ -32,7 +32,7 @@ public:
 private:
     static inline volatile int64_t _time{0};
     static constexpr std::chrono::milliseconds time_step{1};
-    static constexpr int_fast8_t task_count_max{4};
+    static constexpr size_t task_count_max{4};
 
 /* periodic tasks */
 private:
@@ -51,7 +51,7 @@ public:
         _tasks.push_back(task);
     }
 
-    static void set_task_period(int index, std::chrono::milliseconds period)
+    static void set_task_period(size_t index, std::chrono::milliseconds period)
     {
         if (index < _tasks.size()) {
             _tasks[index].period = period;

@@ -26,7 +26,7 @@ enum class Peripheral {
 };
 
 
-constexpr int peripheral_count = 6;
+constexpr size_t peripheral_count = 6;
 
 
 struct RxPinConfig {
@@ -96,7 +96,7 @@ public:
         return 1;
     }
 
-    virtual int recv(char* buf, int len) override {
+    virtual int recv(char* buf, size_t len) override {
         int i = 0;
         char ch = 0;
 
@@ -113,7 +113,7 @@ public:
         return 1;
     }
 
-    virtual int send(const char* buf, int len) override {
+    virtual int send(const char* buf, size_t len) override {
         if (HAL_UART_Transmit(&_handle, reinterpret_cast<const uint8_t*>(buf), static_cast<uint16_t>(len), timeout_ms) != HAL_OK) {
             return 0;
         }

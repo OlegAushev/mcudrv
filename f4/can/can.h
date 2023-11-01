@@ -33,7 +33,7 @@ enum class Peripheral {
 };
 
 
-constexpr int peripheral_count = 2;
+constexpr size_t peripheral_count = 2;
 
 
 struct RxPinConfig {

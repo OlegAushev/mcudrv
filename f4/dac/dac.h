@@ -30,7 +30,7 @@ enum class DataAlignment {
 };
 
 
-constexpr int peripheral_count = 1;
+constexpr size_t peripheral_count = 1;
 
 
 struct PinConfig {

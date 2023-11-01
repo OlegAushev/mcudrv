@@ -32,7 +32,7 @@ enum class StreamId {
 };
 
 
-constexpr int stream_count = 16;
+constexpr size_t stream_count = 16;
 
 
 struct Config {

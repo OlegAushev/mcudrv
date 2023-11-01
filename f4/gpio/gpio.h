@@ -31,7 +31,7 @@ struct Config {
 
 namespace impl {
 
-constexpr int port_count = 8;
+constexpr size_t port_count = 8;
 
 
 inline constexpr std::array<GPIO_TypeDef*, port_count> gpio_ports = {

@@ -16,7 +16,7 @@ enum class AdvancedControlPeripheral {
 };
 
 
-constexpr int adv_timer_peripheral_count = 2;
+constexpr size_t adv_timer_peripheral_count = 2;
 
 
 namespace impl {

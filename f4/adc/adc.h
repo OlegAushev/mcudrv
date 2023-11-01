@@ -21,7 +21,7 @@ enum class Peripheral {
 };
 
 
-constexpr int peripheral_count = 3;
+constexpr size_t peripheral_count = 3;
 
 
 struct PinConfig {
