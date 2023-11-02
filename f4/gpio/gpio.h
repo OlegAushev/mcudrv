@@ -103,7 +103,7 @@ public:
         init(config);
     }
 
-    virtual int read_level() const override {
+    virtual unsigned int read_level() const override {
         assert_param(_initialized);
         if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
             return 1;
@@ -177,7 +177,7 @@ public:
         init(config);
     }
 
-    virtual int read_level() const override {
+    virtual unsigned int read_level() const override {
         assert_param(_initialized);
         if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
             return 1;
@@ -185,7 +185,7 @@ public:
         return 0;
     }
 
-    virtual void set_level(int level) override {
+    virtual void set_level(unsigned int level) override {
         assert_param(_initialized);
         if(level != 0) {
             mcu::write_reg(_config.port->BSRR, _config.pin.Pin);
