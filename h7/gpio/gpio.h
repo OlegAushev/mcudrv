@@ -4,8 +4,8 @@
 #ifdef STM32H7xx
 
 #include "../mcu_def.h"
-#include <emblib_stm32/core.h>
-#include <emblib_stm32/interfaces/gpio.h>
+#include <emblib/core.h>
+#include <emblib/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
 
@@ -112,7 +112,7 @@ public:
                 - (HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)) ^ static_cast<uint32_t>(_config.active_state)));
     }
 
-    virtual int read_level() const override {
+    virtual unsigned int read_level() const override {
         assert_param(_initialized);
         return static_cast<int>(HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)));
     }
@@ -199,12 +199,12 @@ public:
         HAL_GPIO_TogglePin(_config.port, static_cast<uint16_t>(_config.pin.Pin));
     }
 
-    virtual int read_level() const override {
+    virtual unsigned int read_level() const override {
         assert_param(_initialized);
         return static_cast<int>(HAL_GPIO_ReadPin(_config.port, static_cast<uint16_t>(_config.pin.Pin)));
     }
 
-    virtual void set_level(int level) override {
+    virtual void set_level(unsigned int level) override {
         assert_param(_initialized);
         GPIO_PinState state = (level == 0) ? GPIO_PIN_RESET : GPIO_PIN_SET;
         HAL_GPIO_WritePin(_config.port, static_cast<uint16_t>(_config.pin.Pin), state);

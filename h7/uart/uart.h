@@ -6,8 +6,8 @@
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib_stm32/core.h>
-#include <emblib_stm32/interfaces/uart.h>
+#include <emblib/core.h>
+#include <emblib/interfaces/uart.h>
 
 #include <utility>
 
@@ -101,7 +101,7 @@ public:
         return 1;
     }
 
-    virtual int recv(char* buf, int len) override {
+    virtual int recv(char* buf, size_t len) override {
         int i = 0;
         char ch = 0;
 
@@ -118,7 +118,7 @@ public:
         return 1;
     }
 
-    virtual int send(const char* buf, int len) override {
+    virtual int send(const char* buf, size_t len) override {
         if (HAL_UART_Transmit(&_handle, reinterpret_cast<const uint8_t*>(buf), static_cast<uint16_t>(len), timeout_ms) != HAL_OK) {
             return 0;
         }

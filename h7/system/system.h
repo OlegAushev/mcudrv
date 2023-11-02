@@ -4,7 +4,7 @@
 #ifdef STM32H7xx
 
 #include "../mcu_def.h"
-#include <emblib_stm32/core.h>
+#include <emblib/core.h>
 #include <cstdio>
 #include <chrono>
 

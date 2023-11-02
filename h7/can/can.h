@@ -6,8 +6,8 @@
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib_stm32/core.h>
-#include <emblib_stm32/interfaces/can.h>
+#include <emblib/core.h>
+#include <emblib/interfaces/can.h>
 #include <utility>
 
 
