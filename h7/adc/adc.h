@@ -45,7 +45,7 @@ struct ChannelConfig {
 
 namespace impl {
 
-inline constexpr std::array<ADC_TypeDef*, peripheral_count> adc_instances = {ADC1, ADC2, ADC3};
+inline const std::array<ADC_TypeDef*, peripheral_count> adc_instances = {ADC1, ADC2, ADC3};
 
 
 inline Peripheral to_peripheral(const ADC_TypeDef* instance) {

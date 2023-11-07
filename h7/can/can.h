@@ -60,7 +60,7 @@ inline constexpr std::array<IRQn_Type, 2> irq1_numbers = {
 };
 
 
-inline constexpr std::array<FDCAN_GlobalTypeDef*, peripheral_count> can_instances = {FDCAN1, FDCAN2};
+inline const std::array<FDCAN_GlobalTypeDef*, peripheral_count> can_instances = {FDCAN1, FDCAN2};
 
 
 inline Peripheral to_peripheral(const FDCAN_GlobalTypeDef* instance) {

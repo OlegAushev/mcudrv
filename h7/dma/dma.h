@@ -13,7 +13,7 @@ namespace mcu {
 
 namespace dma {
 
-enum class Stream {
+enum class Stream : unsigned int {
     dma1_stream0,
     dma1_stream1,
     dma1_stream2,
@@ -51,7 +51,7 @@ inline constexpr std::array<IRQn_Type, stream_count> irq_numbers = {
 };
 
 
-inline constexpr std::array<DMA_Stream_TypeDef*, stream_count> dma_stream_instances = {
+inline const std::array<DMA_Stream_TypeDef*, stream_count> dma_stream_instances = {
     DMA1_Stream0, DMA1_Stream1, DMA1_Stream2, DMA1_Stream3,
     DMA1_Stream4, DMA1_Stream5, DMA1_Stream6, DMA1_Stream7,
     DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3,

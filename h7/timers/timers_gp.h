@@ -52,7 +52,7 @@ struct PwmPinConfig {
 
 namespace impl {
 
-inline constexpr std::array<TIM_TypeDef*, peripheral_count> timer_instances = {TIM2, TIM3, TIM4, TIM5};
+inline const std::array<TIM_TypeDef*, peripheral_count> timer_instances = {TIM2, TIM3, TIM4, TIM5};
 
 
 inline Peripheral to_peripheral(const TIM_TypeDef* instance) {

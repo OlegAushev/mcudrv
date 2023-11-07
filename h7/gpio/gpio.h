@@ -33,7 +33,7 @@ namespace impl {
 constexpr int port_count = 11;
 
 
-inline constexpr std::array<GPIO_TypeDef*, port_count> gpio_ports = {
+inline const std::array<GPIO_TypeDef*, port_count> gpio_ports = {
     GPIOA, GPIOB, GPIOC, GPIOD,
     GPIOE, GPIOF, GPIOG, GPIOH,
     GPIOI, GPIOJ, GPIOK
