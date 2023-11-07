@@ -10,7 +10,7 @@ namespace mcu {
 namespace timers {
 
 
-enum class AdvancedControlPeripheral {
+enum class AdvancedControlPeripheral : unsigned int{
     tim1,
     tim8
 };
@@ -21,7 +21,7 @@ constexpr size_t adv_timer_peripheral_count = 2;
 
 namespace impl {
 
-inline constexpr std::array<TIM_TypeDef*, adv_timer_peripheral_count> adv_timer_instances = {TIM1, TIM8};
+inline const std::array<TIM_TypeDef*, adv_timer_peripheral_count> adv_timer_instances = {TIM1, TIM8};
 
 
 inline AdvancedControlPeripheral to_peripheral(const TIM_TypeDef* instance) {
@@ -71,22 +71,22 @@ public:
     void init_bdt(BkinPin* pin_bkin, BdtConfig config);
 
     bool pwm_active() const {
-        return bit_is_set(_reg->BDTR, TIM_BDTR_MOE);
+        return bit_is_set<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void start_pwm() {
         if (_brk_enabled) {
-            clear_bit(_reg->SR, TIM_SR_BIF);
-            set_bit(TIM1->DIER, TIM_DIER_BIE);
+            clear_bit<uint32_t>(_reg->SR, TIM_SR_BIF);
+            set_bit<uint32_t>(TIM1->DIER, TIM_DIER_BIE);
         }
-        set_bit(_reg->BDTR, TIM_BDTR_MOE);
+        set_bit<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
     }
 
     void stop_pwm() {
-        mcu::clear_bit(_reg->BDTR, TIM_BDTR_MOE);
+        mcu::clear_bit<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
         if (_brk_enabled) {
             // disable break interrupts to prevent instant call of BRK ISR
-            mcu::clear_bit(TIM1->DIER, TIM_DIER_BIE);
+            mcu::clear_bit<uint32_t>(TIM1->DIER, TIM_DIER_BIE);
         }
     }
 
@@ -113,7 +113,7 @@ public:
     void init_update_interrupts(IrqPriority priority);
 
     void enable_update_interrupts() {
-        clear_bit(_reg->SR, TIM_SR_UIF);
+        clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF);
         clear_pending_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
         enable_irq(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)]);
     }
@@ -125,7 +125,7 @@ public:
     void init_break_interrupts(IrqPriority priority);
 
     void enable_break_interrupts() {
-        clear_bit(_reg->SR, TIM_SR_BIF);
+        clear_bit<uint32_t>(_reg->SR, TIM_SR_BIF);
         clear_pending_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
         enable_irq(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)]);
     }

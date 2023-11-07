@@ -16,7 +16,7 @@ namespace mcu {
 
 namespace uart {
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     usart1,
     usart2,
     usart3,

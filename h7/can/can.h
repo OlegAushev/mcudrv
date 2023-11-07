@@ -18,7 +18,7 @@ namespace can {
 inline constexpr bool strict_error_check = true;
 
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     fdcan1,
     fdcan2
 };

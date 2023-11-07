@@ -12,7 +12,7 @@
 namespace mcu {
 namespace dma {
 
-enum class StreamId {
+enum class StreamId : unsigned int {
     dma1_stream0,
     dma1_stream1,
     dma1_stream2,
@@ -58,7 +58,7 @@ inline constexpr std::array<IRQn_Type, stream_count> dma_irqn = {
 };
 
 
-inline constexpr std::array<DMA_Stream_TypeDef*, stream_count> dma_stream_instances = {
+inline const std::array<DMA_Stream_TypeDef*, stream_count> dma_stream_instances = {
     DMA1_Stream0, DMA1_Stream1, DMA1_Stream2, DMA1_Stream3,
     DMA1_Stream4, DMA1_Stream5, DMA1_Stream6, DMA1_Stream7,
     DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3,
@@ -106,7 +106,7 @@ public:
     }
 
     void enable() {
-        set_bit(_stream_reg->CR, DMA_SxCR_EN);
+        set_bit<uint32_t>(_stream_reg->CR, DMA_SxCR_EN);
     }
 protected:
     static void _enable_clk(StreamId stream_id);
@@ -139,7 +139,7 @@ public:
     MemoryBuffer<T, Size> buf0;
     MemoryBuffer<T, Size> buf1;
     MemoryDoubleBuffer(Stream& stream) : _stream(stream), buf0(stream), buf1(stream) {
-        set_bit(_stream.stream_reg()->CR, DMA_SxCR_DBM);
+        set_bit<uint32_t>(_stream.stream_reg()->CR, DMA_SxCR_DBM);
         write_reg(_stream.stream_reg()->NDTR, uint32_t(Size));
         write_reg(_stream.stream_reg()->M0AR, uint32_t(buf0.data()));
         write_reg(_stream.stream_reg()->M1AR, uint32_t(buf1.data()));

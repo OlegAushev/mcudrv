@@ -1,3 +1,4 @@
+#include <cstddef>
 #ifdef STM32F4xx
 
 #include "tests.h"
@@ -5,7 +6,7 @@
 
 void mcu::tests::chrono_test() {
 #ifdef STM32F446_NUCLEO
-    auto taskLedToggle = [](int task_idx) {
+    auto taskLedToggle = [](size_t task_idx) {
         bsp::nucleo::led_green.toggle();
         return mcu::chrono::TaskStatus::success;
     };

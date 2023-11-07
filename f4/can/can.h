@@ -27,7 +27,7 @@ namespace mcu {
 namespace can {
 
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     can1,
     can2
 };
@@ -58,7 +58,7 @@ struct Config {
 namespace impl {
 
 
-inline constexpr std::array<CAN_TypeDef*, peripheral_count> can_instances = {CAN1, CAN2};
+inline const std::array<CAN_TypeDef*, peripheral_count> can_instances = {CAN1, CAN2};
 
 
 inline Peripheral to_peripheral(const CAN_TypeDef* instance) {
@@ -135,7 +135,7 @@ public:
     void stop();
 
     bool mailbox_empty() const {
-        if (bit_is_clear(_reg->TSR, CAN_TSR_TME)) {
+        if (bit_is_clear<uint32_t>(_reg->TSR, CAN_TSR_TME)) {
             return false;
         }
         return true;
@@ -144,9 +144,9 @@ public:
     uint32_t rxfifo_level(RxFifo fifo) const {
         switch (fifo) {
         case RxFifo::fifo0:
-            return read_bit(_reg->RF0R, CAN_RF0R_FMP0);
+            return read_bit<uint32_t>(_reg->RF0R, CAN_RF0R_FMP0);
         case RxFifo::fifo1:
-            return read_bit(_reg->RF1R, CAN_RF1R_FMP1);
+            return read_bit<uint32_t>(_reg->RF1R, CAN_RF1R_FMP1);
         }
         return 0;
     }

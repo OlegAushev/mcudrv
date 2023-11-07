@@ -16,7 +16,7 @@ namespace mcu {
 
 namespace uart {
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     usart1,
     usart2,
     usart3,
@@ -50,7 +50,7 @@ struct Config {
 
 namespace impl {
 
-inline constexpr std::array<USART_TypeDef*, peripheral_count> uart_instances = {USART1, USART2, USART3, UART4, UART5, USART6};
+inline const std::array<USART_TypeDef*, peripheral_count> uart_instances = {USART1, USART2, USART3, UART4, UART5, USART6};
 
 
 inline Peripheral to_peripheral(const USART_TypeDef* instance) {

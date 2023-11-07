@@ -14,7 +14,7 @@ namespace mcu {
 
 namespace timers_gp {
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     tim2,
     tim3,
     tim4,

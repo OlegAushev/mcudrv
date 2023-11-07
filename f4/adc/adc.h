@@ -14,7 +14,7 @@ namespace mcu {
 namespace adc {
 
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     adc1,
     adc2,
     adc3
@@ -56,7 +56,7 @@ enum class InjectedChannelRank {
 namespace impl {
 
 
-inline constexpr std::array<ADC_TypeDef*, peripheral_count> adc_instances = {ADC1, ADC2, ADC3};
+inline const std::array<ADC_TypeDef*, peripheral_count> adc_instances = {ADC1, ADC2, ADC3};
 
 
 inline Peripheral to_peripheral(const ADC_TypeDef* instance) {
@@ -101,10 +101,10 @@ public:
     void add_regular_internal_channel(RegularChannelConfig channel_config);
 
     void start_injected() {
-        if (bit_is_set(_reg->SR, ADC_SR_JSTRT)) {
+        if (bit_is_set<uint32_t>(_reg->SR, ADC_SR_JSTRT)) {
             return; // there is ongoing injected channel conversion
         }
-        set_bit(_reg->CR2, ADC_CR2_JSWSTART);
+        set_bit<uint32_t>(_reg->CR2, ADC_CR2_JSWSTART);
     }
 
     uint32_t read_injected(InjectedChannelRank rank) {
@@ -122,22 +122,22 @@ public:
     }
 
     void acknowledge_injected() {
-        clear_bit(_reg->SR, ADC_SR_JEOC | ADC_SR_JSTRT);
+        clear_bit<uint32_t>(_reg->SR, ADC_SR_JEOC | ADC_SR_JSTRT);
     }
 
     void start_regular() {
-        if (bit_is_set(_reg->SR, ADC_SR_STRT)) {
+        if (bit_is_set<uint32_t>(_reg->SR, ADC_SR_STRT)) {
             return; // there is ongoing regular channel conversion
         }
-        set_bit(_reg->CR2, ADC_CR2_SWSTART);
+        set_bit<uint32_t>(_reg->CR2, ADC_CR2_SWSTART);
     }
 
     bool busy() const {
-        return bit_is_set(_reg->SR, ADC_SR_STRT);
+        return bit_is_set<uint32_t>(_reg->SR, ADC_SR_STRT);
     }
 
     bool regular_ready() const {
-        return bit_is_set(_reg->SR, ADC_SR_EOC);
+        return bit_is_set<uint32_t>(_reg->SR, ADC_SR_EOC);
     }
 
     uint32_t read_regular() {
@@ -145,7 +145,7 @@ public:
     }
 
     void acknowledge_regular() {
-        clear_bit(_reg->SR, ADC_SR_EOC | ADC_SR_STRT);
+        clear_bit<uint32_t>(_reg->SR, ADC_SR_EOC | ADC_SR_STRT);
     }
 
 public:

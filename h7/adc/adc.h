@@ -16,7 +16,7 @@ namespace adc {
 inline constexpr bool strict_error_check = true;
 
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     adc1,
     adc2,
     adc3

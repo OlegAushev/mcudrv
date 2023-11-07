@@ -12,7 +12,7 @@ namespace mcu {
 namespace dac {
 
 
-enum class Peripheral {
+enum class Peripheral : unsigned int {
     dac1
 };
 
@@ -47,7 +47,7 @@ struct ChannelConfig {
 namespace impl {
 
 
-inline constexpr std::array<DAC_TypeDef*, peripheral_count> dac_instances = {DAC1};
+inline const std::array<DAC_TypeDef*, peripheral_count> dac_instances = {DAC1};
 
 
 inline Peripheral to_peripheral(const DAC_TypeDef* instance) {
