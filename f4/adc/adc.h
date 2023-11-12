@@ -1,6 +1,8 @@
 #pragma once
 
+
 #ifdef STM32F4xx
+
 
 #include "../mcudef.h"
 #include "../system/system.h"
@@ -11,6 +13,8 @@
 
 
 namespace mcu {
+
+
 namespace adc {
 
 
@@ -159,6 +163,8 @@ protected:
 
 
 } // namespace adc
+
+
 } // namespace mcu
 
 

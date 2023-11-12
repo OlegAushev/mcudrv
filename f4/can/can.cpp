@@ -1,10 +1,13 @@
 #ifdef STM32F4xx
 
+
 #include <mculib_stm32/f4/can/can.h>
 #include <mculib_stm32/f4/chrono/chrono.h>
 
 
 namespace mcu {
+
+    
 namespace can {
 
 
@@ -72,9 +75,9 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterTypeDef& filter) {
 
 
 void Module::start() {
-    clear_bit(_reg->MCR, CAN_MCR_INRQ);
+    clear_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
     mcu::chrono::Timeout start_timeout(std::chrono::milliseconds(2));
-    while (bit_is_set(_reg->MSR, CAN_MSR_INAK)) {
+    while (bit_is_set<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
         if (start_timeout.expired()) {
              fatal_error("CAN module start failed");
         }
@@ -83,9 +86,9 @@ void Module::start() {
 
 
 void Module::stop() {
-    set_bit(_reg->MCR, CAN_MCR_INRQ);
+    set_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
     mcu::chrono::Timeout stop_timeout(std::chrono::milliseconds(2));
-    while (bit_is_set(_reg->MSR, CAN_MSR_INAK)) {
+    while (bit_is_set<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
         if (stop_timeout.expired()) {
              fatal_error("CAN module start failed");
         }
@@ -102,7 +105,7 @@ Error Module::send(const can_frame& frame) {
         return Error::busy;
     }
     
-    uint32_t mailboxid = read_bit(_reg->TSR, CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
+    uint32_t mailboxid = read_bit<uint32_t>(_reg->TSR, CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
     if (mailboxid > 2) {
         return Error::internal;
     }
@@ -132,7 +135,7 @@ Error Module::send(const can_frame& frame) {
         (uint32_t(frame.payload[7]) << CAN_TDH0R_DATA7_Pos));
     
     // request transmission
-    set_bit(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_TXRQ);
+    set_bit<uint32_t>(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_TXRQ);
 
     return Error::none;
 }
@@ -146,35 +149,35 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
     auto fifo_idx = std::to_underlying(fifo);
 
     // get id, len, filter
-    if (bit_is_clear(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_IDE)) {
-        frame.id = read_bit(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_STID) >> CAN_TI0R_STID_Pos;
+    if (bit_is_clear<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_IDE)) {
+        frame.id = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_STID) >> CAN_TI0R_STID_Pos;
     } else {
-        frame.id = read_bit(_reg->sFIFOMailBox[fifo_idx].RIR, (CAN_RI0R_EXID | CAN_RI0R_STID)) >> CAN_RI0R_EXID_Pos;
+        frame.id = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RIR, (CAN_RI0R_EXID | CAN_RI0R_STID)) >> CAN_RI0R_EXID_Pos;
     }
 
-    frame.len = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos);
+    frame.len = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos);
 
     RxMessageAttribute attr;
-    attr.filter_idx = read_bit(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_FMI) >> CAN_RDT0R_FMI_Pos;
+    attr.filter_idx = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_FMI) >> CAN_RDT0R_FMI_Pos;
     attr.fifo = fifo;
 
     // get data
-    frame.payload[0] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA0) >> CAN_RDL0R_DATA0_Pos);
-    frame.payload[1] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA1) >> CAN_RDL0R_DATA1_Pos);
-    frame.payload[2] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA2) >> CAN_RDL0R_DATA2_Pos);
-    frame.payload[3] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA3) >> CAN_RDL0R_DATA3_Pos);
-    frame.payload[4] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA4) >> CAN_RDH0R_DATA4_Pos);
-    frame.payload[5] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA5) >> CAN_RDH0R_DATA5_Pos);
-    frame.payload[6] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA6) >> CAN_RDH0R_DATA6_Pos);
-    frame.payload[7] = uint8_t(read_bit(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA7) >> CAN_RDH0R_DATA7_Pos);
+    frame.payload[0] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA0) >> CAN_RDL0R_DATA0_Pos);
+    frame.payload[1] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA1) >> CAN_RDL0R_DATA1_Pos);
+    frame.payload[2] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA2) >> CAN_RDL0R_DATA2_Pos);
+    frame.payload[3] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA3) >> CAN_RDL0R_DATA3_Pos);
+    frame.payload[4] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA4) >> CAN_RDH0R_DATA4_Pos);
+    frame.payload[5] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA5) >> CAN_RDH0R_DATA5_Pos);
+    frame.payload[6] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA6) >> CAN_RDH0R_DATA6_Pos);
+    frame.payload[7] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA7) >> CAN_RDH0R_DATA7_Pos);
 
     // release fifo
     switch (fifo) {
     case RxFifo::fifo0:
-        set_bit(_reg->RF0R, CAN_RF0R_RFOM0);
+        set_bit<uint32_t>(_reg->RF0R, CAN_RF0R_RFOM0);
         break;
     case RxFifo::fifo1:
-        set_bit(_reg->RF1R, CAN_RF1R_RFOM1);
+        set_bit<uint32_t>(_reg->RF1R, CAN_RF1R_RFOM1);
         break;
     }    
 
@@ -219,6 +222,8 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace can
+
+
 } // namespace mcu
 
 

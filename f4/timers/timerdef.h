@@ -1,6 +1,8 @@
 #pragma once
 
+
 #ifdef STM32F4xx
+
 
 #include "../mcudef.h"
 #include "../system/system.h"
@@ -8,6 +10,7 @@
 
 
 namespace mcu {
+
 
 namespace timers {
 
@@ -18,7 +21,7 @@ struct Config {
 };
 
 
-enum class Channel {
+enum class Channel : unsigned int {
     channel1 = TIM_CHANNEL_1,
     channel2 = TIM_CHANNEL_2,
     channel3 = TIM_CHANNEL_3,
@@ -88,6 +91,8 @@ public:
 
 } // namespace timers
 
+
 } // namepsace mcu
+
 
 #endif

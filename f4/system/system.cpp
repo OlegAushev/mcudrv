@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+
 void init_hal() {
     HAL_Init();
 }
@@ -19,6 +20,7 @@ void reset_device() {
 void fatal_error(const char* hint, int code) {
     emb::fatal_error(hint, code);
 }
+
 
 } // namespace mcu
 
@@ -37,5 +39,6 @@ void assert_failed(uint8_t *file, uint32_t line) {
     emb::fatal_error(buf, line);
 }
 #endif // USE_FULL_ASSERT
+
 
 #endif

@@ -4,6 +4,7 @@
 #include <cstddef>
 #ifdef STM32F4xx
 
+
 #include "../mcudef.h"
 #include "../system/system.h"
 #include <emblib/core.h>
@@ -17,7 +18,9 @@ extern "C" void SysTick_Handler();
 
 namespace mcu {
 
+
 namespace chrono {
+
 
 enum class TaskStatus {
     success,
@@ -113,6 +116,8 @@ public:
 
 } // namespace chrono
 
+
 } // namespace mcu
+
 
 #endif

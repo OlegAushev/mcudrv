@@ -3,6 +3,7 @@
 
 #ifdef STM32F4xx
 
+
 #include "../mcudef.h"
 #include "../system/system.h"
 #include <array>
@@ -10,7 +11,10 @@
 
 
 namespace mcu {
+
+
 namespace dma {
+
 
 enum class StreamId : unsigned int {
     dma1_stream0,
@@ -148,6 +152,8 @@ public:
 
 
 } // namespace dma
+
+
 } // namespace mcu
 
 

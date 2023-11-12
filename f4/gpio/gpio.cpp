@@ -1,5 +1,6 @@
 #ifdef STM32F4xx
 
+
 #include <mculib_stm32/f4/gpio/gpio.h>
 
 
@@ -58,5 +59,5 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     mcu::gpio::Input::on_interrupt[pinNo]();
 }
 
-#endif
 
+#endif

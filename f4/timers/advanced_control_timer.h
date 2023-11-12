@@ -1,12 +1,16 @@
 #pragma once
 
+
 #ifdef STM32F4xx
+
 
 #include "timerdef.h"
 #include <utility>
 
 
 namespace mcu {
+
+
 namespace timers {
 
 
@@ -20,6 +24,7 @@ constexpr size_t adv_timer_peripheral_count = 2;
 
 
 namespace impl {
+
 
 inline const std::array<TIM_TypeDef*, adv_timer_peripheral_count> adv_timer_instances = {TIM1, TIM8};
 
@@ -43,7 +48,7 @@ inline constexpr std::array<IRQn_Type, adv_timer_peripheral_count> adv_timer_up_
 inline constexpr std::array<IRQn_Type, adv_timer_peripheral_count> adv_timer_brk_irqn = {TIM1_BRK_TIM9_IRQn, TIM8_BRK_TIM12_IRQn};
 
 
-}
+} // namespace impl
 
 
 class AdvancedControlTimer : public emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>, public emb::noncopyable {
@@ -139,6 +144,9 @@ private:
 
 
 } // namespace timers
+
+
 } // namepsace mcu
+
 
 #endif

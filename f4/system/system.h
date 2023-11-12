@@ -3,16 +3,15 @@
 
 #ifdef STM32F4xx
 
+
 #include "../mcudef.h"
 #include <emblib/core.h>
 #include <cstdio>
 #include <chrono>
 
 
-//void MX_GPIO_Init();
-
-
 namespace mcu {
+
 
 void init_hal();
 
@@ -67,6 +66,8 @@ inline float calculate_mcu_vref(uint32_t adc_data) {
     return 3.3f * float(*VREFINT_CAL_ADDR) / float(adc_data);
 }
 
+
 } // namespace mcu
+
 
 #endif

@@ -1,9 +1,12 @@
 #ifdef STM32F4xx
 
+
 #include <mculib_stm32/f4/timers/advanced_control_timer.h>
 
 
 namespace mcu {
+
+
 namespace timers {
 
 
@@ -79,7 +82,7 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_c
         set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
     }
 
-    set_bit(_reg->CR1, TIM_CR1_CEN);
+    set_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);
 }
 
 
@@ -109,19 +112,22 @@ void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
 
 
 void AdvancedControlTimer::init_update_interrupts(IrqPriority priority) {
-    set_bit(_reg->DIER, TIM_DIER_UIE);
+    set_bit<uint32_t>(_reg->DIER, TIM_DIER_UIE);
     set_irq_priority(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)], priority);
 }
 
 
 void AdvancedControlTimer::init_break_interrupts(IrqPriority priority) {
-    set_bit(_reg->DIER, TIM_DIER_BIE);
+    set_bit<uint32_t>(_reg->DIER, TIM_DIER_BIE);
     set_irq_priority(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;
 }
 
 
 } // namespace timers
+
+
 } // namespace mcu
+
 
 #endif

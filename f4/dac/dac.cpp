@@ -5,6 +5,8 @@
 
 
 namespace mcu {
+
+
 namespace dac {
 
 
@@ -49,6 +51,8 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace dac
+
+
 } // namespace mcu
 
 

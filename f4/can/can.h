@@ -3,6 +3,7 @@
 
 #ifdef STM32F4xx
 
+
 #include "../mcudef.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
@@ -24,6 +25,8 @@ void CAN2_TX_IRQHandler();
 
 
 namespace mcu {
+
+    
 namespace can {
 
 
@@ -112,7 +115,7 @@ private:
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 
-    int _filter_count{0};
+    unsigned int _filter_count{0};
     #ifdef CAN2
     static const int max_fitler_count{28};
     #else
@@ -174,6 +177,8 @@ private:
 
 
 } // namespace can
+
+
 } // namespace mcu
 
 

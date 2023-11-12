@@ -3,6 +3,7 @@
 
 #ifdef STM32F4xx
 
+
 #include "../mcudef.h"
 #include <emblib/core.h>
 #include <emblib/interfaces/gpio.h>
@@ -20,7 +21,9 @@ extern "C" void EXTI4_IRQHandler();
 
 namespace mcu {
 
+
 namespace gpio {
+
 
 struct Config {
     GPIO_TypeDef* port;
@@ -30,6 +33,7 @@ struct Config {
 
 
 namespace impl {
+
 
 constexpr size_t port_count = 8;
 
@@ -63,7 +67,8 @@ protected:
 public:
     void init(const Config& config) {
         // enable port clock
-        auto port_idx = std::distance(gpio_ports.begin(), std::find(gpio_ports.begin(), gpio_ports.end(), config.port));
+        size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(),
+                                                            std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
             _clk_enabled[port_idx] = true;
@@ -86,6 +91,7 @@ public:
     uint16_t pin_bit() const { return static_cast<uint16_t>(_config.pin.Pin); }
     const GPIO_TypeDef* port() const { return _config.port; }
 };
+
 
 } // namespace impl
 
@@ -277,8 +283,11 @@ public:
     }
 };
 
+
 } // namespace gpio
 
+
 } // namespace mcu
+
 
 #endif

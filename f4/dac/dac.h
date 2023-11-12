@@ -1,6 +1,8 @@
 #pragma once
 
+
 #ifdef STM32F4xx
+
 
 #include "../mcudef.h"
 #include "../gpio/gpio.h"
@@ -9,6 +11,8 @@
 
 
 namespace mcu {
+
+
 namespace dac {
 
 
@@ -17,13 +21,13 @@ enum class Peripheral : unsigned int {
 };
 
 
-enum class Channel {
+enum class Channel : unsigned int {
     channel1 = DAC_CHANNEL_1,
     channel2 = DAC_CHANNEL_2
 };
 
 
-enum class DataAlignment {
+enum class DataAlignment : unsigned int {
     right_12bit = DAC_ALIGN_12B_R,
     left_12bit = DAC_ALIGN_12B_L,
     right_8bit = DAC_ALIGN_8B_R
@@ -100,6 +104,8 @@ protected:
 
 
 } // namespace dac
+
+
 } // namespace mcu
 
 

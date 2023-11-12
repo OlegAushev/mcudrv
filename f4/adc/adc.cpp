@@ -1,9 +1,12 @@
 #ifdef STM32F4xx
 
+
 #include <mculib_stm32/f4/adc/adc.h>
 
 
 namespace mcu {
+
+
 namespace adc {
 
 
@@ -19,7 +22,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
         fatal_error("ADC module initialization failed");
     }
 
-    set_bit(_reg->CR2, ADC_CR2_ADON);
+    set_bit<uint32_t>(_reg->CR2, ADC_CR2_ADON);
     auto counter = (ADC_STAB_DELAY_US * (core_clk_freq() / 1000000));
     while(counter != 0)
     {
@@ -27,7 +30,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
     }
 
     if (dma) {
-        set_bit(_reg->CR2, ADC_CR2_DMA);
+        set_bit<uint32_t>(_reg->CR2, ADC_CR2_DMA);
         write_reg(dma->stream_reg()->PAR, uint32_t(&(_reg->DR)));
     }
 }
@@ -80,7 +83,7 @@ void Module::add_regular_internal_channel(RegularChannelConfig channel_config) {
 
 
 void Module::init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
-    clear_bit(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
+    clear_bit<uint32_t>(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
     set_bit(_reg->CR1, interrupt_list);
      mcu::set_irq_priority(ADC_IRQn, priority);
 }
@@ -98,6 +101,8 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace adc
+
+
 } // namespace mcu
 
 
