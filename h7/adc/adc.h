@@ -1,6 +1,8 @@
 #pragma once
 
+
 #ifdef STM32H7xx
+
 
 #include "../mcu_def.h"
 #include "../system/system.h"
@@ -11,7 +13,9 @@
 
 namespace mcu {
 
+
 namespace adc {
+
 
 inline constexpr bool strict_error_check = true;
 
@@ -44,6 +48,7 @@ struct ChannelConfig {
 
 
 namespace impl {
+
 
 inline const std::array<ADC_TypeDef*, peripheral_count> adc_instances = {ADC1, ADC2, ADC3};
 
@@ -81,10 +86,8 @@ public:
 
     HalStatus start_regular_conversion() {
         HalStatus status = HAL_ADC_Start(&_handle);
-        if constexpr (strict_error_check)
-        {
-            if (status != HAL_OK)
-            {
+        if constexpr (strict_error_check) {
+            if (status != HAL_OK) {
                 fatal_error("regular ADC conversion start failed");
             }
         }
@@ -94,10 +97,8 @@ public:
     template <uint32_t DmaBufSize>
     HalStatus start_regular_conversion_with_dma(mcu::dma::Buffer<uint16_t, DmaBufSize>& buf) {
         HalStatus status = HAL_ADC_Start_DMA(&_handle, reinterpret_cast<uint32_t*>(buf.data()), buf.size());
-        if constexpr (strict_error_check)
-        {
-            if (status != HAL_OK)
-            {
+        if constexpr (strict_error_check) {
+            if (status != HAL_OK) {
                 fatal_error("regular ADC conversion with DMA start failed");
             }
         }
@@ -134,9 +135,11 @@ protected:
     }
 };
 
+
 } // namespace adc
+
 
 } // namespace mcu
 
-#endif
 
+#endif

@@ -1,11 +1,14 @@
 #ifdef STM32H7xx
 
+
 #include <mculib_stm32/h7/uart/uart.h>
 
 
 namespace mcu {
 
+
 namespace uart {
+
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
@@ -41,9 +44,11 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     }
 }	
 
+
 } // namespace uart
+
 
 } // namespace mcu
 
-#endif
 
+#endif

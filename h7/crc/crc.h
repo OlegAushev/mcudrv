@@ -3,13 +3,16 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 
 
 namespace mcu {
 
+
 namespace crc {
+
 
 enum InputDataFormat {
     bytes = CRC_INPUTDATA_FORMAT_BYTES,
@@ -17,10 +20,12 @@ enum InputDataFormat {
     words = CRC_INPUTDATA_FORMAT_WORDS
 };
 
+
 struct Config {
     CRC_InitTypeDef hal_init;
     InputDataFormat input_data_format;
 };
+
 
 class calc_unit {
 private:
@@ -45,9 +50,11 @@ public:
     static uint32_t accumulate(uint32_t* buf, uint32_t len) { return HAL_CRC_Accumulate(&_handle, buf, len); }
 };
 
+
 } // namespace crc
+
 
 } // namespace mcu
 
-#endif
 
+#endif

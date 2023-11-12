@@ -1,11 +1,14 @@
 #ifdef STM32H7xx
 
+
 #include <mculib_stm32/h7/can/can.h>
 
 
 namespace mcu {
 
+
 namespace can {
+
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
@@ -110,9 +113,12 @@ void Module::set_fifo_watermark(uint32_t fifo, uint32_t watermark)
     }
 }
 
+
 } // namespace can
 
+
 } // namespace mcu
+
 
 extern "C" void FDCAN1_IT0_IRQHandler(void) {
     using namespace mcu::can;
@@ -192,5 +198,5 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
     }
 }
 
-#endif
 
+#endif

@@ -3,6 +3,7 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
@@ -12,7 +13,9 @@
 
 namespace mcu {
 
+
 namespace timers_gp {
+
 
 enum class Peripheral : unsigned int {
     tim2,
@@ -38,6 +41,7 @@ enum class Channel {
     channel4 = TIM_CHANNEL_4,
 };
 
+
 struct ChannelConfig {
     TIM_OC_InitTypeDef hal_init;
 };
@@ -51,6 +55,7 @@ struct PwmPinConfig {
 
 
 namespace impl {
+
 
 inline const std::array<TIM_TypeDef*, peripheral_count> timer_instances = {TIM2, TIM3, TIM4, TIM5};
 
@@ -68,7 +73,8 @@ inline std::array<void(*)(void), peripheral_count> timer_clk_enable_funcs = {
     [](){ __HAL_RCC_TIM5_CLK_ENABLE(); },	
 };
 
-}
+
+} // namespace impl
 
 
 class Timer : public emb::interrupt_invoker_array<Timer, peripheral_count>, emb::noncopyable {
@@ -130,20 +136,10 @@ protected:
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
 } // namespace timers
+
 
 } // namespace mcu
 
-#endif
 
+#endif

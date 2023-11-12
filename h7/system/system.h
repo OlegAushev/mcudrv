@@ -3,6 +3,7 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include <emblib/core.h>
 #include <cstdio>
@@ -13,6 +14,7 @@
 
 
 namespace mcu {
+
 
 void init_hal();
 
@@ -80,7 +82,8 @@ inline float calculate_mcu_vref(uint32_t adcData) {
     return 3.3f * float(*VREFINT_CAL_ADDR) / float(adcData);
 }
 
+
 } // namespace mcu
 
-#endif
 
+#endif

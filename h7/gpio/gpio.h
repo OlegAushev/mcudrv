@@ -3,6 +3,7 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include <emblib/core.h>
 #include <emblib/interfaces/gpio.h>
@@ -19,7 +20,9 @@ extern "C" void EXTI4_IRQHandler();
 
 namespace mcu {
 
+
 namespace gpio {
+
 
 struct Config {
     GPIO_TypeDef* port;
@@ -29,6 +32,7 @@ struct Config {
 
 
 namespace impl {
+
 
 constexpr int port_count = 11;
 
@@ -89,6 +93,7 @@ public:
     uint16_t pin_bit() const { return static_cast<uint16_t>(_config.pin.Pin); }
     const GPIO_TypeDef* port() const { return _config.port; }
 };
+
 
 } // namespace impl
 
@@ -270,9 +275,11 @@ public:
     }
 };
 
+
 } // namespace gpio
+
 
 } // namespace mcu
 
-#endif
 
+#endif

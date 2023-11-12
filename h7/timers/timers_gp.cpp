@@ -1,11 +1,14 @@
 #ifdef STM32H7xx
 
+
 #include <mculib_stm32/h7/timers/timers_gp.h>
 
 
 namespace mcu {
 
+
 namespace timers_gp {
+
 
 Timer::Timer(Peripheral peripheral, const Config& config)
         : emb::interrupt_invoker_array<Timer, peripheral_count>(this, std::to_underlying(peripheral))
@@ -35,9 +38,11 @@ Timer::Timer(Peripheral peripheral, const Config& config)
     }
 }
 
+
 }
+
 
 } // namespace mcu
 
-#endif
 
+#endif

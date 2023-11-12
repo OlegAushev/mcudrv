@@ -71,4 +71,4 @@ inline void disable_irq(IRQn_Type irqn) { HAL_NVIC_DisableIRQ(irqn); }
 inline void clear_pending_irq(IRQn_Type irqn) { HAL_NVIC_ClearPendingIRQ(irqn); }
 
 
-}
+} // namespace mcu

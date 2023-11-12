@@ -3,18 +3,20 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
 #include <emblib/interfaces/uart.h>
-
 #include <utility>
 
 
 namespace mcu {
 
+
 namespace uart {
+
 
 enum class Peripheral : unsigned int {
     usart1,
@@ -53,6 +55,7 @@ struct Config {
 
 namespace impl {
 
+
 inline const std::array<USART_TypeDef*, peripheral_count> uart_instances = {USART1, USART2, USART3, UART4, UART5, USART6, UART7, UART8};
 
 
@@ -73,7 +76,8 @@ inline std::array<void(*)(void), peripheral_count> uart_clk_enable_funcs = {
     [](){ __HAL_RCC_UART8_CLK_ENABLE(); }	
 };
 
-}
+
+} // namespace impl
 
 
 class Module : public emb::uart::UartInterface, public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
@@ -134,9 +138,11 @@ protected:
     }
 };
 
+
 } // namespace uart
+
 
 } // namespace mcu
 
-#endif
 
+#endif

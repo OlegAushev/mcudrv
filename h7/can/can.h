@@ -3,6 +3,7 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
@@ -13,7 +14,9 @@
 
 namespace mcu {
 
+
 namespace can {
+
 
 inline constexpr bool strict_error_check = true;
 
@@ -48,6 +51,7 @@ struct Config {
 
 namespace impl {
 
+
 inline constexpr std::array<IRQn_Type, 2> irq0_numbers = {	
     FDCAN1_IT0_IRQn,
     FDCAN2_IT0_IRQn,
@@ -81,6 +85,7 @@ inline constexpr std::array<uint32_t, 9> data_len_codes = {
     FDCAN_DLC_BYTES_7,
     FDCAN_DLC_BYTES_8
 };
+
 
 } // namespace impl
 
@@ -201,9 +206,11 @@ protected:
     }
 };
 
+
 } // namespace can
+
 
 } // namespace mcu
 
-#endif
 
+#endif

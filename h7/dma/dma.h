@@ -3,6 +3,7 @@
 
 #ifdef STM32H7xx
 
+
 #include "../mcu_def.h"
 #include "../system/system.h"
 #include <array>
@@ -11,7 +12,9 @@
 
 namespace mcu {
 
+
 namespace dma {
+
 
 enum class Stream : unsigned int {
     dma1_stream0,
@@ -43,6 +46,7 @@ struct Config {
 
 namespace impl {
 
+
 inline constexpr std::array<IRQn_Type, stream_count> irq_numbers = {	
     DMA1_Stream0_IRQn, DMA1_Stream1_IRQn, DMA1_Stream2_IRQn, DMA1_Stream3_IRQn,
     DMA1_Stream4_IRQn, DMA1_Stream5_IRQn, DMA1_Stream6_IRQn, DMA1_Stream7_IRQn,
@@ -57,6 +61,7 @@ inline const std::array<DMA_Stream_TypeDef*, stream_count> dma_stream_instances 
     DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3,
     DMA2_Stream4, DMA2_Stream5, DMA2_Stream6, DMA2_Stream7
 };
+
 
 } // namespace impl
 
@@ -155,9 +160,11 @@ public:
     }
 };
 
+
 } // namespace dma
+
 
 } // namespace mcu
 
-#endif
 
+#endif
