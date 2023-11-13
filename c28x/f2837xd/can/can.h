@@ -5,8 +5,8 @@
 
 
 #include <emblib/core.h>
-#include <mculib_c28x/f2837xd/gpio/gpio.h>
-#include <mculib_c28x/f2837xd/system/system.h>
+#include <mcudrv/c28x/f2837xd/gpio/gpio.h>
+#include <mcudrv/c28x/f2837xd/system/system.h>
 
 
 namespace mcu {

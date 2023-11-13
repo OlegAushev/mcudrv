@@ -7,9 +7,9 @@
 #include <tests/tests_config.h>
 #include <emblib/testrunner/testrunner.h>
 #include "../system/system.h"
-#include "mculib_c28x/f2837xd/gpio/gpio.h"
-#include "mculib_c28x/f2837xd/chrono/chrono.h"
-#include "mculib_c28x/f2837xd/crc/crc.h"
+#include <mcudrv/c28x/f2837xd/gpio/gpio.h>
+#include <mcudrv/c28x/f2837xd/chrono/chrono.h>
+#include <mcudrv/c28x/f2837xd/crc/crc.h>
 
 #ifdef _LAUNCHXL_F28379D
 #include <bsp_c28x/launchpad/launchpad.h>

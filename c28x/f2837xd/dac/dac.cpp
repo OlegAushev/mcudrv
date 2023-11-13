@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mculib_c28x/f2837xd/dac/dac.h>
+#include <mcudrv/c28x/f2837xd/dac/dac.h>
 
 
 namespace mcu {

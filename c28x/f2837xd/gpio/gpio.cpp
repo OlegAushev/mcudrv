@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mculib_c28x/f2837xd/gpio/gpio.h>
+#include <mcudrv/c28x/f2837xd/gpio/gpio.h>
 
 
 namespace mcu {
