@@ -5,7 +5,7 @@
 #ifdef STM32F4xx
 
 
-#include "../common.h"
+#include "../stm32_base.h"
 #include <cassert>
 
 

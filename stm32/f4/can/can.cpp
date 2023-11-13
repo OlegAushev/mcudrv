@@ -2,8 +2,8 @@
 #ifdef STM32F4xx
 
 
-#include <mculib_stm32/f4/can/can.h>
-#include <mculib_stm32/f4/chrono/chrono.h>
+#include <mcudrv/stm32/f4/can/can.h>
+#include <mcudrv/stm32/f4/chrono/chrono.h>
 
 
 namespace mcu {

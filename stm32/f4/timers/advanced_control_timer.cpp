@@ -2,7 +2,7 @@
 #ifdef STM32F4xx
 
 
-#include <mculib_stm32/f4/timers/advanced_control_timer.h>
+#include <mcudrv/stm32/f4/timers/advanced_control_timer.h>
 
 
 namespace mcu {

@@ -2,7 +2,7 @@
 #ifdef STM32F4xx
 
 
-#include <mculib_stm32/f4/adc/adc.h>
+#include <mcudrv/stm32/f4/adc/adc.h>
 
 
 namespace mcu {
