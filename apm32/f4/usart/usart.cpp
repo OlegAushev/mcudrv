@@ -1,6 +1,4 @@
-#include "emblib/interfaces/gpio.h"
-#include <apm32f4xx_gpio.h>
-#include <utility>
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
@@ -68,4 +66,5 @@ void Module::_enable_clk(Peripheral peripheral) {
 } // namespace mcu
 
 
+#endif
 #endif

@@ -1,10 +1,11 @@
 #pragma once
 
 
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
-#include "../mcudef.h"
+#include "../apm32_f4_base.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <apm32f4xx_usart.h>
@@ -134,4 +135,5 @@ protected:
 } // namespace mcu
 
 
+#endif
 #endif

@@ -1,11 +1,12 @@
 #pragma once
 
 
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
+#include "../apm32_f4_base.h"
 #include <apm32f4xx.h>
-#include "../mcudef.h"
 #include <chrono>
 
 
@@ -24,4 +25,5 @@ void delay(std::chrono::milliseconds delay);
 } // namespace mcu
 
 
+#endif
 #endif

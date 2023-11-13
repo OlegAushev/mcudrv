@@ -1,4 +1,4 @@
-#include "mculib_apm32/f4/system/system.h"
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
@@ -59,4 +59,5 @@ void system_clock::run_tasks() {
 } // namespace mcu
 
 
+#endif
 #endif

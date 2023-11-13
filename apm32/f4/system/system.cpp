@@ -1,3 +1,4 @@
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
@@ -24,4 +25,5 @@ void delay(std::chrono::milliseconds delay) {
 } // namespace mcu
 
 
+#endif
 #endif

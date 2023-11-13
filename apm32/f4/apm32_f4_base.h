@@ -1,10 +1,11 @@
 #pragma once
 
 
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
-#include "../common.h"
+#include "../apm32_base.h"
 
 
 namespace mcu {
@@ -23,4 +24,5 @@ enum class Error {
 } // namespace mcu
 
 
+#endif
 #endif

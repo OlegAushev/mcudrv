@@ -1,6 +1,7 @@
 #pragma once
 
 
+#ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
 
@@ -119,4 +120,5 @@ public:
 } // namespace mcu
 
 
+#endif
 #endif
