@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
@@ -8,7 +11,9 @@
 
 namespace mcu {
 
+
 namespace spi {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     spia,
@@ -59,6 +64,7 @@ struct Config {
 
 namespace impl {
 
+
 struct Module {
     uint32_t base;
     uint32_t pie_rx_int_num;
@@ -69,6 +75,7 @@ struct Module {
 
 extern const uint32_t spi_bases[3];
 extern const uint32_t spi_rx_pie_int_nums[3];
+
 
 } // namespace impl
 
@@ -159,7 +166,11 @@ protected:
 #endif
 };
 
+
 } // namespace spi
+
 
 } // namespace mcu
 
+
+#endif

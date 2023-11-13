@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
@@ -9,7 +12,9 @@
 
 namespace mcu {
 
+
 namespace sci {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     scia,
@@ -156,7 +161,11 @@ protected:
 #endif
 };
 
+
 } // namespace sci
+
 
 } // namespace mcu
 
+
+#endif

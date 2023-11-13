@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -76,4 +77,5 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *handle) {
 }
 
 
+#endif
 #endif

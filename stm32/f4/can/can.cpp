@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -251,4 +252,5 @@ extern "C" void CAN2_TX_IRQHandler() {
 }
 
 
+#endif
 #endif

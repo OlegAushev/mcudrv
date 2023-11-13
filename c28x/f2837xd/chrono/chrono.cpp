@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/chrono/chrono.h>
 
 
 namespace mcu {
 
+
 namespace chrono {
+
 
 volatile int64_t system_clock::_time;
 const emb::chrono::milliseconds system_clock::time_step(1);
@@ -87,7 +92,11 @@ void high_resolution_clock::init(emb::chrono::microseconds period) {
     set_initialized();
 }
 
+
 } // namespace chrono
+
 
 } // namespace mcu
 
+
+#endif

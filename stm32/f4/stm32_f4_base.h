@@ -1,6 +1,7 @@
 #pragma once
 
 
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -24,4 +25,5 @@ enum class Error {
 } // namespace mcu
 
 
+#endif
 #endif

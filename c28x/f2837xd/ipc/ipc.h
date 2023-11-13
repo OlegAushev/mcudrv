@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include <emblib/core.h>
 #include "F2837xD_Ipc_drivers.h"
@@ -8,7 +11,9 @@
 
 namespace mcu {
 
+
 namespace ipc {
+
 
 namespace traits {
 struct singlecore{};
@@ -135,13 +140,19 @@ inline void registerIpcInterruptHandler(InterruptType ipc_interrupt, void (*hand
 
 namespace flags {
 
+
 extern mcu::ipc::Flag cpu1_periphery_configured;
 extern mcu::ipc::Flag cpu2_booted;
 extern mcu::ipc::Flag cpu2_periphery_configured;
 
+
 } // namespace flags
+
 
 } // namespace ipc
 
+
 } // namespace mcu
 
+
+#endif

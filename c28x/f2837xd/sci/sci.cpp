@@ -1,9 +1,13 @@
+#ifdef MCUDRV_C28X
+
 #include <mculib_c28x/f2837xd/sci/sci.h>
 
 
 namespace mcu {
 
+
 namespace sci {
+
 
 const uint32_t impl::sci_bases[4] = {SCIA_BASE, SCIB_BASE, SCIC_BASE, SCID_BASE};
 const uint32_t impl::sci_rx_pie_int_nums[4] = {INT_SCIA_RX, INT_SCIB_RX, INT_SCIC_RX, INT_SCID_RX};
@@ -74,7 +78,11 @@ void Module::_init_pins(const gpio::Config& rx_pin, const gpio::Config& tx_pin) 
 }
 #endif
 
+
 } // namespace sci
+
 
 } // namespace mcu
 
+
+#endif

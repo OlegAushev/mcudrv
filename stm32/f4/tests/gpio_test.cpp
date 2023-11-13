@@ -1,4 +1,6 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
+
 
 #include "tests.h"
 
@@ -34,4 +36,6 @@ void mcu::tests::gpio_test()
 #endif
 }
 
+
+#endif
 #endif

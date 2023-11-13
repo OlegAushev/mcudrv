@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -28,4 +29,5 @@ extern "C" void DMA1_Stream3_IRQHandler(void) {
 }
 
 
+#endif
 #endif

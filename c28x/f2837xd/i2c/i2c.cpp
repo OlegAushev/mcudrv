@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/i2c/i2c.h>
 
 
 namespace mcu {
 
+
 namespace i2c {
+
 
 const uint32_t impl::i2c_bases[2] = {I2CA_BASE, I2CB_BASE};
 
@@ -51,7 +56,11 @@ void Module::_init_pins(const gpio::Config& sda_pin, const gpio::Config& scl_pin
 }
 #endif
 
+
 } // namespace i2c
+
 
 } // namespace mcu
 
+
+#endif

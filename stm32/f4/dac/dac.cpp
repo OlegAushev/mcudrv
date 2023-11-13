@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -56,4 +57,5 @@ void Module::_enable_clk(Peripheral peripheral) {
 } // namespace mcu
 
 
+#endif
 #endif

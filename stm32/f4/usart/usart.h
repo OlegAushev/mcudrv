@@ -1,7 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
+
 
 #include "../mcudef.h"
 #include "../system/system.h"
@@ -138,4 +140,5 @@ protected:
 } // namespace mcu
 
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -76,4 +77,5 @@ void Stream::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) 
 } // namespace mcu
 
 
+#endif
 #endif

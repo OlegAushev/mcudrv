@@ -1,11 +1,17 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/ipc/ipc.h>
 
 
 namespace mcu {
 
+
 namespace ipc {
 
+
 namespace flags {
+
 
 #ifdef DUALCORE
 const mcu::ipc::Mode mode = mcu::ipc::Mode::singlecore;
@@ -17,9 +23,14 @@ mcu::ipc::Flag cpu1_periphery_configured(31, mode);
 mcu::ipc::Flag cpu2_booted(30, mode);
 mcu::ipc::Flag cpu2_periphery_configured(29, mode);
 
+
 } // namespace flags
+
 
 } // namespace ipc
 
+
 } // namespace mcu
 
+
+#endif

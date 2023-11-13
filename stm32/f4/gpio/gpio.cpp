@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -60,4 +61,5 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 
+#endif
 #endif

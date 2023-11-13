@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -199,4 +200,5 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
 }
 
 
+#endif
 #endif

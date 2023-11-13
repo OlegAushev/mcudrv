@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -59,4 +60,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     mcu::gpio::Input::on_interrupt[pinNo]();
 }
 
+
+#endif
 #endif

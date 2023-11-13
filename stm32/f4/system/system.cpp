@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -41,4 +42,5 @@ void assert_failed(uint8_t *file, uint32_t line) {
 #endif // USE_FULL_ASSERT
 
 
+#endif
 #endif

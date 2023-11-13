@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/spi/spi.h>
 
 
 namespace mcu {
 
+
 namespace spi {
+
 
 const uint32_t impl::spi_bases[3] = {SPIA_BASE, SPIB_BASE, SPIC_BASE};
 const uint32_t impl::spi_rx_pie_int_nums[3] = {INT_SPIA_RX, INT_SPIB_RX, INT_SPIC_RX};
@@ -76,7 +81,11 @@ void Module::_init_pins(const gpio::Config& mosi_pin, const gpio::Config& miso_p
 }
 #endif
 
+
 } // namespace spi
+
 
 } // namespace mcu
 
+
+#endif

@@ -1,6 +1,7 @@
 #pragma once
 
 
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -149,4 +150,5 @@ private:
 } // namepsace mcu
 
 
+#endif
 #endif

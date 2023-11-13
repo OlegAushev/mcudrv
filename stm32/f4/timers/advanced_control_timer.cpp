@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -130,4 +131,5 @@ void AdvancedControlTimer::init_break_interrupts(IrqPriority priority) {
 } // namespace mcu
 
 
+#endif
 #endif

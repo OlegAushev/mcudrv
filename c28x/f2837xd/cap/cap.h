@@ -1,13 +1,18 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 
 
 namespace mcu {
 
+
 namespace cap {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     cap1,
@@ -24,6 +29,7 @@ const size_t peripheral_count = 6;
 
 namespace impl {
 
+
 struct Module {
     uint32_t base;
     XBAR_InputNum xbar_input;
@@ -36,6 +42,7 @@ struct Module {
 extern const uint32_t cap_bases[6];
 extern const XBAR_InputNum cap_xbar_inputs[6];
 extern const uint32_t cap_pie_int_nums[6];
+
 
 } // namespace impl
 
@@ -80,7 +87,11 @@ protected:
     }
 };
 
+
 } // namespace cap
+
 
 } // namespace mcu
 
+
+#endif

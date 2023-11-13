@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/array.h>
@@ -10,7 +13,9 @@
 
 namespace mcu {
 
+
 namespace pwm {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(State) {
     off,
@@ -580,6 +585,11 @@ public:
 #endif
 };
 
+
 } // namespace pwm
 
+
 } // namespace mcu
+
+
+#endif

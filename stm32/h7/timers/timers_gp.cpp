@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -45,4 +46,5 @@ Timer::Timer(Peripheral peripheral, const Config& config)
 } // namespace mcu
 
 
+#endif
 #endif

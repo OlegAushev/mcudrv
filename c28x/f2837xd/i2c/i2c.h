@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
@@ -8,7 +11,9 @@
 
 namespace mcu {
 
+
 namespace i2c {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     i2ca,
@@ -47,6 +52,7 @@ struct Config {
 
 namespace impl {
 
+
 struct Module {
     uint32_t base;
     Module(uint32_t base_) : base(base_) {}
@@ -54,6 +60,7 @@ struct Module {
 
 
 extern const uint32_t i2c_bases[2];
+
 
 } // namespace impl
 
@@ -91,7 +98,11 @@ protected:
 #endif
 };
 
+
 } // namespace i2c
+
 
 } // namespace mcu
 
+
+#endif

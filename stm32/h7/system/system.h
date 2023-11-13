@@ -1,6 +1,7 @@
 #pragma once
 
 
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -86,4 +87,5 @@ inline float calculate_mcu_vref(uint32_t adcData) {
 } // namespace mcu
 
 
+#endif
 #endif

@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/pwm/pwm.h>
 
 
 namespace mcu {
 
+
 namespace pwm {
+
 
 const uint32_t impl::pwm_bases[12] = {
     EPWM1_BASE, EPWM2_BASE, EPWM3_BASE, EPWM4_BASE,
@@ -21,7 +26,11 @@ const uint32_t impl::pwm_pie_trip_int_nums[12] = {
     INT_EPWM9_TZ, INT_EPWM10_TZ, INT_EPWM11_TZ, INT_EPWM12_TZ
 };
 
+
 } // namespace pwm
+
 
 } // namespace mcu
 
+
+#endif

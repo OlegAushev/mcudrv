@@ -1,4 +1,6 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
+
 
 #include <mculib_stm32/f4/usart/usart.h>
 
@@ -49,4 +51,5 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 } // namespace mcu
 
 
+#endif
 #endif

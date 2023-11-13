@@ -1,13 +1,18 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include <dsp/vcu/vcu2_crc.h>
 
 
 namespace mcu {
 
+
 namespace crc {
+
 
 inline uint32_t calc_crc32(const uint16_t* buf, size_t bytes) {
     // CRC-32/MPEG-2
@@ -59,7 +64,11 @@ inline void reset() {
     EMB_UNUSED(res);
 }
 
+
 } // namespace crc
+
 
 } // namespace mcu
 
+
+#endif

@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/dac/dac.h>
 
 
 namespace mcu {
 
+
 namespace dac {
+
 
 const uint32_t impl::dac_bases[3] = {DACA_BASE, DACB_BASE, DACC_BASE};
 
@@ -18,7 +23,11 @@ Module::Module(Peripheral peripheral)
     mcu::delay(emb::chrono::microseconds(10));  // Delay for buffered DAC to power up
 }
 
+
 } // namespace dac
+
 
 } // namespace mcu
 
+
+#endif

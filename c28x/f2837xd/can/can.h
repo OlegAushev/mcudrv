@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include <emblib/core.h>
 #include <mculib_c28x/f2837xd/gpio/gpio.h>
 #include <mculib_c28x/f2837xd/system/system.h>
@@ -8,7 +11,9 @@
 
 namespace mcu {
 
+
 namespace can {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     cana,
@@ -54,6 +59,7 @@ struct Config {
 
 namespace impl {
 
+
 struct Module {
     uint32_t base;
     uint32_t pie_int_num;
@@ -65,6 +71,7 @@ struct Module {
 extern const uint32_t can_bases[2];
 extern const uint32_t can_pie_int_nums[2];
 extern const SysCtl_CPUSelPeriphInstance can_cpusel_instances[2];
+
 
 } // namespace impl
 
@@ -123,7 +130,11 @@ protected:
     }
 };
 
+
 } // namespace can
+
 
 } // namespace mcu
 
+
+#endif

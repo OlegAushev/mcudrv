@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include <emblib/interfaces/gpio.h>
 #include <emblib/chrono.h>
@@ -9,7 +12,9 @@
 
 namespace mcu {
 
+
 namespace gpio {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Type) {
     std = GPIO_PIN_TYPE_STD,
@@ -43,8 +48,10 @@ SCOPED_ENUM_DECLARE_BEGIN(MasterCore) {
 
 namespace impl {
 
+
 extern const uint32_t pie_xint_nums[5];
 extern const uint16_t pie_xint_groups[5];
+
 
 } // namespace impl
 
@@ -88,6 +95,7 @@ struct Config {
 
 namespace impl {
 
+
 class Gpio {
 protected:
     Config _config;
@@ -105,6 +113,7 @@ public:
     const Config& config() const { return _config; }
     uint32_t no() const { return _config.no; }
 };
+
 
 } // namespace impl
 
@@ -303,7 +312,11 @@ public:
     }
 };
 
+
 } //namespace gpio
+
 
 } // namespace mcu
 
+
+#endif

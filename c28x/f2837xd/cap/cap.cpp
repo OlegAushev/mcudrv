@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/cap/cap.h>
 
 
 namespace mcu {
 
+
 namespace cap {
+
 
 const uint32_t impl::cap_bases[6] = {ECAP1_BASE, ECAP2_BASE, ECAP3_BASE, ECAP4_BASE, ECAP5_BASE, ECAP6_BASE};
 const XBAR_InputNum impl::cap_xbar_inputs[6] = {XBAR_INPUT7, XBAR_INPUT8, XBAR_INPUT9, XBAR_INPUT10, XBAR_INPUT11, XBAR_INPUT12};
@@ -88,7 +93,11 @@ void Module::register_interrupt_callback(void (*callback)(Module*, uint16_t)) {
     _on_interrupt_callbacks[_peripheral.underlying_value()] = callback;
 }
 
+
 } // namespace cap
+
 
 } // namespace mcu
 
+
+#endif

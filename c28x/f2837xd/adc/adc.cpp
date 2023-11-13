@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/adc/adc.h>
 
 
 namespace mcu {
 
+
 namespace adc {
+
 
 const uint32_t impl::adc_bases[4] = {ADCA_BASE, ADCB_BASE, ADCC_BASE, ADCD_BASE};
 const uint32_t impl::adc_result_bases[4]= {ADCARESULT_BASE, ADCBRESULT_BASE, ADCCRESULT_BASE, ADCDRESULT_BASE};
@@ -65,7 +70,11 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral) {
 }
 #endif
 
+
 } // namespace adc
+
 
 } // namespace mcu
 
+
+#endif

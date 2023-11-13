@@ -1,13 +1,18 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include "../system/system.h"
 #include <emblib/core.h>
 
 
 namespace mcu {
 
+
 namespace dac {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     daca,
@@ -21,6 +26,7 @@ const size_t peripheral_count = 3;
 
 namespace impl {
 
+
 struct Module {
     uint32_t base;
     Module(uint32_t base_) : base(base_) {}
@@ -28,6 +34,7 @@ struct Module {
 
 
 extern const uint32_t dac_bases[3];
+
 
 } // namespace impl
 
@@ -59,7 +66,11 @@ public:
     void convert(Input input) { DAC_setShadowValue(_module.base, input.get()); }
 };
 
+
 } // namespace dac
+
 
 } // namespace mcu
 
+
+#endif

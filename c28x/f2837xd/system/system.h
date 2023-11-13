@@ -1,6 +1,10 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
+#include "../../c28x_base.h"
 #include <emblib/core.h>
 #include <emblib/chrono.h>
 #include <driverlib.h>
@@ -9,6 +13,7 @@
 
 
 namespace mcu {
+
 
 namespace traits {
 struct unused{};
@@ -87,5 +92,8 @@ inline uint32_t sysclk_freq() { return DEVICE_SYSCLK_FREQ; }
 #define INVOKE_USER2_INTERRUPT() __asm(" TRAP #21")
 #define INVOKE_USER3_INTERRUPT() __asm(" TRAP #22")
 
+
 } // namespace mcu
 
+
+#endif

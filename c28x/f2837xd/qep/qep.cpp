@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/qep/qep.h>
 
 
 namespace mcu {
 
+
 namespace qep {
+
 
 const uint32_t impl::qep_bases[3] = {EQEP1_BASE, EQEP2_BASE, EQEP3_BASE};
 const uint32_t impl::qep_pie_int_nums[3] = {INT_EQEP1, INT_EQEP2, INT_EQEP3};
@@ -66,7 +71,11 @@ void Module::_init_pins(const gpio::Config& qepa_pin, const gpio::Config& qepb_p
 }
 #endif
 
+
 } // namespace qep
+
 
 } // namespace mcu
 
+
+#endif

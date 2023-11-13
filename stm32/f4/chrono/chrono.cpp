@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -50,4 +51,5 @@ void system_clock::run_tasks() {
 } // namespace mcu
 
 
+#endif
 #endif

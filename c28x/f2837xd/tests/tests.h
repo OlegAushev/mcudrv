@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include <tests/tests_config.h>
 #include <emblib/testrunner/testrunner.h>
 #include "../system/system.h"
@@ -15,6 +18,7 @@
 
 namespace mcu {
 
+
 class tests {
 public:
     static void gpio_test();
@@ -22,5 +26,8 @@ public:
     static void crc_test();
 };
 
+
 } // namespace mcu
 
+
+#endif

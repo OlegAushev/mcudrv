@@ -1,9 +1,14 @@
+#ifdef MCUDRV_C28X
+
+
 #include <mculib_c28x/f2837xd/can/can.h>
 
 
 namespace mcu {
 
+
 namespace can {
+
 
 const uint32_t impl::can_bases[2] = {CANA_BASE, CANB_BASE};
 const uint32_t impl::can_pie_int_nums[2] = {INT_CANA0, INT_CANB0};
@@ -81,7 +86,11 @@ void Module::_init_pins(const gpio::Config& rxPin, const gpio::Config& txPin) {
 }
 #endif
 
+
 } // namespace can
+
 
 } // namespace mcu
 
+
+#endif

@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_STM32
+
+
 #include "../config.h"
 #include <cstdint>
 
@@ -74,3 +77,6 @@ inline void clear_pending_irq(IRQn_Type irqn) { HAL_NVIC_ClearPendingIRQ(irqn); 
 
 
 } // namespace mcu
+
+
+#endif

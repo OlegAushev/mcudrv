@@ -1,6 +1,7 @@
 #pragma once
 
 
+#ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
 
@@ -182,4 +183,5 @@ private:
 } // namespace mcu
 
 
+#endif
 #endif

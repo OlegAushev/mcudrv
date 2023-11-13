@@ -1,3 +1,4 @@
+#ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
 
@@ -51,4 +52,5 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 } // namespace mcu
 
 
+#endif
 #endif

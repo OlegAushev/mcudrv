@@ -1,6 +1,9 @@
 #pragma once
 
 
+#ifdef MCUDRV_C28X
+
+
 #include <emblib/array.h>
 #include <emblib/core.h>
 #include <mcu/adc_channels/adc_channels.h>
@@ -9,7 +12,9 @@
 
 namespace mcu {
 
+
 namespace adc {
+
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     adca,
@@ -28,6 +33,7 @@ struct Config {
 
 
 namespace impl {
+
 
 struct Module {
     uint32_t base;
@@ -81,6 +87,7 @@ void init_channels(emb::array<impl::Channel, ChannelId::count>& channels);
 
 
 void init_irqs(emb::array<impl::Irq, IrqId::count>& irqs);
+
 
 } // namespace impl
 
@@ -174,7 +181,11 @@ public:
     Module* adc() { return _adc; }
 };
 
+
 } // namespace adc
+
 
 } // namespace mcu
 
+
+#endif
