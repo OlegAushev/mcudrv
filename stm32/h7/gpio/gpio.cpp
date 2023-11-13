@@ -2,7 +2,7 @@
 #ifdef STM32H7xx
 
 
-#include <mculib_stm32/h7/gpio/gpio.h>
+#include <mcudrv/stm32/h7/gpio/gpio.h>
 
 
 extern "C" void EXTI0_IRQHandler() {

@@ -2,7 +2,7 @@
 #ifdef STM32H7xx
 
 
-#include <mculib_stm32/h7/timers/timers_gp.h>
+#include <mcudrv/stm32/h7/timers/timers_gp.h>
 
 
 namespace mcu {

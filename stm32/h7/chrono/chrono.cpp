@@ -2,7 +2,7 @@
 #ifdef STM32H7xx
 
 
-#include <mculib_stm32/h7/chrono/chrono.h>
+#include <mcudrv/stm32/h7/chrono/chrono.h>
 
 
 /// @brief Mandatory HAL-lib tick handler.

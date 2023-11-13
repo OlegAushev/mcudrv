@@ -2,7 +2,7 @@
 #ifdef STM32H7xx
 
 
-#include <mculib_stm32/h7/can/can.h>
+#include <mcudrv/stm32/h7/can/can.h>
 
 
 namespace mcu {

@@ -2,7 +2,7 @@
 #ifdef STM32H7xx
 
 
-#include <mculib_stm32/h7/dma/dma.h>
+#include <mcudrv/stm32/h7/dma/dma.h>
 
 
 extern "C" void DMA1_Stream0_IRQHandler(void) {
