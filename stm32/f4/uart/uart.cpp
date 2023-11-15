@@ -2,13 +2,13 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/usart/usart.h>
+#include <mcudrv/stm32/f4/uart/uart.h>
 
 
 namespace mcu {
 
 
-namespace usart {
+namespace uart {
 
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
@@ -37,7 +37,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         .active_state = emb::gpio::ActiveState::high});
 
     enable_clk();
-    _handle.Instance = impl::usart_instances[std::to_underlying(_peripheral)];
+    _handle.Instance = impl::uart_instances[std::to_underlying(_peripheral)];
     _handle.Init = config.hal_init;
     if (HAL_UART_Init(&_handle) != HAL_OK) {
         fatal_error("UART module initialization failed");
@@ -45,7 +45,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 }	
 
 
-} // namespace usart
+} // namespace uart
 
 
 } // namespace mcu

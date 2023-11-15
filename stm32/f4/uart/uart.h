@@ -17,7 +17,7 @@
 namespace mcu {
 
 
-namespace usart {
+namespace uart {
 
 
 enum class Peripheral : unsigned int {
@@ -54,16 +54,16 @@ struct Config {
 
 namespace impl {
 
-inline const std::array<USART_TypeDef*, peripheral_count> usart_instances = {USART1, USART2, USART3, UART4, UART5, USART6};
+inline const std::array<USART_TypeDef*, peripheral_count> uart_instances = {USART1, USART2, USART3, UART4, UART5, USART6};
 
 
 inline Peripheral to_peripheral(const USART_TypeDef* instance) {
     return static_cast<Peripheral>(
-        std::distance(usart_instances.begin(), std::find(usart_instances.begin(), usart_instances.end(), instance)));
+        std::distance(uart_instances.begin(), std::find(uart_instances.begin(), uart_instances.end(), instance)));
 }
 
 
-inline std::array<void(*)(void), peripheral_count> usart_clk_enable_funcs = {
+inline std::array<void(*)(void), peripheral_count> uart_clk_enable_funcs = {
     [](){ __HAL_RCC_USART1_CLK_ENABLE(); },
     [](){ __HAL_RCC_USART2_CLK_ENABLE(); },
     [](){ __HAL_RCC_USART3_CLK_ENABLE(); },
@@ -127,14 +127,14 @@ protected:
     void enable_clk() {
         auto uart_idx = std::to_underlying(_peripheral);
         if (!_clk_enabled[uart_idx]) {
-            impl::usart_clk_enable_funcs[uart_idx]();
+            impl::uart_clk_enable_funcs[uart_idx]();
             _clk_enabled[uart_idx] = true;
         }
     }
 };
 
 
-} // namespace usart
+} // namespace uart
 
 
 } // namespace mcu
