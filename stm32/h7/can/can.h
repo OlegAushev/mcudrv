@@ -92,9 +92,9 @@ inline constexpr std::array<uint32_t, 9> data_len_codes = {
 
 
 struct MessageAttribute {
-    uint32_t location;
-    uint32_t id_type;
-    uint32_t filter_index;
+    uint32_t location{0xBAAAAAAD};
+    uint32_t id_type{0xBAAAAAAD};
+    uint32_t filter_index{0xBAAAAAAD};
     bool operator==(const MessageAttribute&) const = default;
 };
 

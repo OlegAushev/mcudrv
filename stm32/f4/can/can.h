@@ -94,7 +94,7 @@ enum class RxFifo {
 
 struct RxMessageAttribute {
     RxFifo fifo;
-    uint32_t filter_idx;
+    uint32_t filter_idx{0xBAAAAAAD};
     bool operator==(const RxMessageAttribute&) const = default;
 };
 
