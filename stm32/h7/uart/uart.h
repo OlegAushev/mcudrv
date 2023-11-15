@@ -9,7 +9,7 @@
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
-#include <emblib/interfaces/uart.h>
+#include <emblib/interfaces/tty.h>
 #include <utility>
 
 
@@ -49,8 +49,8 @@ struct TxPinConfig {
 
 
 struct Config {
-    UART_InitTypeDef hal_init;
-    UART_AdvFeatureInitTypeDef hal_init_advanced;
+    UART_InitTypeDef hal_config;
+    UART_AdvFeatureInitTypeDef hal_adv_config;
 };
 
 
@@ -81,62 +81,46 @@ inline std::array<void(*)(void), peripheral_count> uart_clk_enable_funcs = {
 } // namespace impl
 
 
-class Module : public emb::uart::UartInterface, public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::Tty, public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     UART_HandleTypeDef _handle = {};
+    USART_TypeDef* _reg;
+
     mcu::gpio::Input _rx_pin;
     mcu::gpio::Output _tx_pin;
 
-    static inline std::array<bool, peripheral_count> _clk_enabled = {};
+    uint32_t _datamask{0};
 
-    static constexpr uint32_t timeout_ms = 1000;
+    static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
     Module(Peripheral peripheral, const RxPinConfig& rxPinConf, const TxPinConfig& txPinConf, const Config& conf);
+    
     Peripheral peripheral() const { return _peripheral; }
     UART_HandleTypeDef* handle() { return &_handle; }
+    USART_TypeDef* reg() { return _reg; }
+
     static Module* instance(Peripheral peripheral) {
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    virtual int getchar(char& ch) override {
-        if (HAL_UART_Receive(&_handle, reinterpret_cast<uint8_t*>(&ch), 1, 0) != HAL_OK) {
-            return 0;
+    virtual int getchar() override {
+        if (bit_is_clear<uint32_t>(_reg->ISR, USART_ISR_RXNE_RXFNE)) {
+            return EOF;
         }
-        return 1;
+        return read_reg(_reg->RDR) & _datamask;
     }
 
-    virtual int recv(char* buf, size_t len) override {
-        int i = 0;
-        char ch = 0;
-
-        while ((i < len) && (getchar(ch) == 1)) {
-            buf[i++] = ch;
+    virtual int putchar(int ch) override {
+        if (bit_is_clear<uint32_t>(_reg->ISR, USART_ISR_TXE_TXFNF)) {
+            return EOF;
         }
-        return i;
+        write_reg<uint32_t>(_reg->TDR, ch);
+        return ch;
     }
 
-    virtual int putchar(char ch) override {
-        if (HAL_UART_Transmit(&_handle, reinterpret_cast<const uint8_t*>(&ch), 1, timeout_ms) != HAL_OK) {
-            return 0;
-        }
-        return 1;
-    }
-
-    virtual int send(const char* buf, size_t len) override {
-        if (HAL_UART_Transmit(&_handle, reinterpret_cast<const uint8_t*>(buf), static_cast<uint16_t>(len), timeout_ms) != HAL_OK) {
-            return 0;
-        }
-        return 1;
-    }
-protected:
-    void enable_clk() {
-        auto uart_idx = std::to_underlying(_peripheral);
-        if (!_clk_enabled[uart_idx]) {
-            impl::uart_clk_enable_funcs[uart_idx]();
-            _clk_enabled[uart_idx] = true;
-        }
-    }
+private:
+    static void _enable_clk(Peripheral peripheral);
 };
 
 
