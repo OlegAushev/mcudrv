@@ -7,6 +7,7 @@
 
 void mcu::tests::gpio_test()
 {
+#ifdef STM32H743_NUCLEO
     bsp::nucleo::led_green.reset();
     EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::State::inactive);
     EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read_level(), 0);
@@ -32,6 +33,7 @@ void mcu::tests::gpio_test()
 
     bsp::nucleo::led_green.deinit();
     bsp::nucleo::led_green.init(bsp::nucleo::led_green_config);
+#endif
 }
 
 

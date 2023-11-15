@@ -6,6 +6,7 @@
 
 
 void mcu::tests::chrono_test() {
+#ifdef STM32H743_NUCLEO
     auto taskLedToggle = [](int task_idx) {
         bsp::nucleo::led_green.toggle();
         return mcu::chrono::TaskStatus::success;
@@ -32,6 +33,7 @@ void mcu::tests::chrono_test() {
             mcu::chrono::system_clock::register_delayed_task([](){ bsp::nucleo::led_red.toggle(); }, std::chrono::milliseconds(200));
         }
     }
+#endif
 }
 
 
