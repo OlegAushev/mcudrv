@@ -120,8 +120,7 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert_param(_initialized);
-        auto level = read_level();
-        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
+        return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive; 
     }
 private:
     IRQn_Type _irqn = NonMaskableInt_IRQn;	// use NonMaskableInt_IRQn as value for not initialized interrupt
@@ -203,14 +202,16 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert_param(_initialized);
-        auto level = read_level();
-        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
+        return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive;
     }
 
     virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
         assert_param(_initialized);
-        auto level = 1 - (std::to_underlying(state) ^ std::to_underlying(_config.active_state));
-        set_level(level);
+        if (state == emb::gpio::State::active) {
+            set_level(std::to_underlying(_config.active_state));
+        } else {
+            set_level(1 - std::to_underlying(_config.active_state));
+        }
     }
 
     virtual void reset() override {
@@ -242,10 +243,12 @@ public:
             : _port(gpio_output.port())
             , _pin(gpio_output.pin_bit()) {
         if constexpr (Mode == DurationLoggerMode::set_reset) {
-            _port->BSRR = _pin;	//HAL_GPIO_WritePin(m_port, m_pin, GPIO_PIN_SET);
+            _port->BSRR = _pin;
         } else {
-            _port->BSRR = ((_port->ODR & _pin) << 16) | (~_port->ODR & _pin);	//HAL_GPIO_TogglePin(m_port, m_pin);
-            _port->BSRR = ((_port->ODR & _pin) << 16) | (~_port->ODR & _pin);	//HAL_GPIO_TogglePin(m_port, m_pin);
+            auto odr_reg = mcu::read_reg(_port->ODR);
+            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            odr_reg = mcu::read_reg(_port->ODR);
+            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
         }
     }
 
@@ -254,18 +257,21 @@ public:
             , _pin(pin_bit) {
         if constexpr (Mode == DurationLoggerMode::set_reset)
         {
-            _port->BSRR = _pin;	//HAL_GPIO_WritePin(m_port, m_pin, GPIO_PIN_SET);
+            _port->BSRR = _pin;
         } else {
-            _port->BSRR = ((_port->ODR & _pin) << 16) | (~_port->ODR & _pin);	//HAL_GPIO_TogglePin(m_port, m_pin);
-            _port->BSRR = ((_port->ODR & _pin) << 16) | (~_port->ODR & _pin);	//HAL_GPIO_TogglePin(m_port, m_pin);
+            auto odr_reg = mcu::read_reg(_port->ODR);
+            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            odr_reg = mcu::read_reg(_port->ODR);
+            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
         }
     }
 
     ~DurationLogger() {
         if constexpr (Mode == DurationLoggerMode::set_reset) {
-            _port->BSRR = static_cast<uint32_t>(_pin) << 16;	//HAL_GPIO_WritePin(m_port, m_pin, GPIO_PIN_RESET);
+            _port->BSRR = static_cast<uint32_t>(_pin) << 16;
         } else {
-            _port->BSRR = ((_port->ODR & _pin) << 16) | (~_port->ODR & _pin);	//HAL_GPIO_TogglePin(m_port, m_pin);
+            auto odr_reg = mcu::read_reg(_port->ODR);
+            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
         }
     }
 
