@@ -13,7 +13,8 @@ namespace uart {
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
-        , _peripheral(peripheral) {
+        , _peripheral(peripheral)
+{
     _rx_pin.init({.port = rx_pin_config.port, 
                   .pin = {.Pin = rx_pin_config.pin,
                           .Mode = GPIO_MODE_AF_PP,

@@ -19,6 +19,7 @@ namespace mcu {
 namespace uart {
 
 
+constexpr size_t peripheral_count = 8;
 enum class Peripheral : unsigned int {
     usart1,
     usart2,
@@ -29,9 +30,6 @@ enum class Peripheral : unsigned int {
     uart7,
     uart8
 };
-
-
-constexpr size_t peripheral_count = 8;
 
 
 struct RxPinConfig {
@@ -94,7 +92,7 @@ private:
 
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
-    Module(Peripheral peripheral, const RxPinConfig& rxPinConf, const TxPinConfig& txPinConf, const Config& conf);
+    Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
     
     Peripheral peripheral() const { return _peripheral; }
     UART_HandleTypeDef* handle() { return &_handle; }

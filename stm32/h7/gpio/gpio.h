@@ -229,7 +229,15 @@ public:
         auto odr_reg = mcu::read_reg(_config.port->ODR);
         mcu::write_reg(_config.port->BSRR, ((odr_reg & _config.pin.Pin) << 16) | (~odr_reg & _config.pin.Pin));
     }
+};
 
+
+class Alternate : public impl::Gpio {
+public:
+    Alternate() = default;
+    Alternate(const Config& config) {
+        init(config);
+    }
 };
 
 
