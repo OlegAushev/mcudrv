@@ -97,7 +97,7 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::InputInterface, public impl::Gpio {
+class Input : public emb::gpio::Input, public impl::Gpio {
     friend void ::EXTI0_IRQHandler();
     friend void ::EXTI1_IRQHandler();
     friend void ::EXTI2_IRQHandler();
@@ -176,7 +176,7 @@ public:
 };
 
 
-class Output : public emb::gpio::OutputInterface, public impl::Gpio {
+class Output : public emb::gpio::Output, public impl::Gpio {
 public:
     Output() = default;
     Output(const Config& config) {

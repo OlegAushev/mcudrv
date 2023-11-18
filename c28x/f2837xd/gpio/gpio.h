@@ -118,7 +118,7 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::InputInterface, public impl::Gpio {
+class Input : public emb::gpio::Input, public impl::Gpio {
 private:
     GPIO_ExternalIntNum _int_num;
 public:
@@ -171,7 +171,7 @@ public:
 };
 
 
-class Output : public emb::gpio::OutputInterface, public impl::Gpio {
+class Output : public emb::gpio::Output, public impl::Gpio {
 public:
     Output() {}
     Output(const Config& config) { init(config); }
