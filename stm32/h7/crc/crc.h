@@ -20,7 +20,7 @@ inline void init() {
 }
 
 
-inline uint8_t calc_crc8(uint8_t* buf, size_t len) {
+inline uint8_t calc_crc8(const uint8_t* buf, size_t len) {
     CRC_HandleTypeDef handle = {.Instance = CRC,
                                 .Init = {.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE,
                                          .DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE,
@@ -37,11 +37,11 @@ inline uint8_t calc_crc8(uint8_t* buf, size_t len) {
         return 0;
     }
 
-    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(buf), len);
+    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(buf)), len);
 }
 
 
-inline uint32_t calc_crc32(uint8_t* buf, size_t len) {
+inline uint32_t calc_crc32(const uint8_t* buf, size_t len) {
     // MPEG-2
     CRC_HandleTypeDef handle = {.Instance = CRC,
                                 .Init = {.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE,
@@ -59,7 +59,7 @@ inline uint32_t calc_crc32(uint8_t* buf, size_t len) {
         return 0;
     }
 
-    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(buf), len);
+    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(buf)), len);
 }
 
 
