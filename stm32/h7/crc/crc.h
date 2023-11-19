@@ -15,41 +15,52 @@ namespace mcu {
 namespace crc {
 
 
-enum InputDataFormat {
-    bytes = CRC_INPUTDATA_FORMAT_BYTES,
-    halfwords = CRC_INPUTDATA_FORMAT_HALFWORDS,
-    words = CRC_INPUTDATA_FORMAT_WORDS
-};
+inline void init() {
+    __HAL_RCC_CRC_CLK_ENABLE();
+}
 
 
-struct Config {
-    CRC_InitTypeDef hal_init;
-    InputDataFormat input_data_format;
-};
-
-
-class calc_unit {
-private:
-    calc_unit() = default;
-    static inline CRC_HandleTypeDef _handle;
-public:
-    calc_unit(const calc_unit& other) = delete;
-    calc_unit& operator=(const calc_unit& other) = delete;
-
-    static void init(const Config& config) {
-        _handle.Instance = CRC;
-        _handle.Init = config.hal_init;
-        _handle.InputDataFormat = static_cast<uint32_t>(config.input_data_format);
-        if (HAL_CRC_Init(&_handle) != HAL_OK)
-        {
-            fatal_error("CRC module initialization failed");
-        }
+inline uint8_t calc_crc8(uint8_t* buf, size_t len) {
+    CRC_HandleTypeDef handle = {.Instance = CRC,
+                                .Init = {.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE,
+                                         .DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE,
+                                         .GeneratingPolynomial = 0x07,
+                                         .CRCLength = CRC_POLYLENGTH_8B,
+                                         .InitValue = 0x00,
+                                         .InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE,
+                                         .OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE},
+                                .Lock{},
+                                .State{},
+                                .InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES};
+    
+    if (HAL_CRC_Init(&handle) != HAL_OK) {
+        return 0;
     }
 
-    static HalStatus deinit() { return HAL_CRC_DeInit(&_handle); }
-    static uint32_t calculate(uint32_t* buf, uint32_t len) { return HAL_CRC_Calculate(&_handle, buf, len); }
-    static uint32_t accumulate(uint32_t* buf, uint32_t len) { return HAL_CRC_Accumulate(&_handle, buf, len); }
-};
+    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(buf), len);
+}
+
+
+inline uint32_t calc_crc32(uint8_t* buf, size_t len) {
+    // MPEG-2
+    CRC_HandleTypeDef handle = {.Instance = CRC,
+                                .Init = {.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE,
+                                         .DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE,
+                                         .GeneratingPolynomial = 0x04C11DB7,
+                                         .CRCLength = CRC_POLYLENGTH_32B,
+                                         .InitValue = 0xFFFFFFFF,
+                                         .InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE,
+                                         .OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE},
+                                .Lock{},
+                                .State{},
+                                .InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES};
+    
+    if (HAL_CRC_Init(&handle) != HAL_OK) {
+        return 0;
+    }
+
+    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(buf), len);
+}
 
 
 } // namespace crc
