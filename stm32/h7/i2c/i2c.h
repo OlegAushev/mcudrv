@@ -91,12 +91,12 @@ public:
 
     bool busy() const { return bit_is_set<uint32_t>(_reg->ISR, I2C_ISR_BUSY); }
     
-    void write_mem(uint16_t devaddr, uint16_t memaddr, uint16_t memaddrsize, uint8_t *data, uint16_t size, std::chrono::milliseconds timeout) {
-        HAL_I2C_Mem_Write(&_handle, devaddr, memaddr, memaddrsize, data, size, timeout.count());
+    void write_mem(uint16_t devaddr, uint16_t memaddr, uint16_t memaddrsize, const uint8_t *data, size_t len, std::chrono::milliseconds timeout) {
+        HAL_I2C_Mem_Write(&_handle, devaddr, memaddr, memaddrsize, const_cast<uint8_t*>(data), len, timeout.count());
     }
 
-    void read_mem() {
-
+    void read_mem(uint16_t devaddr, uint16_t memaddr, uint16_t memaddrsize, uint8_t *data, size_t len, std::chrono::milliseconds timeout) {
+        HAL_I2C_Mem_Read(&_handle, devaddr, memaddr, memaddrsize, data, len, timeout.count());
     }
 
 
