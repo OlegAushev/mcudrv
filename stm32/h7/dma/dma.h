@@ -157,7 +157,7 @@ public:
     constexpr T& operator[](size_t pos) const { return _data[pos]; }
 
     void invalidate_dcache(size_t offset_, size_t size_) {
-        SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t*>(&_data[offset_]), size_ * sizeof(T));
+        SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t*>(&_data[offset_]), int32_t(size_ * sizeof(T)));
     }
 };
 
