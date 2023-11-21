@@ -37,7 +37,7 @@ void fatal_error(const char* hint, int code) {
 void assert_failed(uint8_t *file, uint32_t line) {
     char buf[256] = {};
     snprintf(buf, 255, "assertion failed at %s, line %lu", reinterpret_cast<char*>(file), line);
-    emb::fatal_error(buf, line);
+    emb::fatal_error(buf, int(line));
 }
 #endif // USE_FULL_ASSERT
 
