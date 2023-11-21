@@ -25,8 +25,8 @@ void mcu::tests::gpio_test()
 
     mcu::gpio::Output out1(out1cfg);
     mcu::gpio::Output out2(out2cfg);
-    mcu::gpio::Output in1(in1cfg);
-    mcu::gpio::Output in2(in2cfg);
+    mcu::gpio::Input in1(in1cfg);
+    mcu::gpio::Input in2(in2cfg);
     
     out1.reset();
     out2.reset();
