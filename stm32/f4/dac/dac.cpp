@@ -1,3 +1,4 @@
+#include "mcudrv/stm32/f4/gpio/gpio.h"
 #ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
@@ -30,7 +31,7 @@ void Module::init_channel(Channel channel, const PinConfig& pin_config, ChannelC
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::Output output(cfg);
+    mcu::gpio::AnalogIO output(cfg);
     
     if (HAL_DAC_ConfigChannel(&_handle, &config.hal_config, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("DAC channel initialization failed");

@@ -6,6 +6,7 @@
 
 #include "../config.h"
 #include <cstdint>
+#include <cassert>
 
 
 #if defined(STM32F4xx)
@@ -63,7 +64,7 @@ private:
 public:
     explicit IrqPriority(uint32_t value)
             : _value(value) {
-        assert_param(value <= 15);
+        assert(value <= 15);
     }
 
     uint32_t get() const { return _value; }

@@ -1,3 +1,4 @@
+#include "mcudrv/stm32/f4/gpio/gpio.h"
 #ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
@@ -43,7 +44,7 @@ void Module::add_injected_channel(const PinConfig& pin_config, InjectedChannelCo
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::Input input(cfg);
+    mcu::gpio::AnalogIO input(cfg);
 
     if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC injected channel initialization failed");
@@ -57,7 +58,7 @@ void Module::add_regular_channel(const PinConfig& pin_config, const RegularChann
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::Input input(cfg);
+    mcu::gpio::AnalogIO input(cfg);
 
     for (auto rank : ranks) {
         auto config = channel_config;

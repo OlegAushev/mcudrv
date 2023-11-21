@@ -106,8 +106,8 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
 private:
     const Peripheral _peripheral;
     FDCAN_HandleTypeDef _handle = {};
-    mcu::gpio::Input _rx_pin;
-    mcu::gpio::Output _tx_pin;
+    mcu::gpio::AlternateIO _rx_pin;
+    mcu::gpio::AlternateIO _tx_pin;
 
     static inline bool _clk_enabled = false;
 

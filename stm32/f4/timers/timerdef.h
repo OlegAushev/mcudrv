@@ -45,7 +45,7 @@ struct ChPinConfig {
 class ChPin {
 public:
     ChPin(const ChPinConfig& config) {
-        mcu::gpio::Output({
+        mcu::gpio::AlternateIO({
             .port = config.port, 
             .pin = {
                 .Pin = config.pin,
@@ -76,7 +76,7 @@ struct BkinPinConfig {
 class BkinPin {
 public:
     BkinPin(const BkinPinConfig& config) {
-        mcu::gpio::Input({
+        mcu::gpio::AlternateIO({
             .port = config.port, 
             .pin = {
                 .Pin = config.pin,

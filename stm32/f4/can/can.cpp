@@ -41,7 +41,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     _enable_clk(peripheral);
     _reg = impl::can_instances[static_cast<size_t>(_peripheral)];
     _handle.Instance = _reg;
-    _handle.Init = config.hal_init;
+    _handle.Init = config.hal_config;
 
     if(HAL_CAN_Init(&_handle) != HAL_OK) {
         fatal_error("CAN module initialization failed");

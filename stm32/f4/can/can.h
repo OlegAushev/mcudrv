@@ -55,7 +55,7 @@ struct TxPinConfig {
 
 
 struct Config {
-    CAN_InitTypeDef hal_init;
+    CAN_InitTypeDef hal_config;
 };
 
 
@@ -111,8 +111,8 @@ private:
     CAN_HandleTypeDef _handle{};
     CAN_TypeDef* _reg;
 
-    mcu::gpio::Input _rx_pin;
-    mcu::gpio::Output _tx_pin;
+    mcu::gpio::AlternateIO _rx_pin;
+    mcu::gpio::AlternateIO _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 

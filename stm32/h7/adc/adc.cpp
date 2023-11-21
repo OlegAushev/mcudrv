@@ -1,3 +1,4 @@
+#include "mcudrv/stm32/f4/gpio/gpio.h"
 #ifdef MCUDRV_STM32
 #ifdef STM32H7xx
 
@@ -38,7 +39,7 @@ void Module::add_regular_channel(PinConfig pin_config, ChannelConfig channel_con
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::Input input(cfg);
+    mcu::gpio::AnalogIO input(cfg);
 
     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_init) != HAL_OK) {
         fatal_error("ADC regular channel initialization failed");

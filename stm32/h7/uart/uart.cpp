@@ -44,7 +44,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         if (config.hal_config.Parity == UART_PARITY_NONE) {
             _datamask = 0xFF;
         } else {
-            _datamask = 0x7FF;
+            _datamask = 0x7F;
         }
     } else if (config.hal_config.WordLength == UART_WORDLENGTH_7B) {
         if (config.hal_config.Parity == UART_PARITY_NONE) {

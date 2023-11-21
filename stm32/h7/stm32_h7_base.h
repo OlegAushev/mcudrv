@@ -6,7 +6,6 @@
 
 
 #include "../stm32_base.h"
-#include <cassert>
 
 
 namespace mcu {

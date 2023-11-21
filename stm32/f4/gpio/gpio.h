@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <cassert>
 #ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
@@ -107,11 +108,14 @@ class Input : public emb::gpio::Input, public impl::Gpio {
 public:
     Input() = default;
     Input(const Config& config) {
+        assert(config.pin.Mode == GPIO_MODE_INPUT
+                || config.pin.Mode == GPIO_MODE_IT_RISING || config.pin.Mode == GPIO_MODE_IT_FALLING || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
+                || config.pin.Mode == GPIO_MODE_EVT_RISING || config.pin.Mode == GPIO_MODE_EVT_FALLING || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
         init(config);
     }
 
     virtual unsigned int read_level() const override {
-        assert_param(_initialized);
+        assert(_initialized);
         if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
             return 1;
         }
@@ -119,7 +123,7 @@ public:
     }
 
     virtual emb::gpio::State read() const override {
-        assert_param(_initialized);
+        assert(_initialized);
         return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive; 
     }
 private:
@@ -180,11 +184,12 @@ class Output : public emb::gpio::Output, public impl::Gpio {
 public:
     Output() = default;
     Output(const Config& config) {
+        assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
         init(config);
     }
 
     virtual unsigned int read_level() const override {
-        assert_param(_initialized);
+        assert(_initialized);
         if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
             return 1;
         }
@@ -192,7 +197,7 @@ public:
     }
 
     virtual void set_level(unsigned int level) override {
-        assert_param(_initialized);
+        assert(_initialized);
         if(level != 0) {
             mcu::write_reg(_config.port->BSRR, _config.pin.Pin);
         } else {
@@ -201,12 +206,12 @@ public:
     }
 
     virtual emb::gpio::State read() const override {
-        assert_param(_initialized);
+        assert(_initialized);
         return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive;
     }
 
     virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
-        assert_param(_initialized);
+        assert(_initialized);
         if (state == emb::gpio::State::active) {
             set_level(std::to_underlying(_config.active_state));
         } else {
@@ -215,16 +220,38 @@ public:
     }
 
     virtual void reset() override {
-        assert_param(_initialized);
+        assert(_initialized);
         set(emb::gpio::State::inactive);
     }
 
     virtual void toggle() override {
-        assert_param(_initialized);
+        assert(_initialized);
         auto odr_reg = mcu::read_reg(_config.port->ODR);
         mcu::write_reg(_config.port->BSRR, ((odr_reg & _config.pin.Pin) << 16) | (~odr_reg & _config.pin.Pin));
     }
 };
+
+
+class AlternateIO : public impl::Gpio {
+public:
+    AlternateIO() = default;
+    AlternateIO(const Config& config) {
+        assert(config.pin.Mode == GPIO_MODE_AF_PP || config.pin.Mode == GPIO_MODE_AF_OD);
+        init(config);
+    }
+};
+
+
+class AnalogIO : public impl::Gpio {
+public:
+    AnalogIO() = default;
+    AnalogIO(const Config& config) {
+        assert(config.pin.Mode == GPIO_MODE_ANALOG);
+        init(config);
+    }
+};
+
+
 
 
 enum class DurationLoggerMode {

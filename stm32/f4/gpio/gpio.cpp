@@ -55,9 +55,9 @@ extern "C" void EXTI15_10_IRQHandler() {
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    size_t pinNo = POSITION_VAL(GPIO_Pin);
-    assert_param(pinNo <= 15);
-    mcu::gpio::Input::on_interrupt[pinNo]();
+    size_t pin_no = POSITION_VAL(GPIO_Pin);
+    assert(pin_no <= 15);
+    mcu::gpio::Input::on_interrupt[pin_no]();
 }
 
 
