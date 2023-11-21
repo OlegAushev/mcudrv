@@ -25,7 +25,7 @@ void system_clock::init() {
 
 
 void system_clock::run_tasks() {
-    for (auto i = 0; i < _tasks.size(); ++i) {
+    for (size_t i = 0; i < _tasks.size(); ++i) {
         if (now() >= (_tasks[i].timepoint + _tasks[i].period)) {
             if (_tasks[i].func(i) == TaskStatus::success) {
                 _tasks[i].timepoint = now();

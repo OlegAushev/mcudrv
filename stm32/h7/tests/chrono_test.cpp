@@ -7,7 +7,7 @@
 
 void mcu::tests::chrono_test() {
 #ifdef STM32H743_NUCLEO
-    auto taskLedToggle = [](int task_idx) {
+    auto taskLedToggle = [](size_t task_idx) {
         bsp::nucleo::led_green.toggle();
         return mcu::chrono::TaskStatus::success;
     };

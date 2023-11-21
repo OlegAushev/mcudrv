@@ -88,7 +88,8 @@ private:
     mcu::gpio::AlternateIO _rx_pin;
     mcu::gpio::AlternateIO _tx_pin;
 
-    uint32_t _datamask{0};
+    uint32_t _rdatamask{0};
+    uint32_t _wdatamask{0};
 
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:
@@ -106,14 +107,14 @@ public:
         if (bit_is_clear<uint32_t>(_reg->ISR, USART_ISR_RXNE_RXFNE)) {
             return EOF;
         }
-        return read_reg(_reg->RDR) & _datamask;
+        return static_cast<int>(read_reg(_reg->RDR) & _rdatamask);
     }
 
     virtual int putchar(int ch) override {
         if (bit_is_clear<uint32_t>(_reg->ISR, USART_ISR_TXE_TXFNF)) {
             return EOF;
         }
-        write_reg<uint32_t>(_reg->TDR, ch);
+        write_reg<uint32_t>(_reg->TDR, static_cast<uint32_t>(ch) & _wdatamask);
         return ch;
     }
 

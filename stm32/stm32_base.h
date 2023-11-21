@@ -55,7 +55,10 @@ template <typename T>
 void modify_reg(volatile T& reg, T clearmask, T setmask) { reg = (reg & ~clearmask) | setmask; }
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 inline uint32_t position_val(uint32_t val) { return __builtin_clz(__RBIT(val)); }
+#pragma GCC diagnostic pop
 
 
 class IrqPriority {

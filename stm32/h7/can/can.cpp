@@ -158,7 +158,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
             can_frame frame;
             HAL_FDCAN_GetRxMessage(handle, FDCAN_RX_FIFO0, &header, frame.payload.data());
             frame.id = header.Identifier;
-            frame.len = header.DataLength >> 16;
+            frame.len = uint8_t(header.DataLength >> 16);
 
             MessageAttribute attr;
             attr.location = FDCAN_RX_FIFO0;
@@ -186,7 +186,7 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
             can_frame frame;
             HAL_FDCAN_GetRxMessage(handle, FDCAN_RX_FIFO1, &header, frame.payload.data());
             frame.id = header.Identifier;
-            frame.len = header.DataLength >> 16;
+            frame.len = uint8_t(header.DataLength >> 16);
             
             MessageAttribute attr;
             attr.location = FDCAN_RX_FIFO1;

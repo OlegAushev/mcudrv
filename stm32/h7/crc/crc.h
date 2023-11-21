@@ -37,7 +37,7 @@ inline uint8_t calc_crc8(const uint8_t* buf, size_t len) {
         return 0;
     }
 
-    return HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(buf)), len);
+    return uint8_t(HAL_CRC_Calculate(&handle, reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(buf)), len));
 }
 
 

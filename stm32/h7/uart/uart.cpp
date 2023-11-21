@@ -36,24 +36,28 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 
     if (config.hal_config.WordLength == UART_WORDLENGTH_9B) {
         if (config.hal_config.Parity == UART_PARITY_NONE) {
-            _datamask = 0x1FF;
+            _rdatamask = 0x1FF;
+            _wdatamask = 0x1FF;
         } else {
-            _datamask = 0xFF;
+            _rdatamask = 0xFF;
+            _wdatamask = 0xFF;
         }
     } else if (config.hal_config.WordLength == UART_WORDLENGTH_8B) {
         if (config.hal_config.Parity == UART_PARITY_NONE) {
-            _datamask = 0xFF;
+            _rdatamask = 0xFF;
+            _wdatamask = 0xFF;
         } else {
-            _datamask = 0x7F;
+            _rdatamask = 0x7F;
+            _wdatamask = 0xFF;
         }
     } else if (config.hal_config.WordLength == UART_WORDLENGTH_7B) {
         if (config.hal_config.Parity == UART_PARITY_NONE) {
-            _datamask = 0x7F;
+            _rdatamask = 0x7F;
+            _wdatamask = 0xFF;
         } else {
-            _datamask = 0x3F;
+            _rdatamask = 0x3F;
+            _wdatamask = 0xFF;
         }
-    } else {
-        _datamask = 0x00;
     }
 
     _handle.Instance = _reg;

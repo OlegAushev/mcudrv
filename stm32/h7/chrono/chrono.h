@@ -44,18 +44,18 @@ private:
     {
         std::chrono::milliseconds period;
         std::chrono::milliseconds timepoint;
-        TaskStatus (*func)(int);
+        TaskStatus (*func)(size_t);
     };
-    static TaskStatus empty_task(int) { return TaskStatus::success; }
+    static TaskStatus empty_task(size_t) { return TaskStatus::success; }
     static inline emb::static_vector<Task, task_count_max> _tasks;
 public:
-    static void add_task(TaskStatus (*func)(int), std::chrono::milliseconds period)
+    static void add_task(TaskStatus (*func)(size_t), std::chrono::milliseconds period)
     {
         Task task = {period, now(), func};
         _tasks.push_back(task);
     }
 
-    static void set_task_period(int index, std::chrono::milliseconds period)
+    static void set_task_period(size_t index, std::chrono::milliseconds period)
     {
         if (index < _tasks.size()) {
             _tasks[index].period = period;
@@ -80,7 +80,7 @@ public:
 
     static void reset() {
         _time = 0;
-        for (auto i = 0; i < _tasks.size(); ++i) {
+        for (size_t i = 0; i < _tasks.size(); ++i) {
             _tasks[i].timepoint = now();
         }
     }

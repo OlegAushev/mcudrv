@@ -111,9 +111,9 @@ private:
 
     static inline bool _clk_enabled = false;
 
-    int _stdfilter_count = 0;
-    int _extfilter_count = 0;
-    int _rxbuffer_count = 0;
+    unsigned int _stdfilter_count = 0;
+    unsigned int _extfilter_count = 0;
+    unsigned int _rxbuffer_count = 0;
 
     uint64_t _tx_error_counter = 0;
 public:
