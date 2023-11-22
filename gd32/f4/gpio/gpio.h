@@ -1,13 +1,12 @@
 #pragma once
 
 
-#ifdef MCUDRV_APM32
-#ifdef APM32F4xx
+#include <gd32f4xx_gpio.h>
+#ifdef MCUDRV_GD32
+#ifdef GD32F4xx
 
 
-#include "../apm32_f4_base.h"
-#include <apm32f4xx_gpio.h>
-#include <apm32f4xx_rcm.h>
+#include "../gd32_f4_base.h"
 #include <emblib/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
@@ -21,9 +20,11 @@ namespace gpio {
 
 
 struct Config {
-    GPIO_T* port;
-    GPIO_Config_T pin;
-    GPIO_AF_T af_selection;
+    uint32_t port;
+    uint32_t pin;
+    uint32_t mode;
+    uint32_t pull;
+    // GPIO_AF_T af_selection;
     emb::gpio::ActiveState active_state;
 };
 
@@ -34,7 +35,7 @@ namespace impl {
 constexpr size_t port_count = 9;
 
 
-inline const std::array<GPIO_T*, port_count> gpio_ports = {
+inline const std::array<uint32_t, port_count> gpio_ports = {
     GPIOA, GPIOB, GPIOC, GPIOD,
     GPIOE, GPIOF, GPIOG, GPIOH,
     GPIOI
@@ -42,15 +43,15 @@ inline const std::array<GPIO_T*, port_count> gpio_ports = {
 
 
 inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOA); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOB); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOC); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOD); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOE); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOF); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOG); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOH); },
-    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOI); }
+    [](){ rcu_periph_clock_enable(RCU_GPIOA); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOB); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOC); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOD); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOE); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOF); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOG); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOH); },
+    [](){ rcu_periph_clock_enable(RCU_GPIOI); }
 };
 
 
@@ -73,18 +74,19 @@ public:
         }
         _config = config;
 
-        if (_config.pin.mode == GPIO_MODE_AF) {
-            GPIO_ConfigPinAF(_config.port, static_cast<GPIO_PIN_SOURCE_T>(bit_position(_config.pin.pin)), _config.af_selection);
-        }
+        // if (_config.pin.mode == GPIO_MODE_AF) {
+        //     GPIO_ConfigPinAF(_config.port, static_cast<GPIO_PIN_SOURCE_T>(bit_position(_config.pin.pin)), _config.af_selection);
+        // }
 
-        GPIO_Config(_config.port, &_config.pin);
+        gpio_mode_set(_config.port, _config.mode, _config.pull, _config.pin);
+
         _initialized = true;
     }
 
     const Config& config() const { return _config; }
-    unsigned int pin_no() const { return __CLZ(__RBIT(_config.pin.pin)); }
-    uint16_t pin_bit() const { return static_cast<uint16_t>(_config.pin.pin); }
-    const GPIO_T* port() const { return _config.port; }
+    unsigned int pin_no() const { return __CLZ(__RBIT(_config.pin)); }
+    uint16_t pin_bit() const { return static_cast<uint16_t>(_config.pin); }
+    uint32_t port() const { return _config.port; }
 };
 
 
@@ -197,14 +199,16 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert(_initialized);
-        auto level = read_level();
-        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
+        return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive;
     }
 
     virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
         assert(_initialized);
-        auto level = 1 - (std::to_underlying(state) ^ std::to_underlying(_config.active_state));
-        set_level(level);
+        if (state == emb::gpio::State::active) {
+            set_level(std::to_underlying(_config.active_state));
+        } else {
+            set_level(1 - std::to_underlying(_config.active_state));
+        }
     }
 
     virtual void reset() override {

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#ifdef MCUDRV_APM32
+#ifdef MCUDRV_GD32
 
 
 #include "../config.h"
@@ -9,8 +9,8 @@
 #include <cassert>
 
 
-#ifdef APM32F4xx
-#include <apm32f4xx.h>
+#if defined(GD32F4xx)
+#include <gd32f4xx_libopt.h>
 #endif
 
 
@@ -53,29 +53,32 @@ template <typename T>
 void modify_reg(volatile T& reg, T clearmask, T setmask) { reg = (reg & ~clearmask) | setmask; }
 
 
-inline uint32_t bit_position(uint32_t val) { return __CLZ(__RBIT(val)); }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+inline uint32_t position_val(uint32_t val) { return __builtin_clz(__RBIT(val)); }
+#pragma GCC diagnostic pop
 
 
-class IrqPriority {
-private:
-    uint32_t _value;
-public:
-    explicit IrqPriority(uint32_t value)
-            : _value(value) {
-        assert(value <= 15);
-    }
+// class IrqPriority {
+// private:
+//     uint32_t _value;
+// public:
+//     explicit IrqPriority(uint32_t value)
+//             : _value(value) {
+//         assert(value <= 15);
+//     }
 
-    uint32_t get() const { return _value; }
-};
+//     uint32_t get() const { return _value; }
+// };
 
-// TODO
+
 // inline void set_irq_priority(IRQn_Type irqn, IrqPriority priority) { HAL_NVIC_SetPriority(irqn, priority.get(), 0);}
 // inline void enable_irq(IRQn_Type irqn) { HAL_NVIC_EnableIRQ(irqn); }
 // inline void disable_irq(IRQn_Type irqn) { HAL_NVIC_DisableIRQ(irqn); }
 // inline void clear_pending_irq(IRQn_Type irqn) { HAL_NVIC_ClearPendingIRQ(irqn); }
 
 
-}
+} // namespace mcu
 
 
 #endif
