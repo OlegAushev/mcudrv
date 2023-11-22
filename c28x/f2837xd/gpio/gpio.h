@@ -141,15 +141,14 @@ public:
         }
     }
 
-    virtual emb::gpio::State read() const {
-        assert(_initialized);
-        return static_cast<emb::gpio::State>(1
-                - (GPIO_readPin(_config.no) ^ static_cast<uint32_t>(_config.active_state.underlying_value())));
-    }
-
     virtual unsigned int read_level() const {
         assert(_initialized);
         return GPIO_readPin(_config.no);
+    }
+
+    virtual emb::gpio::State read() const {
+        assert(_initialized);
+        return (read_level() == _config.active_state.underlying_value()) ? emb::gpio::State::active : emb::gpio::State::inactive;
     }
 
 public:
@@ -193,14 +192,28 @@ public:
         }
     }
 
+    virtual unsigned int read_level() const {
+        assert(_initialized);
+        return GPIO_readPin(_config.no);
+    }
+
+    virtual void set_level(unsigned int level) {
+        assert(_initialized);
+        GPIO_writePin(_config.no, level);
+    }
+
     virtual emb::gpio::State read() const {
         assert(_initialized);
-        return static_cast<emb::gpio::State>(1 - (GPIO_readPin(_config.no) ^ static_cast<uint32_t>(_config.active_state.underlying_value())));
+        return (read_level() == _config.active_state.underlying_value()) ? emb::gpio::State::active : emb::gpio::State::inactive;
     }
 
     virtual void set(emb::gpio::State state = emb::gpio::State::active) {
         assert(_initialized);
-        GPIO_writePin(_config.no, 1 - (static_cast<uint32_t>(state.underlying_value()) ^ static_cast<uint32_t>(_config.active_state.underlying_value())));
+        if (state == emb::gpio::State::active) {
+            set_level(_config.active_state.underlying_value());
+        } else {
+            set_level(1 - _config.active_state.underlying_value());
+        }
     }
 
     virtual void reset() {
@@ -211,16 +224,6 @@ public:
     virtual void toggle() {
         assert(_initialized);
         GPIO_togglePin(_config.no);
-    }
-
-    virtual unsigned int read_level() const {
-        assert(_initialized);
-        return GPIO_readPin(_config.no);
-    }
-
-    virtual void set_level(unsigned int level) {
-        assert(_initialized);
-        GPIO_writePin(_config.no, level);
     }
 };
 
