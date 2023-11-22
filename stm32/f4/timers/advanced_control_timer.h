@@ -76,6 +76,14 @@ public:
     void init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config);
     void init_bdt(BkinPin* pin_bkin, BdtConfig config);
 
+    void start() {
+        set_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);
+    }
+
+    void stop() {
+        clear_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);
+    }
+
     bool pwm_active() const {
         return bit_is_set<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
     }

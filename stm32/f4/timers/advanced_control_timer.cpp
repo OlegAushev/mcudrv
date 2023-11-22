@@ -82,8 +82,6 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_c
     if (pin_chn) {
         set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
     }
-
-    set_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);
 }
 
 
