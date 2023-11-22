@@ -273,9 +273,9 @@ public:
             _port->BSRR = _pin;
         } else {
             auto odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
             odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
         }
     }
 
@@ -287,9 +287,9 @@ public:
             _port->BSRR = _pin;
         } else {
             auto odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
             odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
         }
     }
 
@@ -298,7 +298,7 @@ public:
             _port->BSRR = static_cast<uint32_t>(_pin) << 16;
         } else {
             auto odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, (odr_reg & _pin << 16) | (~odr_reg & _pin));
+            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
         }
     }
 

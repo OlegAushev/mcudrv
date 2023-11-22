@@ -15,7 +15,7 @@ namespace mcu {
 namespace timers {
 
 
-enum class AdvancedControlPeripheral : unsigned int{
+enum class AdvancedControlPeripheral : unsigned int {
     tim1,
     tim8
 };
