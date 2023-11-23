@@ -158,7 +158,7 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
 
     frame.len = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos);
 
-    RxMessageAttribute attr;
+    RxMessageAttribute attr{};
     attr.filter_idx = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_FMI) >> CAN_RDT0R_FMI_Pos;
     attr.fifo = fifo;
 
