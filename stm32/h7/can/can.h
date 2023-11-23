@@ -10,6 +10,7 @@
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
 #include <emblib/interfaces/can.h>
+#include <optional>
 #include <utility>
 
 
@@ -46,7 +47,7 @@ struct TxPinConfig {
 
 
 struct Config {
-    FDCAN_InitTypeDef hal_init;
+    FDCAN_InitTypeDef hal_config;
 };
 
 
@@ -91,11 +92,17 @@ inline constexpr std::array<uint32_t, 9> data_len_codes = {
 } // namespace impl
 
 
-struct MessageAttribute {
-    uint32_t location{0xBAAAAAAD};
+enum class RxFifo {
+    fifo0,
+    fifo1
+};
+
+
+struct RxMessageAttribute {
+    uint32_t storage{0xBAAAAAAD};
     uint32_t id_type{0xBAAAAAAD};
-    uint32_t filter_index{0xBAAAAAAD};
-    bool operator==(const MessageAttribute&) const = default;
+    uint32_t filter_idx{0xBAAAAAAD};
+    bool operator==(const RxMessageAttribute&) const = default;
 };
 
 
@@ -106,6 +113,7 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
 private:
     const Peripheral _peripheral;
     FDCAN_HandleTypeDef _handle = {};
+    FDCAN_GlobalTypeDef* _reg;
     mcu::gpio::AlternateIO _rx_pin;
     mcu::gpio::AlternateIO _tx_pin;
 
@@ -118,7 +126,7 @@ private:
     uint64_t _tx_error_counter = 0;
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
-    MessageAttribute register_message(FDCAN_FilterTypeDef& filter);
+    RxMessageAttribute register_message(FDCAN_FilterTypeDef& filter);
     
     Peripheral peripheral() const { return _peripheral; }
     FDCAN_HandleTypeDef* handle() { return &_handle; }
@@ -136,6 +144,16 @@ public:
         if (HAL_FDCAN_Stop(&_handle) != HAL_OK) {
             fatal_error("CAN module stop failed");
         }
+    }
+
+    uint32_t rxfifo_level(RxFifo fifo) const {
+        switch (fifo) {
+        case RxFifo::fifo0:
+            return read_bit<uint32_t>(_reg->RXF0S, FDCAN_RXF0S_F0FL);
+        case RxFifo::fifo1:
+            return read_bit<uint32_t>(_reg->RXF1S, FDCAN_RXF1S_F1FL);
+        }
+        return 0;
     }
 
     HalStatus send(can_frame& frame) {
@@ -166,16 +184,18 @@ public:
         return status;		
     }
 
+    std::optional<RxMessageAttribute> recv(can_frame& frame, RxFifo fifo);
+
     /* INTERRUPTS */
 private:
-    void (*_on_fifo0_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
-    void (*_on_fifo1_frame_received)(Module&, const MessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
+    void (*_on_fifo0_frame_received)(Module&, const RxMessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
+    void (*_on_fifo1_frame_received)(Module&, const RxMessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
     void (*_on_buffer_frame_received)() = [](){ fatal_error("uninitialized callback"); };
 public:
-    void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
+    void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const RxMessageAttribute&, const can_frame&)) {
         _on_fifo0_frame_received = callback;
     }
-    void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const MessageAttribute&, const can_frame&)) {
+    void register_on_fifo1_frame_received_callback(void(*callback)(Module&, const RxMessageAttribute&, const can_frame&)) {
         _on_fifo1_frame_received = callback;
     }
     void register_on_buffer_frame_received_callback(void(*callback)()) {

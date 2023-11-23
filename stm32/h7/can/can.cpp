@@ -37,8 +37,10 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         .active_state = emb::gpio::ActiveState::high});
 
     enable_clk();
-    _handle.Instance = impl::can_instances[static_cast<size_t>(_peripheral)];
-    _handle.Init = config.hal_init;
+    _reg = impl::can_instances[std::to_underlying(_peripheral)];
+    _handle.Instance = _reg;
+    _handle.Init = config.hal_config;
+
     if (HAL_FDCAN_Init(&_handle) != HAL_OK) {
         fatal_error("CAN module initialization failed");
     }
@@ -52,8 +54,8 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 }
 
 
-MessageAttribute Module::register_message(FDCAN_FilterTypeDef& filter) {
-    MessageAttribute attr;
+RxMessageAttribute Module::register_message(FDCAN_FilterTypeDef& filter) {
+    RxMessageAttribute attr;
 
     if ((filter.IdType == FDCAN_STANDARD_ID) && (_stdfilter_count >= _handle.Init.StdFiltersNbr)) {
         fatal_error("too many CAN Rx std filters");
@@ -70,18 +72,18 @@ MessageAttribute Module::register_message(FDCAN_FilterTypeDef& filter) {
     }
 
     attr.id_type = filter.IdType;
-    attr.filter_index = filter.FilterIndex;
+    attr.filter_idx = filter.FilterIndex;
 
     if (filter.FilterConfig == FDCAN_FILTER_TO_RXFIFO0 || filter.FilterConfig == FDCAN_FILTER_TO_RXFIFO0_HP) {
-        attr.location = FDCAN_RX_FIFO0;
+        attr.storage = FDCAN_RX_FIFO0;
     } else if (filter.FilterConfig == FDCAN_FILTER_TO_RXFIFO1 || filter.FilterConfig == FDCAN_FILTER_TO_RXFIFO1_HP) {
-        attr.location = FDCAN_RX_FIFO1;
+        attr.storage = FDCAN_RX_FIFO1;
     } else if (filter.FilterConfig == FDCAN_FILTER_TO_RXBUFFER) {
         if (_rxbuffer_count >= _handle.Init.RxBuffersNbr) {
             fatal_error("too many CAN Rx buffers");
         } else {
             filter.RxBufferIndex = _rxbuffer_count;
-            attr.location = _rxbuffer_count++;
+            attr.storage = _rxbuffer_count++;
         }
     } else {
         fatal_error("CAN module Rx filter configuration failed");
@@ -92,6 +94,80 @@ MessageAttribute Module::register_message(FDCAN_FilterTypeDef& filter) {
     }
 
     return attr;
+}
+
+
+std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) {
+    if (rxfifo_level(fifo) == 0) {
+        return {};
+    }
+
+    uint32_t* rx_addr;
+    uint32_t index = 0;
+
+    switch (fifo) {
+    case RxFifo::fifo0:
+        // check that the Rx FIFO 0 is full & overwrite mode is on
+        if(((_reg->RXF0S & FDCAN_RXF0S_F0F) >> FDCAN_RXF0S_F0F_Pos) == 1) {
+            if(((_reg->RXF0C & FDCAN_RXF0C_F0OM) >> FDCAN_RXF0C_F0OM_Pos) == FDCAN_RX_FIFO_OVERWRITE) {
+                // when overwrite status is on discard first message in FIFO
+                index = 1;
+            }
+        }
+        // calculate Rx FIFO 0 element index
+        index += ((_reg->RXF0S & FDCAN_RXF0S_F0GI) >> FDCAN_RXF0S_F0GI_Pos);
+        // calculate Rx FIFO 0 element address
+        rx_addr = reinterpret_cast<uint32_t*>(_handle.msgRam.RxFIFO0SA + (index * _handle.Init.RxFifo0ElmtSize * 4U));
+        break;
+    case RxFifo::fifo1:
+        // check that the Rx FIFO 1 is full & overwrite mode is on
+        if(((_reg->RXF1S & FDCAN_RXF1S_F1F) >> FDCAN_RXF1S_F1F_Pos) == 1) {
+            if(((_reg->RXF1C & FDCAN_RXF1C_F1OM) >> FDCAN_RXF1C_F1OM_Pos) == FDCAN_RX_FIFO_OVERWRITE) {
+                // when overwrite status is on discard first message in FIFO
+                index = 1;
+            }
+        }
+        // calculate Rx FIFO 1 element index
+        index += ((_reg->RXF1S & FDCAN_RXF1S_F1GI) >> FDCAN_RXF1S_F1GI_Pos);
+        // calculate Rx FIFO 1 element address
+        rx_addr = reinterpret_cast<uint32_t*>(_handle.msgRam.RxFIFO1SA + (index * _handle.Init.RxFifo1ElmtSize * 4U));
+        break;
+    }
+
+    RxMessageAttribute attr{};
+
+    attr.id_type = *rx_addr & 0x40000000U; //FDCAN_ELEMENT_MASK_XTD;
+    if (attr.id_type == FDCAN_STANDARD_ID) {
+        frame.id = (*rx_addr & 0x1FFC0000U) >> 18;
+    } else {
+        frame.id = *rx_addr & 0x1FFFFFFFU;
+    }
+
+    // increment RxAddress pointer to second word of Rx FIFO element
+    ++rx_addr;
+
+    frame.len = (*rx_addr & 0x000F0000U) >> 16;
+    attr.filter_idx = (*rx_addr & 0x7F000000U) >> 24;
+   
+    // increment RxAddress pointer to payload of Rx FIFO element
+    ++rx_addr;
+    uint8_t* data = reinterpret_cast<uint8_t*>(rx_addr);
+    for (size_t i = 0; i < frame.len; ++i) {
+        frame.payload[i] = data[i];
+    }
+
+    switch(fifo) {
+    case RxFifo::fifo0:
+        attr.storage = FDCAN_RX_FIFO0;
+        _reg->RXF0A = index;
+        break;
+    case RxFifo::fifo1:
+        attr.storage = FDCAN_RX_FIFO1;
+        _reg->RXF1A = index;
+        break;
+    }
+
+    return {attr};
 }
 
 
@@ -121,30 +197,6 @@ void Module::set_fifo_watermark(uint32_t fifo, uint32_t watermark)
 } // namespace mcu
 
 
-extern "C" void FDCAN1_IT0_IRQHandler(void) {
-    using namespace mcu::can;
-    HAL_FDCAN_IRQHandler(Module::instance(Peripheral::fdcan1)->handle());
-}
-
-
-extern "C" void FDCAN2_IT0_IRQHandler(void) {
-    using namespace mcu::can;
-    HAL_FDCAN_IRQHandler(Module::instance(Peripheral::fdcan2)->handle());
-}
-
-
-extern "C" void FDCAN1_IT1_IRQHandler(void) {
-    using namespace mcu::can;
-    HAL_FDCAN_IRQHandler(Module::instance(Peripheral::fdcan1)->handle());
-}
-
-
-extern "C" void FDCAN2_IT1_IRQHandler(void) {
-    using namespace mcu::can;
-    HAL_FDCAN_IRQHandler(Module::instance(Peripheral::fdcan2)->handle());
-}
-
-
 /*extern "C" void FDCAN_CAL_IRQHandler(void) {
     HAL_FDCAN_IRQHandler(&hfdcan);
 }*/
@@ -152,22 +204,26 @@ extern "C" void FDCAN2_IT1_IRQHandler(void) {
 
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_flags) {
     using namespace mcu::can;
-    if ((interrupt_flags & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET) {
-        do {
-            FDCAN_RxHeaderTypeDef header;
-            can_frame frame;
-            HAL_FDCAN_GetRxMessage(handle, FDCAN_RX_FIFO0, &header, frame.payload.data());
-            frame.id = header.Identifier;
-            frame.len = uint8_t(header.DataLength >> 16);
+    if (mcu::bit_is_clear<uint32_t>(interrupt_flags, FDCAN_IT_RX_FIFO0_NEW_MESSAGE)) {
+        return;
+    }
 
-            MessageAttribute attr;
-            attr.location = FDCAN_RX_FIFO0;
-            attr.id_type = header.IdType;
-            attr.filter_index = header.FilterIndex;
+    while (HAL_FDCAN_GetRxFifoFillLevel(handle, FDCAN_RX_FIFO0) > 0) {
+        FDCAN_RxHeaderTypeDef header{};
+        can_frame frame{};
+        if (HAL_FDCAN_GetRxMessage(handle, FDCAN_RX_FIFO0, &header, frame.payload.data()) != HAL_OK) {
+            return;
+        }
+        frame.id = header.Identifier;
+        frame.len = uint8_t(header.DataLength >> 16);
 
-            auto module = Module::instance(impl::to_peripheral(handle->Instance));
-            module->_on_fifo0_frame_received(*module, attr, frame);
-        } while (HAL_FDCAN_GetRxFifoFillLevel(handle, FDCAN_RX_FIFO0) > 0); 
+        RxMessageAttribute attr{};
+        attr.storage = FDCAN_RX_FIFO0;
+        attr.id_type = header.IdType;
+        attr.filter_idx = header.FilterIndex;
+
+        auto module = Module::instance(impl::to_peripheral(handle->Instance));
+        module->_on_fifo0_frame_received(*module, attr, frame);
     }
 }
 
@@ -180,23 +236,27 @@ void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *handle) {
 
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_flags) {
     using namespace mcu::can;
-    if ((interrupt_flags & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) != RESET) {
-        do {
-            FDCAN_RxHeaderTypeDef header;
-            can_frame frame;
-            HAL_FDCAN_GetRxMessage(handle, FDCAN_RX_FIFO1, &header, frame.payload.data());
-            frame.id = header.Identifier;
-            frame.len = uint8_t(header.DataLength >> 16);
-            
-            MessageAttribute attr;
-            attr.location = FDCAN_RX_FIFO1;
-            attr.id_type = header.IdType;
-            attr.filter_index = header.FilterIndex;
-            
-            auto module = Module::instance(impl::to_peripheral(handle->Instance));
-            module->_on_fifo1_frame_received(*module, attr, frame);
-        } while (HAL_FDCAN_GetRxFifoFillLevel(handle, FDCAN_RX_FIFO1) > 0); 
+    if (mcu::bit_is_clear<uint32_t>(interrupt_flags, FDCAN_IT_RX_FIFO1_NEW_MESSAGE)) {
+        return;
     }
+
+    while (HAL_FDCAN_GetRxFifoFillLevel(handle, FDCAN_RX_FIFO1) > 0) {
+        FDCAN_RxHeaderTypeDef header{};
+        can_frame frame{};
+        if (HAL_FDCAN_GetRxMessage(handle, FDCAN_RX_FIFO1, &header, frame.payload.data()) != HAL_OK) {
+            return;
+        }
+        frame.id = header.Identifier;
+        frame.len = uint8_t(header.DataLength >> 16);
+        
+        RxMessageAttribute attr{};
+        attr.storage = FDCAN_RX_FIFO1;
+        attr.id_type = header.IdType;
+        attr.filter_idx = header.FilterIndex;
+        
+        auto module = Module::instance(impl::to_peripheral(handle->Instance));
+        module->_on_fifo1_frame_received(*module, attr, frame);
+    } 
 }
 
 
