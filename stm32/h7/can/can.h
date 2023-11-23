@@ -206,18 +206,18 @@ public:
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
 
     void set_interrupt_priority(IrqPriority line0_priority, IrqPriority line1_priority) {
-        HAL_NVIC_SetPriority(impl::irq0_numbers[static_cast<size_t>(_peripheral)], line0_priority.get(), 0);
-        HAL_NVIC_SetPriority(impl::irq1_numbers[static_cast<size_t>(_peripheral)], line1_priority.get(), 0);
+        set_irq_priority(impl::irq0_numbers[std::to_underlying(_peripheral)], line0_priority);
+        set_irq_priority(impl::irq1_numbers[std::to_underlying(_peripheral)], line1_priority);
     }
 
     void enable_interrupts() {
-        HAL_NVIC_EnableIRQ(impl::irq0_numbers[static_cast<size_t>(_peripheral)]);
-        HAL_NVIC_EnableIRQ(impl::irq1_numbers[static_cast<size_t>(_peripheral)]);
+        enable_irq(impl::irq0_numbers[std::to_underlying(_peripheral)]);
+        enable_irq(impl::irq1_numbers[std::to_underlying(_peripheral)]);
     }
 
     void disable_interrupts() {
-        HAL_NVIC_DisableIRQ(impl::irq0_numbers[static_cast<size_t>(_peripheral)]);
-        HAL_NVIC_DisableIRQ(impl::irq1_numbers[static_cast<size_t>(_peripheral)]);
+        disable_irq(impl::irq0_numbers[std::to_underlying(_peripheral)]);
+        disable_irq(impl::irq1_numbers[std::to_underlying(_peripheral)]);
     }
 protected:
     void enable_clk() {

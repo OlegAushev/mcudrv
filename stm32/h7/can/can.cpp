@@ -228,12 +228,6 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
 }
 
 
-void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *handle) {
-    using namespace mcu::can;
-    Module::instance(impl::to_peripheral(handle->Instance))->_on_buffer_frame_received();
-}
-
-
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_flags) {
     using namespace mcu::can;
     if (mcu::bit_is_clear<uint32_t>(interrupt_flags, FDCAN_IT_RX_FIFO1_NEW_MESSAGE)) {
@@ -257,6 +251,12 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
         auto module = Module::instance(impl::to_peripheral(handle->Instance));
         module->_on_fifo1_frame_received(*module, attr, frame);
     } 
+}
+
+
+void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *handle) {
+    using namespace mcu::can;
+    Module::instance(impl::to_peripheral(handle->Instance))->_on_buffer_frame_received();
 }
 
 
