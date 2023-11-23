@@ -197,14 +197,16 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert(_initialized);
-        auto level = read_level();
-        return static_cast<emb::gpio::State>(1 - (level ^ std::to_underlying(_config.active_state)));
+        return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive;
     }
 
     virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
         assert(_initialized);
-        auto level = 1 - (std::to_underlying(state) ^ std::to_underlying(_config.active_state));
-        set_level(level);
+        if (state == emb::gpio::State::active) {
+            set_level(std::to_underlying(_config.active_state));
+        } else {
+            set_level(1 - std::to_underlying(_config.active_state));
+        }
     }
 
     virtual void reset() override {
