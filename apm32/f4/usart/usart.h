@@ -79,8 +79,8 @@ class Module : public emb::Tty, public emb::interrupt_invoker_array<Module, peri
 private:
     const Peripheral _peripheral;
     USART_T* _reg;
-    mcu::gpio::Input _rx_pin;
-    mcu::gpio::Output _tx_pin;
+    mcu::gpio::AlternateIO _rx_pin;
+    mcu::gpio::AlternateIO _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:

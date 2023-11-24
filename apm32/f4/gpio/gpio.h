@@ -101,6 +101,7 @@ class Input : public emb::gpio::Input, public impl::Gpio {
 public:
     Input() = default;
     Input(const Config& config) {
+        assert(config.pin.mode == GPIO_MODE_IN);
         init(config);
     }
 
@@ -175,6 +176,7 @@ class Output : public emb::gpio::Output, public impl::Gpio {
 public:
     Output() = default;
     Output(const Config& config) {
+        assert(config.pin.mode == GPIO_MODE_OUT);
         init(config);
     }
 
@@ -219,6 +221,26 @@ public:
         uint16_t odr_reg = static_cast<uint16_t>( read_reg(_config.port->ODATA));
         write_reg<uint16_t>(_config.port->BSCL, ~odr_reg & _config.pin.pin);
         write_reg<uint16_t>(_config.port->BSCH, odr_reg & _config.pin.pin);
+    }
+};
+
+
+class AlternateIO : public impl::Gpio {
+public:
+    AlternateIO() = default;
+    AlternateIO(const Config& config) {
+        assert(config.pin.mode == GPIO_MODE_AF);
+        init(config);
+    }
+};
+
+
+class AnalogIO : public impl::Gpio {
+public:
+    AnalogIO() = default;
+    AnalogIO(const Config& config) {
+        assert(config.pin.mode == GPIO_MODE_AN);
+        init(config);
     }
 };
 
