@@ -118,9 +118,9 @@ private:
 
     unsigned int _filter_count{0};
     #ifdef CAN2
-    static const int max_fitler_count{28};
+    static const unsigned int max_fitler_count{28};
     #else
-    static const int max_fitler_count{14};
+    static const unsigned int max_fitler_count{14};
     #endif
 
     emb::queue<can_frame, 32> _txqueue;

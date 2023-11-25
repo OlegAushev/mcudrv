@@ -19,7 +19,10 @@ inline uint32_t core_clk_freq() { return SystemCoreClock; }
 void init();
 
 
-void delay(std::chrono::milliseconds delay); 
+void delay(std::chrono::milliseconds delay);
+
+
+void fatal_error(const char* hint, int code = 0);
 
 
 } // namespace mcu

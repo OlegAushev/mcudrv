@@ -89,7 +89,7 @@ void Module::start() {
 void Module::stop() {
     set_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
     mcu::chrono::Timeout stop_timeout(std::chrono::milliseconds(2));
-    while (bit_is_set<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
+    while (bit_is_clear<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
         if (stop_timeout.expired()) {
              fatal_error("CAN module start failed");
         }
@@ -116,6 +116,7 @@ Error Module::send(const can_frame& frame) {
         write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_STID_Pos));
     } else if (frame.id <=0x1FFFFFFF) {
         write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_EXID_Pos));
+        TODO
     } else {
         return Error::invalid_argument;
     }

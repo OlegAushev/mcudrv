@@ -112,16 +112,16 @@ private:
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 
-    unsigned int _filter_count{0};
+    uint8_t _filter_count{0};
     #ifdef CAN2
-    static const int max_fitler_count{28};
+    static const uint8_t max_fitler_count{28};
     #else
-    static const int max_fitler_count{14};
+    static const uint8_t max_fitler_count{14};
     #endif
 
     emb::queue<can_frame, 32> _txqueue;
 public:
-    Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
+    Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, Config config);
     RxMessageAttribute register_rxmessage(CAN_FilterConfig_T& filter);
     
     Peripheral peripheral() const { return _peripheral; }
@@ -133,19 +133,19 @@ public:
     void start();
     void stop();
 
-    bool mailbox_empty() const {
-        if (bit_is_clear<uint32_t>(_reg->TXSTS, CAN_TSR_TME)) {
-            return false;
+    bool mailbox_full() const {
+        if ((_reg->TXSTS_B.TXMEFLG0 + _reg->TXSTS_B.TXMEFLG1 + _reg->TXSTS_B.TXMEFLG2) == 0) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     uint32_t rxfifo_level(RxFifo fifo) const {
         switch (fifo) {
         case RxFifo::fifo0:
-            return read_bit<uint32_t>(_reg->RF0R, CAN_RF0R_FMP0);
+            return _reg->RXF0_B.FMNUM0;
         case RxFifo::fifo1:
-            return read_bit<uint32_t>(_reg->RF1R, CAN_RF1R_FMP1);
+            return _reg->RXF1_B.FMNUM1;
         }
         return 0;
     }
@@ -160,7 +160,7 @@ public:
     void disable_interrupts();
 
 private:
-    void on_txmailbox_empty() {
+    void _on_txmailbox_free() {
         if (_txqueue.empty()) { return; }
         auto frame = _txqueue.front();
         _txqueue.pop();

@@ -12,7 +12,7 @@ namespace mcu {
 namespace can {
 
 
-Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config)
+Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, Config config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
@@ -37,11 +37,11 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     _enable_clk(peripheral);
     _reg = impl::can_instances[static_cast<size_t>(_peripheral)];
 
-    // TODO
+    CAN_Config(_reg, &config.hal_config);
 }
 
 
-RxMessageAttribute Module::register_rxmessage(CAN_FilterTypeDef& filter) {
+RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
     RxMessageAttribute attr = {};
     
     if (_filter_count >= max_fitler_count) {
@@ -49,28 +49,26 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterTypeDef& filter) {
     }
 
     if (_peripheral == Peripheral::can1) {
-        filter.FilterBank = _filter_count++;
+        filter.filterNumber = _filter_count++;
     } else {
-        filter.FilterBank = 14 + _filter_count++;
+        filter.filterNumber = 14 + _filter_count++;
     }
-    filter.FilterActivation = ENABLE;
-    filter.SlaveStartFilterBank = 14;
+    filter.filterActivation = ENABLE;
+    //filter.SlaveStartFilterBank = 14;
 
-    attr.filter_idx = filter.FilterBank;
-    attr.fifo = RxFifo(filter.FilterFIFOAssignment);
+    attr.filter_idx = filter.filterNumber;
+    attr.fifo = RxFifo(filter.filterFIFO);
 
-    if (HAL_CAN_ConfigFilter(&_handle, &filter) != HAL_OK) {
-        fatal_error("CAN module Rx filter configuration failed");
-    }
+    CAN_ConfigFilter(&filter);
 
     return attr;
 }
 
 
 void Module::start() {
-    clear_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
+    _reg->MCTRL_B.INITREQ = 0;
     mcu::chrono::Timeout start_timeout(std::chrono::milliseconds(2));
-    while (bit_is_set<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
+    while (_reg->MSTS_B.INITFLG == 1) {
         if (start_timeout.expired()) {
              fatal_error("CAN module start failed");
         }
@@ -79,9 +77,9 @@ void Module::start() {
 
 
 void Module::stop() {
-    set_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
+    _reg->MCTRL_B.INITREQ = 1;
     mcu::chrono::Timeout stop_timeout(std::chrono::milliseconds(2));
-    while (bit_is_set<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
+    while (_reg->MSTS_B.INITFLG == 0) {
         if (stop_timeout.expired()) {
              fatal_error("CAN module start failed");
         }
@@ -90,7 +88,7 @@ void Module::stop() {
 
 
 Error Module::send(const can_frame& frame) {
-    if (!mailbox_empty()) {
+    if (mailbox_full()) {
         if (_txqueue.full()) {
             return Error::overflow;
         }
@@ -98,37 +96,38 @@ Error Module::send(const can_frame& frame) {
         return Error::busy;
     }
     
-    uint32_t mailboxid = read_bit<uint32_t>(_reg->TSR, CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
+    uint32_t mailboxid = _reg->TXSTS_B.EMNUM;
     if (mailboxid > 2) {
         return Error::internal;
     }
 
     // set up id
     if (frame.id <= 0x7FF) {
-        write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_STID_Pos));
+        write_reg(_reg->sTxMailBox[mailboxid].TXMID, (frame.id << 21));
     } else if (frame.id <=0x1FFFFFFF) {
-        write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_EXID_Pos));
+        write_reg(_reg->sTxMailBox[mailboxid].TXMID, (frame.id << 3));
+        _reg->sTxMailBox[mailboxid].TXMID_B.IDTYPESEL = 1;
     } else {
         return Error::invalid_argument;
     }
 
     // set up dlc
-    write_reg(_reg->sTxMailBox[mailboxid].TDTR, static_cast<uint32_t>(frame.len));
+    _reg->sTxMailBox[mailboxid].TXDLEN_B.DLCODE = frame.len;
 
     // set up data field
-    write_reg(_reg->sTxMailBox[mailboxid].TDLR,
-        (uint32_t(frame.payload[0]) << CAN_TDL0R_DATA0_Pos) |
-        (uint32_t(frame.payload[1]) << CAN_TDL0R_DATA1_Pos) |
-        (uint32_t(frame.payload[2]) << CAN_TDL0R_DATA2_Pos) |
-        (uint32_t(frame.payload[3]) << CAN_TDL0R_DATA3_Pos));
-    write_reg(_reg->sTxMailBox[mailboxid].TDHR,
-        (uint32_t(frame.payload[4]) << CAN_TDH0R_DATA4_Pos) |
-        (uint32_t(frame.payload[5]) << CAN_TDH0R_DATA5_Pos) |
-        (uint32_t(frame.payload[6]) << CAN_TDH0R_DATA6_Pos) |
-        (uint32_t(frame.payload[7]) << CAN_TDH0R_DATA7_Pos));
+    write_reg(_reg->sTxMailBox[mailboxid].TXMDL,
+        (uint32_t(frame.payload[0]) << 0) |
+        (uint32_t(frame.payload[1]) << 8) |
+        (uint32_t(frame.payload[2]) << 16) |
+        (uint32_t(frame.payload[3]) << 24));
+    write_reg(_reg->sTxMailBox[mailboxid].TXMDH,
+        (uint32_t(frame.payload[4]) << 0) |
+        (uint32_t(frame.payload[5]) << 8) |
+        (uint32_t(frame.payload[6]) << 16) |
+        (uint32_t(frame.payload[7]) << 24));
     
     // request transmission
-    set_bit<uint32_t>(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_TXRQ);
+    _reg->sTxMailBox[mailboxid].TXMID_B.TXMREQ = 1;
 
     return Error::none;
 }
@@ -142,35 +141,35 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
     auto fifo_idx = std::to_underlying(fifo);
 
     // get id, len, filter
-    if (bit_is_clear<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_IDE)) {
-        frame.id = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RIR, CAN_RI0R_STID) >> CAN_TI0R_STID_Pos;
+    if (_reg->sRxMailBox[fifo_idx].RXMID_B.IDTYPESEL == 0) {
+        frame.id = _reg->sRxMailBox[fifo_idx].RXMID >> 21;
     } else {
-        frame.id = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RIR, (CAN_RI0R_EXID | CAN_RI0R_STID)) >> CAN_RI0R_EXID_Pos;
+        frame.id = _reg->sRxMailBox[fifo_idx].RXMID >> 3;
     }
 
-    frame.len = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos);
+    frame.len = uint8_t(_reg->sRxMailBox[fifo_idx].RXDLEN_B.DLCODE);
 
     RxMessageAttribute attr{};
-    attr.filter_idx = read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDTR, CAN_RDT0R_FMI) >> CAN_RDT0R_FMI_Pos;
+    attr.filter_idx = _reg->sRxMailBox[fifo_idx].RXDLEN_B.FMIDX;
     attr.fifo = fifo;
 
     // get data
-    frame.payload[0] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA0) >> CAN_RDL0R_DATA0_Pos);
-    frame.payload[1] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA1) >> CAN_RDL0R_DATA1_Pos);
-    frame.payload[2] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA2) >> CAN_RDL0R_DATA2_Pos);
-    frame.payload[3] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDLR, CAN_RDL0R_DATA3) >> CAN_RDL0R_DATA3_Pos);
-    frame.payload[4] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA4) >> CAN_RDH0R_DATA4_Pos);
-    frame.payload[5] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA5) >> CAN_RDH0R_DATA5_Pos);
-    frame.payload[6] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA6) >> CAN_RDH0R_DATA6_Pos);
-    frame.payload[7] = uint8_t(read_bit<uint32_t>(_reg->sFIFOMailBox[fifo_idx].RDHR, CAN_RDH0R_DATA7) >> CAN_RDH0R_DATA7_Pos);
+    frame.payload[0] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDL_B.DATABYTE0);
+    frame.payload[1] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDL_B.DATABYTE1);
+    frame.payload[2] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDL_B.DATABYTE2);
+    frame.payload[3] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDL_B.DATABYTE3);
+    frame.payload[4] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDH_B.DATABYTE4);
+    frame.payload[5] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDH_B.DATABYTE5);
+    frame.payload[6] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDH_B.DATABYTE6);
+    frame.payload[7] = uint8_t(_reg->sRxMailBox[fifo_idx].RXMDH_B.DATABYTE7);
 
     // release fifo
     switch (fifo) {
     case RxFifo::fifo0:
-        set_bit<uint32_t>(_reg->RF0R, CAN_RF0R_RFOM0);
+        _reg->RXF0_B.RFOM0 = 1;
         break;
     case RxFifo::fifo1:
-        set_bit<uint32_t>(_reg->RF1R, CAN_RF1R_RFOM1);
+        _reg->RXF1_B.RFOM1 = 1;;
         break;
     }    
 
@@ -179,27 +178,27 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
 
 
 void Module::init_interrupts(uint32_t interrupt_list) {
-    set_bit(_reg->IER, interrupt_list);
+    // set_bit(_reg->IER, interrupt_list);
 }
 
 
 void Module::set_interrupt_priority(IrqPriority fifo0_priority, IrqPriority fifo1_priority, IrqPriority tx_priority) {
-    HAL_NVIC_SetPriority(impl::can_fifo0_irqn[std::to_underlying(_peripheral)], fifo0_priority.get(), 0);
-    HAL_NVIC_SetPriority(impl::can_fifo1_irqn[std::to_underlying(_peripheral)], fifo1_priority.get(), 0);
-    HAL_NVIC_SetPriority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority.get(), 0);
+    // HAL_NVIC_SetPriority(impl::can_fifo0_irqn[std::to_underlying(_peripheral)], fifo0_priority.get(), 0);
+    // HAL_NVIC_SetPriority(impl::can_fifo1_irqn[std::to_underlying(_peripheral)], fifo1_priority.get(), 0);
+    // HAL_NVIC_SetPriority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority.get(), 0);
 
 }
 
 void Module::enable_interrupts() {
-    HAL_NVIC_EnableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_EnableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_EnableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
+    // HAL_NVIC_EnableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
+    // HAL_NVIC_EnableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
+    // HAL_NVIC_EnableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
 }
 
 void Module::disable_interrupts() {
-    HAL_NVIC_DisableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_DisableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_DisableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
+    // HAL_NVIC_DisableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
+    // HAL_NVIC_DisableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
+    // HAL_NVIC_DisableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
 }
 
 
@@ -220,28 +219,28 @@ void Module::_enable_clk(Peripheral peripheral) {
 } // namespace mcu
 
 
-extern "C" void CAN2_RX0_IRQHandler() {
-    using namespace mcu::can;
-    HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
-}
+// extern "C" void CAN2_RX0_IRQHandler() {
+//     using namespace mcu::can;
+//     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
+// }
 
 
-extern "C" void CAN1_RX1_IRQHandler() {
-    using namespace mcu::can;
-    HAL_CAN_IRQHandler(Module::instance(Peripheral::can1)->handle());
-}
+// extern "C" void CAN1_RX1_IRQHandler() {
+//     using namespace mcu::can;
+//     HAL_CAN_IRQHandler(Module::instance(Peripheral::can1)->handle());
+// }
 
 
-extern "C" void CAN2_RX1_IRQHandler() {
-    using namespace mcu::can;
-    HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
-}
+// extern "C" void CAN2_RX1_IRQHandler() {
+//     using namespace mcu::can;
+//     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
+// }
 
 
-extern "C" void CAN2_TX_IRQHandler() {
-    using namespace mcu::can;
-    HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
-}
+// extern "C" void CAN2_TX_IRQHandler() {
+//     using namespace mcu::can;
+//     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
+// }
 
 
 #endif
