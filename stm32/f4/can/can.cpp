@@ -116,7 +116,7 @@ Error Module::send(const can_frame& frame) {
         write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_STID_Pos));
     } else if (frame.id <=0x1FFFFFFF) {
         write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_EXID_Pos));
-        TODO
+        set_bit<uint32_t>(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_IDE);
     } else {
         return Error::invalid_argument;
     }
@@ -192,23 +192,23 @@ void Module::init_interrupts(uint32_t interrupt_list) {
 }
 
 
-void Module::set_interrupt_priority(IrqPriority fifo0_priority, IrqPriority fifo1_priority, IrqPriority tx_priority) {
-    HAL_NVIC_SetPriority(impl::can_fifo0_irqn[std::to_underlying(_peripheral)], fifo0_priority.get(), 0);
-    HAL_NVIC_SetPriority(impl::can_fifo1_irqn[std::to_underlying(_peripheral)], fifo1_priority.get(), 0);
-    HAL_NVIC_SetPriority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority.get(), 0);
+void Module::set_interrupt_priority(IrqPriority rx0_priority, IrqPriority rx1_priority, IrqPriority tx_priority) {
+    set_irq_priority(impl::can_rx0_irqn[std::to_underlying(_peripheral)], rx0_priority);
+    set_irq_priority(impl::can_rx1_irqn[std::to_underlying(_peripheral)], rx1_priority);
+    set_irq_priority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority);
 
 }
 
 void Module::enable_interrupts() {
-    HAL_NVIC_EnableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_EnableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_EnableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
+    enable_irq(impl::can_rx0_irqn[std::to_underlying(_peripheral)]);
+    enable_irq(impl::can_rx1_irqn[std::to_underlying(_peripheral)]);
+    enable_irq(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
 }
 
 void Module::disable_interrupts() {
-    HAL_NVIC_DisableIRQ(impl::can_fifo0_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_DisableIRQ(impl::can_fifo1_irqn[std::to_underlying(_peripheral)]);
-    HAL_NVIC_DisableIRQ(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
+    disable_irq(impl::can_rx0_irqn[std::to_underlying(_peripheral)]);
+    disable_irq(impl::can_rx1_irqn[std::to_underlying(_peripheral)]);
+    disable_irq(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
 }
 
 

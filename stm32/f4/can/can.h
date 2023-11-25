@@ -78,8 +78,8 @@ inline std::array<void(*)(void), peripheral_count> can_clk_enable_funcs = {
 };
 
 
-inline constexpr std::array<IRQn_Type, peripheral_count> can_fifo0_irqn = {CAN1_RX0_IRQn, CAN2_RX0_IRQn};
-inline constexpr std::array<IRQn_Type, peripheral_count> can_fifo1_irqn = {CAN1_RX1_IRQn, CAN2_RX1_IRQn};
+inline constexpr std::array<IRQn_Type, peripheral_count> can_rx0_irqn = {CAN1_RX0_IRQn, CAN2_RX0_IRQn};
+inline constexpr std::array<IRQn_Type, peripheral_count> can_rx1_irqn = {CAN1_RX1_IRQn, CAN2_RX1_IRQn};
 inline constexpr std::array<IRQn_Type, peripheral_count> can_tx_irqn = {CAN1_TX_IRQn, CAN2_TX_IRQn};
 
 
@@ -165,11 +165,14 @@ public:
     void disable_interrupts();
 
 private:
-    void _on_txmailbox_free() {
-        if (_txqueue.empty()) { return; }
-        auto frame = _txqueue.front();
-        _txqueue.pop();
-        send(frame);   
+    void _on_txmailbox_empty() {
+        while (!mailbox_full()) {
+            if (_txqueue.empty()) {
+                return;
+            }
+            send(_txqueue.front());   
+            _txqueue.pop();
+        }  
     }
 
 private:

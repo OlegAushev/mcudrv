@@ -163,10 +163,11 @@ public:
 private:
     void _on_mailbox_empty() {
         while (!mailbox_full()) {
-            if (_txqueue.empty()) { return; }
-            auto frame = _txqueue.front();
+            if (_txqueue.empty()) {
+                return;
+            }
+            send(_txqueue.front());   
             _txqueue.pop();
-            send(frame);   
         }
     }
 
