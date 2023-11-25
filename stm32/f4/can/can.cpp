@@ -98,7 +98,7 @@ void Module::stop() {
 
 
 Error Module::send(const can_frame& frame) {
-    if (!mailbox_empty()) {
+    if (mailbox_full()) {
         if (_txqueue.full()) {
             return Error::overflow;
         }

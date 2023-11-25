@@ -138,11 +138,11 @@ public:
     void start();
     void stop();
 
-    bool mailbox_empty() const {
+    bool mailbox_full() const {
         if (bit_is_clear<uint32_t>(_reg->TSR, CAN_TSR_TME)) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     uint32_t rxfifo_level(RxFifo fifo) const {
@@ -165,7 +165,7 @@ public:
     void disable_interrupts();
 
 private:
-    void on_txmailbox_empty() {
+    void _on_txmailbox_free() {
         if (_txqueue.empty()) { return; }
         auto frame = _txqueue.front();
         _txqueue.pop();
