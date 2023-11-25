@@ -5,6 +5,7 @@
 #ifdef APM32F4xx
 
 
+#include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <apm32f4xx_can.h>
 #include <emblib/core.h>
@@ -75,8 +76,8 @@ inline std::array<void(*)(void), peripheral_count> can_clk_enable_funcs = {
 };
 
 
-inline constexpr std::array<IRQn_Type, peripheral_count> can_fifo0_irqn = {CAN1_RX0_IRQn, CAN2_RX0_IRQn};
-inline constexpr std::array<IRQn_Type, peripheral_count> can_fifo1_irqn = {CAN1_RX1_IRQn, CAN2_RX1_IRQn};
+inline constexpr std::array<IRQn_Type, peripheral_count> can_rx0_irqn = {CAN1_RX0_IRQn, CAN2_RX0_IRQn};
+inline constexpr std::array<IRQn_Type, peripheral_count> can_rx1_irqn = {CAN1_RX1_IRQn, CAN2_RX1_IRQn};
 inline constexpr std::array<IRQn_Type, peripheral_count> can_tx_irqn = {CAN1_TX_IRQn, CAN2_TX_IRQn};
 
 
@@ -155,12 +156,12 @@ public:
 
 public:
     void init_interrupts(uint32_t interrupt_list);
-    void set_interrupt_priority(IrqPriority fifo0_priority, IrqPriority fifo1_priority, IrqPriority tx_priority);
+    void set_interrupt_priority(IrqPriority rx0_priority, IrqPriority rx1_priority, IrqPriority tx_priority);
     void enable_interrupts();
     void disable_interrupts();
 
 private:
-    void _on_txmailbox_free() {
+    void _on_txmailbox_empty() {
         if (_txqueue.empty()) { return; }
         auto frame = _txqueue.front();
         _txqueue.pop();
