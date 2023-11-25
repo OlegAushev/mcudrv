@@ -122,11 +122,10 @@ private:
     emb::queue<can_frame, 32> _txqueue;
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
-    RxMessageAttribute register_rxmessage(CAN_FilterTypeDef& filter);
+    RxMessageAttribute register_rxmessage(CAN_FilterConfig_T& filter);
     
     Peripheral peripheral() const { return _peripheral; }
-    CAN_HandleTypeDef* handle() { return &_handle; }
-    CAN_TypeDef* reg() { return _reg; }
+    CAN_T* reg() { return _reg; }
     static Module* instance(Peripheral peripheral) {
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
@@ -135,7 +134,7 @@ public:
     void stop();
 
     bool mailbox_empty() const {
-        if (bit_is_clear<uint32_t>(_reg->TSR, CAN_TSR_TME)) {
+        if (bit_is_clear<uint32_t>(_reg->TXSTS, CAN_TSR_TME)) {
             return false;
         }
         return true;
