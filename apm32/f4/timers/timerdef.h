@@ -20,6 +20,7 @@ namespace timers {
 struct Config {
     float freq;
     TMR_BaseConfig_T hal_base_config;
+    bool arr_preload;
 };
 
 
@@ -33,6 +34,7 @@ enum class Channel : unsigned int {
 
 struct ChannelConfig {
     TMR_OCConfig_T hal_oc_config;
+    TMR_OC_PRELOAD_T oc_preload;
 };
 
 

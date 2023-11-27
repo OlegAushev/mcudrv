@@ -47,6 +47,9 @@ AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral,
         break;
     }
 
+    if (config.arr_preload) {
+        _reg->CTRL1_B.ARPEN = 1;
+    }
     TMR_ConfigTimeBase(_reg, &config.hal_base_config);
 }
 
@@ -65,21 +68,25 @@ void AdvancedControlTimer::_enable_clk(AdvancedControlPeripheral peripheral) {
 void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
     switch (channel) {
     case Channel::channel1:
+        _reg->CCM1_COMPARE_B.OC1PEN = config.oc_preload;
         TMR_ConfigOC1(_reg, &config.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC1EN = 1; } else { _reg->CCEN_B.CC1EN = 0; }
         if (pin_chn) { _reg->CCEN_B.CC1NEN = 1; } else { _reg->CCEN_B.CC1NEN = 0; }
         break;
     case Channel::channel2:
+        _reg->CCM1_COMPARE_B.OC2PEN = config.oc_preload;
         TMR_ConfigOC2(_reg, &config.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC2EN = 1; } else { _reg->CCEN_B.CC2EN = 0; }
         if (pin_chn) { _reg->CCEN_B.CC2NEN = 1; } else { _reg->CCEN_B.CC2NEN = 0; }
         break;
     case Channel::channel3:
+        _reg->CCM2_COMPARE_B.OC3PEN = config.oc_preload;
         TMR_ConfigOC3(_reg, &config.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC3EN = 1; } else { _reg->CCEN_B.CC3EN = 0; }
         if (pin_chn) { _reg->CCEN_B.CC3NEN = 1; } else { _reg->CCEN_B.CC3NEN = 0; }
         break;
     case Channel::channel4:
+        _reg->CCM2_COMPARE_B.OC4PEN = config.oc_preload;
         TMR_ConfigOC4(_reg, &config.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC4EN = 1; } else { _reg->CCEN_B.CC4EN = 0; }
         break;
