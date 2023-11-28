@@ -48,8 +48,8 @@ public:
             : _preempt_pri(std::clamp(preempt_pri, uint8_t(0), _preempt_priorities))
             , _sub_pri(std::clamp(sub_pri, uint8_t(0), _sub_priorities))
     {
-        assert(_preempt_pri <= _preempt_priorities);
-        assert(_sub_pri <= _sub_priorities);
+        assert(preempt_pri <= _preempt_priorities);
+        assert(sub_pri <= _sub_priorities);
     }
 
     uint8_t preempt_pri() const { return _preempt_pri; }
