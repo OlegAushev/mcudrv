@@ -20,7 +20,7 @@ namespace chrono {
 
 
 void system_clock::init() {
-    set_initialized();
+
 }
 
 

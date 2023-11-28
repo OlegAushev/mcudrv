@@ -21,8 +21,6 @@ void (*system_clock::_delayed_task)();
 
 
 void system_clock::init() {
-    if (initialized()) { return; }
-
     _time = 0;
 
     _delayed_task_start = emb::chrono::milliseconds(0);
@@ -44,8 +42,6 @@ void system_clock::init() {
     CPUTimer_enableInterrupt(CPUTIMER0_BASE);
     Interrupt_enable(INT_TIMER0);
     CPUTimer_startTimer(CPUTIMER0_BASE);
-
-    set_initialized();
 }
 
 
@@ -78,8 +74,6 @@ uint32_t high_resolution_clock::_period;
 
 
 void high_resolution_clock::init(emb::chrono::microseconds period) {
-    if (initialized()) { return; }
-
     CPUTimer_stopTimer(CPUTIMER1_BASE);             // Make sure timer is stopped
     CPUTimer_setPeriod(CPUTIMER1_BASE, 0xFFFFFFFF); // Initialize timer period to maximum
     CPUTimer_setPreScaler(CPUTIMER1_BASE, 0);       // Initialize pre-scale counter to divide by 1 (SYSCLKOUT)
@@ -88,8 +82,6 @@ void high_resolution_clock::init(emb::chrono::microseconds period) {
     _period = (uint32_t)(mcu::sysclk_freq() / 1000000) * period.count() - 1;
     CPUTimer_setPeriod(CPUTIMER1_BASE, _period);
     CPUTimer_setEmulationMode(CPUTIMER1_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
-
-    set_initialized();
 }
 
 

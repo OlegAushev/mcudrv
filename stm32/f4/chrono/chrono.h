@@ -28,7 +28,7 @@ enum class TaskStatus {
 };
 
 
-class system_clock : private emb::noncopyable, public emb::monostate<system_clock> {
+class system_clock {
     friend void ::SysTick_Handler();
 public:
     system_clock() = delete;
