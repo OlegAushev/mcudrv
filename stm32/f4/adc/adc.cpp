@@ -38,7 +38,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
 }
 
 
-void Module::add_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
+void Module::init_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -52,7 +52,7 @@ void Module::add_injected_channel(const PinConfig& pin_config, InjectedChannelCo
 }
 
 
-void Module::add_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config, std::initializer_list<uint32_t> ranks) {
+void Module::init_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -60,9 +60,16 @@ void Module::add_regular_channel(const PinConfig& pin_config, const RegularChann
     cfg.pin.Pull = GPIO_NOPULL;
     mcu::gpio::AnalogIO input(cfg);
 
-    for (auto rank : ranks) {
+    if (channel_config.ranks.size() > 0) {
+        for (auto rank : channel_config.ranks) {
+            auto config = channel_config;
+            config.hal_config.Rank = rank;
+            if (HAL_ADC_ConfigChannel(&_handle, &config.hal_config) != HAL_OK) {
+                fatal_error("ADC regular channel initialization failed");
+            }
+        }
+    } else {
         auto config = channel_config;
-        config.hal_config.Rank = rank;
         if (HAL_ADC_ConfigChannel(&_handle, &config.hal_config) != HAL_OK) {
             fatal_error("ADC regular channel initialization failed");
         }
@@ -70,14 +77,14 @@ void Module::add_regular_channel(const PinConfig& pin_config, const RegularChann
 }
 
 
-void Module::add_injected_internal_channel(InjectedChannelConfig channel_config) {
+void Module::init_injected_internal_channel(InjectedChannelConfig channel_config) {
     if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC injected channel initialization failed");
     }
 }
 
 
-void Module::add_regular_internal_channel(RegularChannelConfig channel_config) {
+void Module::init_regular_internal_channel(RegularChannelConfig channel_config) {
     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC internal channel initialization failed");
     }

@@ -42,6 +42,7 @@ struct Config {
 
 struct RegularChannelConfig {
     ADC_ChannelConfTypeDef hal_config;
+    std::initializer_list<uint32_t> ranks;
 };
 
 
@@ -100,10 +101,10 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void add_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config);
-    void add_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config, std::initializer_list<uint32_t> ranks);
-    void add_injected_internal_channel(InjectedChannelConfig channel_config);
-    void add_regular_internal_channel(RegularChannelConfig channel_config);
+    void init_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config);
+    void init_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config);
+    void init_injected_internal_channel(InjectedChannelConfig channel_config);
+    void init_regular_internal_channel(RegularChannelConfig channel_config);
 
     void start_injected() {
         if (bit_is_set<uint32_t>(_reg->SR, ADC_SR_JSTRT)) {
