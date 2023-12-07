@@ -5,7 +5,7 @@
 #ifdef APM32F4xx
 
 
-#include "../apm32_f4_base.h"
+#include "../apm32f4_common.h"
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <apm32f4xx_usart.h>

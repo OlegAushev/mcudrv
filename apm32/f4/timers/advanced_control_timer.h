@@ -5,7 +5,7 @@
 #ifdef APM32F4xx
 
 
-#include "timerdef.h"
+#include "timers_common.h"
 
 
 namespace mcu {

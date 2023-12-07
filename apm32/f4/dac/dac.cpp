@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include <mcudrv/apm32/f4/dac/dac.h>
+#include "dac.h"
 
 
 namespace mcu {
@@ -24,8 +24,8 @@ void Module::init_channel(Channel channel, const PinConfig& pin_config, ChannelC
     mcu::gpio::Config cfg{.port = pin_config.port,
                           .pin = {.pin = pin_config.pin,
                                   .mode = GPIO_MODE_AN,
-                                  .speed = GPIO_SPEED_25MHz,
-                                  .otype = GPIO_OTYPE_PP,
+                                  .speed{},
+                                  .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
                            .af_selection{},
                            .active_state{}};
