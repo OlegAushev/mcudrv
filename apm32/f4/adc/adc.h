@@ -43,8 +43,8 @@ struct Config {
 
 struct RegularChannelConfig {
     ADC_CHANNEL_T channel;
-    std::initializer_list<uint8_t> ranks;
     ADC_SAMPLETIME_T sampletime;
+    std::initializer_list<uint8_t> ranks;
 };
 
 
