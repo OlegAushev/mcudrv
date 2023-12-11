@@ -245,6 +245,59 @@ public:
 };
 
 
+
+
+enum class DurationLoggerMode {
+    set_reset,
+    toggle
+};
+
+
+template <DurationLoggerMode Mode = DurationLoggerMode::set_reset>
+class DurationLogger {
+private:
+    GPIO_T* _port;
+    uint16_t _pin;
+public:
+    DurationLogger(GPIO_T* port, uint16_t pin)
+            : _port(port)
+            , _pin(pin) {
+        if constexpr (Mode == DurationLoggerMode::set_reset) {
+            write_reg(_port->BSCL, _pin);
+        } else {
+            uint16_t odr_reg = static_cast<uint16_t>( read_reg(_port->ODATA));
+            write_reg<uint16_t>(_port->BSCL, ~odr_reg & _pin);
+            write_reg<uint16_t>(_port->BSCH, odr_reg & _pin);
+
+            odr_reg = static_cast<uint16_t>( read_reg(_port->ODATA));
+            write_reg<uint16_t>(_port->BSCL, ~odr_reg & _pin);
+            write_reg<uint16_t>(_port->BSCH, odr_reg & _pin);
+        }
+    }
+
+    ~DurationLogger() {
+        if constexpr (Mode == DurationLoggerMode::set_reset) {
+            write_reg(_port->BSCH, _pin);
+        } else {
+            uint16_t odr_reg = static_cast<uint16_t>( read_reg(_port->ODATA));
+            write_reg<uint16_t>(_port->BSCL, ~odr_reg & _pin);
+            write_reg<uint16_t>(_port->BSCH, odr_reg & _pin);
+        }
+    }
+
+    static Output init(GPIO_T* port, uint16_t pin) {
+        return Output({.port = port,
+                       .pin = {.pin = pin,
+                               .mode = GPIO_MODE_OUT,
+                               .speed = GPIO_SPEED_100MHz,
+                               .otype = GPIO_OTYPE_PP,
+                               .pupd = GPIO_PUPD_NOPULL},
+                       .af_selection{},
+                       .active_state = emb::gpio::ActiveState::high});
+    }
+};
+
+
 } // namespace gpio
 
 
