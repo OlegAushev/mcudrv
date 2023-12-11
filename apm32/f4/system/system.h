@@ -24,6 +24,7 @@ struct CoreConfig {
 
 void init(const CoreConfig& config);
 
+void reset_device();
 
 void delay(std::chrono::milliseconds delay);
 
@@ -67,6 +68,29 @@ inline void set_irq_priority(IRQn_Type irqn, IrqPriority priority) {
 inline void enable_irq(IRQn_Type irqn) { NVIC_EnableIRQ(irqn); }
 inline void disable_irq(IRQn_Type irqn) { NVIC_DisableIRQ(irqn); }
 inline void clear_pending_irq(IRQn_Type irqn) { NVIC_ClearPendingIRQ(irqn); }
+
+
+inline void enable_interrupts() { __enable_irq(); }
+
+
+inline void disable_interrupts() { __disable_irq(); }
+
+
+class critical_section {
+private:
+    bool irq_enabled;
+public:
+    critical_section() {
+        irq_enabled = (__get_PRIMASK() == 0);
+        __disable_irq();
+    }
+
+    ~critical_section() {
+        if (irq_enabled) {
+            __enable_irq();
+        }
+    }
+};
 
 
 } // namespace mcu

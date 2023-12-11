@@ -14,6 +14,11 @@ void init(const CoreConfig& config) {
 }
 
 
+void reset_device() {
+    NVIC_SystemReset();
+}
+
+
 void delay(std::chrono::milliseconds delay) {
     auto start = chrono::system_clock::now();
     while ((chrono::system_clock::now() - start) <= delay) {
