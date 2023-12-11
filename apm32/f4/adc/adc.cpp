@@ -20,6 +20,10 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
     ADC_CommonConfig(&config.hal_common_config);
     ADC_Config(_reg, &config.hal_config);
 
+    if (config.eoc_on_each_conv) {
+        _reg->CTRL2_B.EOCSEL = 1;
+    }
+
     _reg->CTRL2_B.ADCEN = 1;
     auto counter = (3 * (core_clk_freq() / 1000000));
     while(counter != 0)

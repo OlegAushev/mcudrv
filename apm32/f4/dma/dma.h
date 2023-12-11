@@ -51,8 +51,8 @@ namespace impl {
 
 
 inline std::array<void(*)(void), 2> dma_clk_enable_funcs = {
-    [](){ RCM_EnableAHB1PeriphReset(RCM_AHB1_PERIPH_DMA1); },
-    [](){ RCM_EnableAHB1PeriphReset(RCM_AHB1_PERIPH_DMA2); },
+    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_DMA1); },
+    [](){ RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_DMA2); },
 };
 
 

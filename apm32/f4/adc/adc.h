@@ -37,6 +37,7 @@ struct PinConfig {
 struct Config {
     ADC_CommonConfig_T hal_common_config;
     ADC_Config_T hal_config;
+    bool eoc_on_each_conv;
     bool dma_continuous_requests;
 };
 
