@@ -156,7 +156,7 @@ public:
         return 0;
     }
 
-    HalStatus send(can_frame& frame) {
+    DrvStatus send(can_frame& frame) {
         FDCAN_TxHeaderTypeDef header = {
             .Identifier = frame.id,
             .IdType = FDCAN_STANDARD_ID,
@@ -169,16 +169,18 @@ public:
             .MessageMarker = 0
         };
 
-        HalStatus status = HAL_FDCAN_AddMessageToTxFifoQ(&_handle, &header, frame.payload.data());
-        if (status != HAL_OK) {
+        DrvStatus status = static_cast<DrvStatus>(
+                HAL_FDCAN_AddMessageToTxFifoQ(&_handle, &header, frame.payload.data()));
+        if (status != DrvStatus::ok) {
             ++_tx_error_counter;
         }
         return status;
     }
 
-    HalStatus send(FDCAN_TxHeaderTypeDef& header, can_payload& payload) {
-        HalStatus status = HAL_FDCAN_AddMessageToTxFifoQ(&_handle, &header, payload.data());
-        if (status != HAL_OK) {
+    DrvStatus send(FDCAN_TxHeaderTypeDef& header, can_payload& payload) {
+        DrvStatus status = static_cast<DrvStatus>(
+                HAL_FDCAN_AddMessageToTxFifoQ(&_handle, &header, payload.data()));
+        if (status != DrvStatus::ok) {
             ++_tx_error_counter;
         }
         return status;		

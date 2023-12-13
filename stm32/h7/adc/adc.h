@@ -85,10 +85,10 @@ public:
         dma_stream.handle()->Parent = &_handle;
     }
 
-    HalStatus start_regular_conversion() {
-        HalStatus status = HAL_ADC_Start(&_handle);
+    DrvStatus start_regular_conversion() {
+        DrvStatus status = static_cast<DrvStatus>(HAL_ADC_Start(&_handle));
         if constexpr (strict_error_check) {
-            if (status != HAL_OK) {
+            if (status != DrvStatus::ok) {
                 fatal_error("regular ADC conversion start failed");
             }
         }
@@ -96,17 +96,18 @@ public:
     }
 
     template <uint32_t DmaBufSize>
-    HalStatus start_regular_conversion_with_dma(mcu::dma::Buffer<uint16_t, DmaBufSize>& buf) {
-        HalStatus status = HAL_ADC_Start_DMA(&_handle, reinterpret_cast<uint32_t*>(buf.data()), buf.size());
+    DrvStatus start_regular_conversion_with_dma(mcu::dma::Buffer<uint16_t, DmaBufSize>& buf) {
+        DrvStatus status = static_cast<DrvStatus>(
+                HAL_ADC_Start_DMA(&_handle, reinterpret_cast<uint32_t*>(buf.data()), buf.size()));
         if constexpr (strict_error_check) {
-            if (status != HAL_OK) {
+            if (status != DrvStatus::ok) {
                 fatal_error("regular ADC conversion with DMA start failed");
             }
         }
         return status;
     }
 
-    HalStatus poll() { return HAL_ADC_PollForConversion(&_handle, 0); }
+    DrvStatus poll() { return static_cast<DrvStatus>(HAL_ADC_PollForConversion(&_handle, 0)); }
     uint32_t read_regular_conversion() { return HAL_ADC_GetValue(&_handle); }
     uint32_t read_injected_conversion(uint32_t injected_rank) { return HAL_ADCEx_InjectedGetValue(&_handle, injected_rank); }
 

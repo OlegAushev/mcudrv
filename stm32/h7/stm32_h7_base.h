@@ -21,9 +21,6 @@ enum class DrvStatus {
 };
 
 
-using HalStatus = HAL_StatusTypeDef;
-
-
 } // namespace mcu
 
 
