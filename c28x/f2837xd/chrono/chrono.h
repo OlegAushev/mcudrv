@@ -7,7 +7,7 @@
 #include "../system/system.h"
 #include <emblib/core.h>
 #include <emblib/chrono.h>
-#include <emblib/staticvector.h>
+#include <emblib/static_vector.h>
 
 
 namespace mcu {
