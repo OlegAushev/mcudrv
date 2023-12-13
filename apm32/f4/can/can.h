@@ -151,7 +151,7 @@ public:
         return 0;
     }
 
-    Error send(const can_frame& frame);
+    DrvStatus send(const can_frame& frame);
     std::optional<RxMessageAttribute> recv(can_frame& frame, RxFifo fifo) const;
 
 public:
