@@ -108,7 +108,7 @@ DrvStatus Module::send(const can_frame& frame) {
     
     uint32_t mailboxid = read_bit<uint32_t>(_reg->TSR, CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
     if (mailboxid > 2) {
-        return DrvStatus::internal_error;
+        return DrvStatus::error;
     }
 
     // set up id

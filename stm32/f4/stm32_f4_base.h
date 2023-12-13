@@ -13,11 +13,11 @@ namespace mcu {
 
 enum class DrvStatus {
     ok,
+    error,
     busy,
     timeout,
     invalid_argument,
     overflow,
-    internal_error
 };
 
 
