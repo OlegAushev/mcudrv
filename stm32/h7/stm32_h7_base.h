@@ -11,6 +11,16 @@
 namespace mcu {
 
 
+enum class Status {
+    ok,
+    busy,
+    timeout,
+    invalid_argument,
+    overflow,
+    internal_error
+};
+
+
 using HalStatus = HAL_StatusTypeDef;
 
 
