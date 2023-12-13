@@ -97,18 +97,18 @@ void Module::stop() {
 }
 
 
-Error Module::send(const can_frame& frame) {
+DrvStatus Module::send(const can_frame& frame) {
     if (mailbox_full()) {
         if (_txqueue.full()) {
-            return Error::overflow;
+            return DrvStatus::overflow;
         }
         _txqueue.push(frame);
-        return Error::busy;
+        return DrvStatus::busy;
     }
     
     uint32_t mailboxid = read_bit<uint32_t>(_reg->TSR, CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
     if (mailboxid > 2) {
-        return Error::internal;
+        return DrvStatus::internal_error;
     }
 
     // set up id
@@ -118,7 +118,7 @@ Error Module::send(const can_frame& frame) {
         write_reg(_reg->sTxMailBox[mailboxid].TIR, (frame.id << CAN_TI0R_EXID_Pos));
         set_bit<uint32_t>(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_IDE);
     } else {
-        return Error::invalid_argument;
+        return DrvStatus::invalid_argument;
     }
 
     // set up dlc
@@ -139,7 +139,7 @@ Error Module::send(const can_frame& frame) {
     // request transmission
     set_bit<uint32_t>(_reg->sTxMailBox[mailboxid].TIR, CAN_TI0R_TXRQ);
 
-    return Error::none;
+    return DrvStatus::ok;
 }
 
 

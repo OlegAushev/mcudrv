@@ -11,7 +11,7 @@
 namespace mcu {
 
 
-enum class Status {
+enum class DrvStatus {
     ok,
     busy,
     timeout,
