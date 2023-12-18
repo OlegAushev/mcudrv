@@ -64,6 +64,8 @@ public:
         }
         return false;
     }
+
+    void reset() { _start = system_clock::now(); }
 };
 
 

@@ -89,7 +89,12 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
+    void set_slave_address(uint16_t slave_addr) { modify_reg<uint32_t>(_reg->CR2, I2C_CR2_SADD, slave_addr); }
+    void enable() { set_bit<uint32_t>(_reg->CR1, I2C_CR1_PE); }
+    void disable() { clear_bit<uint32_t>(_reg->CR1, I2C_CR1_PE); }
+
     bool busy() const { return bit_is_set<uint32_t>(_reg->ISR, I2C_ISR_BUSY); }
+    bool stop_detected() const { return bit_is_set<uint32_t>(_reg->ISR, I2C_ISR_STOPF); }
     
     DrvStatus write_mem(uint16_t devaddr, uint16_t memaddr, uint16_t memaddrsize, const uint8_t *data, size_t len, std::chrono::milliseconds timeout) {
         return static_cast<DrvStatus>(
