@@ -17,16 +17,16 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin_config, const 
 {
     _sda_pin.init({.port = sda_pin_config.port, 
                   .pin = {.Pin = sda_pin_config.pin,
-                          .Mode = GPIO_MODE_AF_PP,
-                          .Pull = GPIO_PULLUP,
+                          .Mode = GPIO_MODE_AF_OD,
+                          .Pull = GPIO_NOPULL, // external pullup is required
                           .Speed = GPIO_SPEED_FREQ_HIGH,
                           .Alternate = sda_pin_config.af_selection},
                   .active_state = emb::gpio::ActiveState::high});
             
     _scl_pin.init({.port = scl_pin_config.port,
                   .pin = {.Pin = scl_pin_config.pin,
-                          .Mode = GPIO_MODE_AF_PP,
-                          .Pull = GPIO_PULLUP,
+                          .Mode = GPIO_MODE_AF_OD,
+                          .Pull = GPIO_NOPULL, // external pullup is required
                           .Speed = GPIO_SPEED_FREQ_HIGH,
                           .Alternate = scl_pin_config.af_selection},
                   .active_state = emb::gpio::ActiveState::high});
