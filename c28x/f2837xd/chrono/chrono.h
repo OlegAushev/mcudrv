@@ -22,7 +22,7 @@ SCOPED_ENUM_DECLARE_BEGIN(TaskStatus) {
 } SCOPED_ENUM_DECLARE_END(TaskStatus)
 
 
-class system_clock {
+class steady_clock {
 private:
     static volatile int64_t _time;
     static const emb::chrono::milliseconds time_step;
@@ -58,9 +58,9 @@ public:
         _delayed_task_start = now();
     }
 private:
-    system_clock();                                     // no constructor
-    system_clock(const system_clock& other);            // no copy constructor
-    system_clock& operator=(const system_clock& other); // no copy assignment operator
+    steady_clock();                                     // no constructor
+    steady_clock(const steady_clock& other);            // no copy constructor
+    steady_clock& operator=(const steady_clock& other); // no copy assignment operator
 public:
     static void init();
     static emb::chrono::milliseconds now() { return emb::chrono::milliseconds(_time); }
@@ -106,19 +106,19 @@ private:
 public:
     Timeout(emb::chrono::milliseconds timeout = emb::chrono::milliseconds(-1))
             : _timeout(timeout)
-            , _start(system_clock::now()) {}
+            , _start(steady_clock::now()) {}
 
     bool expired() {
         if (_timeout.count() < 0) {
             return false;
         }
-        if ((system_clock::now() - _start) > _timeout) {
+        if ((steady_clock::now() - _start) > _timeout) {
             return true;
         }
         return false;
     }
 
-    void reset() { _start = system_clock::now(); }
+    void reset() { _start = steady_clock::now(); }
 };
 
 

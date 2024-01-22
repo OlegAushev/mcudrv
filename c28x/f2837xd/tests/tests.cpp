@@ -167,12 +167,12 @@ void mcu::tests::chrono_test() {
 #ifdef MCU_TESTS_ENABLED
     GPIO_writePin(34, 1);
 
-    mcu::chrono::system_clock::register_delayed_task(TestingDelayedTask, emb::chrono::milliseconds(200));
+    mcu::chrono::steady_clock::register_delayed_task(TestingDelayedTask, emb::chrono::milliseconds(200));
     DEVICE_DELAY_US(150000);
-    mcu::chrono::system_clock::run_tasks();
+    mcu::chrono::steady_clock::run_tasks();
     EMB_ASSERT_EQUAL(GPIO_readPin(34), 1);
     DEVICE_DELAY_US(100000);
-    mcu::chrono::system_clock::run_tasks();
+    mcu::chrono::steady_clock::run_tasks();
     EMB_ASSERT_EQUAL(GPIO_readPin(34), 0);
 
     GPIO_writePin(34, 1);

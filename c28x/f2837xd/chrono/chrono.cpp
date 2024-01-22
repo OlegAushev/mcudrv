@@ -10,23 +10,23 @@ namespace mcu {
 namespace chrono {
 
 
-volatile int64_t system_clock::_time;
-const emb::chrono::milliseconds system_clock::time_step(1);
+volatile int64_t steady_clock::_time;
+const emb::chrono::milliseconds steady_clock::time_step(1);
 
-emb::static_vector<system_clock::Task, system_clock::task_count_max> system_clock::_tasks;
+emb::static_vector<steady_clock::Task, steady_clock::task_count_max> steady_clock::_tasks;
 
-emb::chrono::milliseconds system_clock::_delayed_task_start;
-emb::chrono::milliseconds system_clock::_delayed_task_delay;
-void (*system_clock::_delayed_task)();
+emb::chrono::milliseconds steady_clock::_delayed_task_start;
+emb::chrono::milliseconds steady_clock::_delayed_task_delay;
+void (*steady_clock::_delayed_task)();
 
 
-void system_clock::init() {
+void steady_clock::init() {
     _time = 0;
 
     _delayed_task_start = emb::chrono::milliseconds(0);
     _delayed_task_delay = emb::chrono::milliseconds(-1);
 
-    Interrupt_register(INT_TIMER0, system_clock::on_interrupt);
+    Interrupt_register(INT_TIMER0, steady_clock::on_interrupt);
 
     CPUTimer_stopTimer(CPUTIMER0_BASE);             // Make sure timer is stopped
     CPUTimer_setPeriod(CPUTIMER0_BASE, 0xFFFFFFFF); // Initialize timer period to maximum
@@ -45,7 +45,7 @@ void system_clock::init() {
 }
 
 
-void system_clock::run_tasks() {
+void steady_clock::run_tasks() {
     for (size_t i = 0; i < _tasks.size(); ++i) {
         if (now() >= (_tasks[i].timepoint + _tasks[i].period)) {
             if (_tasks[i].func(i) == TaskStatus::success) {
@@ -64,7 +64,7 @@ void system_clock::run_tasks() {
 }
 
 
-interrupt void system_clock::on_interrupt() {
+interrupt void steady_clock::on_interrupt() {
     _time += time_step.count();
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
