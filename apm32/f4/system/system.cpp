@@ -20,8 +20,8 @@ void reset_device() {
 
 
 void delay(std::chrono::milliseconds delay) {
-    auto start = chrono::system_clock::now();
-    while ((chrono::system_clock::now() - start) <= delay) {
+    auto start = chrono::steady_clock::now();
+    while ((chrono::steady_clock::now() - start) <= delay) {
         // wait
     }
 }
