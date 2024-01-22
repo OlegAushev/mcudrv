@@ -40,7 +40,7 @@ protected:
 
 class Timeout {
 private:
-    const std::chrono::milliseconds _timeout;
+    std::chrono::milliseconds _timeout;
     std::chrono::milliseconds _start;
 public:
     Timeout(std::chrono::milliseconds timeout = std::chrono::milliseconds(0))
@@ -56,6 +56,12 @@ public:
             return true;
         }
         return false;
+    }
+
+    void reset() { _start = system_clock::now(); }
+    void reset(std::chrono::milliseconds timeout) {
+        _timeout = timeout;
+        _start = system_clock::now();
     }
 };
 
