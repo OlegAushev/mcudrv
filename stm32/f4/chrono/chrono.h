@@ -28,10 +28,10 @@ enum class TaskStatus {
 };
 
 
-class system_clock {
+class steady_clock {
     friend void ::SysTick_Handler();
 public:
-    system_clock() = delete;
+    steady_clock() = delete;
     static void init();
 private:
     static inline volatile int64_t _time{0};
@@ -99,14 +99,14 @@ private:
 public:
     Timeout(std::chrono::milliseconds timeout = std::chrono::milliseconds(0))
             : _timeout(timeout)
-            , _start(mcu::chrono::system_clock::now())
+            , _start(mcu::chrono::steady_clock::now())
     {}
 
     bool expired() const {
         if (_timeout.count() <= 0) {
             return false;
         }
-        if ((system_clock::now() - _start) > _timeout) {
+        if ((steady_clock::now() - _start) > _timeout) {
             return true;
         }
         return false;
