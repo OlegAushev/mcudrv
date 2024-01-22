@@ -9,7 +9,7 @@
 extern "C" void SysTick_Handler()
 {
     HAL_IncTick();
-    mcu::chrono::system_clock::on_interrupt();
+    mcu::chrono::steady_clock::on_interrupt();
 }
 
 
@@ -19,7 +19,7 @@ namespace mcu {
 namespace chrono {
 
 
-void system_clock::init() {
+void steady_clock::init() {
 
 }
 
