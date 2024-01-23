@@ -38,34 +38,6 @@ protected:
 };
 
 
-class Timeout {
-private:
-    std::chrono::milliseconds _timeout;
-    std::chrono::milliseconds _start;
-public:
-    Timeout(std::chrono::milliseconds timeout = std::chrono::milliseconds(0))
-            : _timeout(timeout)
-            , _start(mcu::chrono::steady_clock::now())
-    {}
-
-    bool expired() const {
-        if (_timeout.count() <= 0) {
-            return false;
-        }
-        if ((steady_clock::now() - _start) > _timeout) {
-            return true;
-        }
-        return false;
-    }
-
-    void reset() { _start = steady_clock::now(); }
-    void reset(std::chrono::milliseconds timeout) {
-        _timeout = timeout;
-        _start = steady_clock::now();
-    }
-};
-
-
 } // namespace chrono
 
 

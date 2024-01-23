@@ -4,6 +4,7 @@
 
 #include "can.h"
 #include "../chrono/chrono.h"
+#include <emblib/chrono.h>
 
 
 namespace mcu {
@@ -67,7 +68,7 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
 
 void Module::start() {
     _reg->MCTRL_B.INITREQ = 0;
-    mcu::chrono::Timeout start_timeout(std::chrono::milliseconds(2));
+    emb::chrono::timeout start_timeout(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 1) {
         if (start_timeout.expired()) {
              fatal_error("CAN module start failed");
@@ -78,7 +79,7 @@ void Module::start() {
 
 void Module::stop() {
     _reg->MCTRL_B.INITREQ = 1;
-    mcu::chrono::Timeout stop_timeout(std::chrono::milliseconds(2));
+    emb::chrono::timeout stop_timeout(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 0) {
         if (stop_timeout.expired()) {
              fatal_error("CAN module start failed");
