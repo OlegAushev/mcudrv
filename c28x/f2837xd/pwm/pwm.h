@@ -575,9 +575,9 @@ protected:
 
 public:
 #ifdef CPU1
-    static void preset_pins(const emb::array<mcu::gpio::Config, 2*Phases>& pins, emb::gpio::ActiveState active_state) {
+    static void preset_pins(const emb::array<mcu::gpio::Config, 2*Phases>& pins, emb::gpio::active_state actstate) {
         for (size_t i = 0; i < pins.size(); ++i) {
-            mcu::gpio::Config cfg = mcu::gpio::Config(pins[i].no, pins[i].mux, mcu::gpio::Direction::output, active_state, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
+            mcu::gpio::Config cfg = mcu::gpio::Config(pins[i].no, pins[i].mux, mcu::gpio::Direction::output, actstate, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
             mcu::gpio::Output pin(cfg);
             pin.reset();
         }

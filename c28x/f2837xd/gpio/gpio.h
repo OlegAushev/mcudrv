@@ -61,7 +61,7 @@ struct Config {
     uint32_t no;
     uint32_t mux;
     Direction direction;
-    emb::gpio::ActiveState active_state;
+    emb::gpio::active_state actstate;
     Type type;
     QualMode qual_mode;
     uint32_t qual_period;
@@ -69,14 +69,14 @@ struct Config {
 
     Config() : valid(false) {}
 
-    Config(uint32_t no_, uint32_t mux_, Direction direction_, emb::gpio::ActiveState active_state_,
+    Config(uint32_t no_, uint32_t mux_, Direction direction_, emb::gpio::active_state actstate_,
             Type type_, QualMode qual_mode_, uint32_t qual_period_,
             MasterCore master_core_ = MasterCore::cpu1)
             : valid(true)
             , no(no_)
             , mux(mux_)
             , direction(direction_)
-            , active_state(active_state_)
+            , actstate(actstate_)
             , type(type_)
             , qual_mode(qual_mode_)
             , qual_period(qual_period_)
@@ -118,7 +118,7 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::Input, public impl::Gpio {
+class Input : public emb::gpio::input, public impl::Gpio {
 private:
     GPIO_ExternalIntNum _int_num;
 public:
@@ -146,7 +146,7 @@ public:
         return GPIO_readPin(_config.no);
     }
 
-    virtual emb::gpio::State read() const {
+    virtual emb::gpio::state read() const {
         assert(_initialized);
         return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::state::active : emb::gpio::state::inactive;
     }
@@ -170,7 +170,7 @@ public:
 };
 
 
-class Output : public emb::gpio::Output, public impl::Gpio {
+class Output : public emb::gpio::output, public impl::Gpio {
 public:
     Output() {}
     Output(const Config& config) { init(config); }
@@ -202,14 +202,14 @@ public:
         GPIO_writePin(_config.no, level);
     }
 
-    virtual emb::gpio::State read() const {
+    virtual emb::gpio::state read() const {
         assert(_initialized);
         return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::state::active : emb::gpio::state::inactive;
     }
 
-    virtual void set(emb::gpio::State state = emb::gpio::state::active) {
+    virtual void set(emb::gpio::state st = emb::gpio::state::active) {
         assert(_initialized);
-        if (state == emb::gpio::state::active) {
+        if (st == emb::gpio::state::active) {
             set_level(_config.actstate.underlying_value());
         } else {
             set_level(1 - _config.actstate.underlying_value());
@@ -234,7 +234,7 @@ private:
     const int _active_debounce_count;
     const int _inactive_debounce_count;
     int _count;
-    emb::gpio::State _state;
+    emb::gpio::state _state;
     bool _state_changed;
 public:
     InputDebouncer(const Input& pin, emb::chrono::milliseconds acq_period,
@@ -249,7 +249,7 @@ public:
 
     void debounce() {
         _state_changed = false;
-        emb::gpio::State raw_state = _pin.read();
+        emb::gpio::state raw_state = _pin.read();
 
         if (raw_state == _state) {
             if (_state == emb::gpio::state::active) {
@@ -270,7 +270,7 @@ public:
         }
     }
 
-    emb::gpio::State state() const { return _state; };
+    emb::gpio::state state() const { return _state; };
     bool state_changed() const { return _state_changed; };
 };
 
