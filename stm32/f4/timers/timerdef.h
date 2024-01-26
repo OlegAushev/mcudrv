@@ -54,7 +54,7 @@ public:
                 .Speed = GPIO_SPEED_FREQ_HIGH,
                 .Alternate = config.af_selection
             },
-            .active_state = emb::gpio::ActiveState::high});
+            .actstate = emb::gpio::active_state::high});
     }
 };
 
@@ -85,7 +85,7 @@ public:
                 .Speed = GPIO_SPEED_FREQ_HIGH,
                 .Alternate = config.af_selection
             },
-            .active_state = emb::gpio::ActiveState::high});
+            .actstate = emb::gpio::active_state::high});
     }
 };
 

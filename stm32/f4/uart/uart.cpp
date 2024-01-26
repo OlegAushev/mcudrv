@@ -21,7 +21,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                           .Pull = GPIO_PULLUP,
                           .Speed = GPIO_SPEED_FREQ_HIGH,
                           .Alternate = rx_pin_config.af_selection},
-                  .active_state = emb::gpio::ActiveState::high});
+                  .actstate = emb::gpio::active_state::high});
             
     _tx_pin.init({.port = tx_pin_config.port,
                   .pin = {.Pin = tx_pin_config.pin,
@@ -29,7 +29,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                           .Pull = GPIO_PULLUP,
                           .Speed = GPIO_SPEED_FREQ_HIGH,
                           .Alternate = tx_pin_config.af_selection},
-                  .active_state = emb::gpio::ActiveState::high});
+                  .actstate = emb::gpio::active_state::high});
 
     _enable_clk(_peripheral);
     _reg = impl::uart_instances[std::to_underlying(_peripheral)];
