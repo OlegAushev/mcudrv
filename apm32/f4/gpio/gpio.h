@@ -24,7 +24,7 @@ struct Config {
     GPIO_T* port;
     GPIO_Config_T pin;
     GPIO_AF_T af_selection;
-    emb::gpio::ActiveState active_state;
+    emb::gpio::active_state actstate;
 };
 
 
@@ -91,7 +91,7 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::Input, public impl::Gpio {
+class Input : public emb::gpio::input, public impl::Gpio {
     // friend void ::EXTI0_IRQHandler();
     // friend void ::EXTI1_IRQHandler();
     // friend void ::EXTI2_IRQHandler();
@@ -113,7 +113,7 @@ public:
         return 0;
     }
 
-    virtual emb::gpio::State read() const override {
+    virtual emb::gpio::state read() const override {
         assert(_initialized);
         return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::state::active : emb::gpio::state::inactive; 
     }
@@ -172,7 +172,7 @@ public:
 };
 
 
-class Output : public emb::gpio::Output, public impl::Gpio {
+class Output : public emb::gpio::output, public impl::Gpio {
 public:
     Output() = default;
     Output(const Config& config) {
@@ -197,14 +197,14 @@ public:
         }
     }
 
-    virtual emb::gpio::State read() const override {
+    virtual emb::gpio::state read() const override {
         assert(_initialized);
         return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::state::active : emb::gpio::state::inactive;
     }
 
-    virtual void set(emb::gpio::State state = emb::gpio::state::active) override {
+    virtual void set(emb::gpio::state st = emb::gpio::state::active) override {
         assert(_initialized);
-        if (state == emb::gpio::state::active) {
+        if (st == emb::gpio::state::active) {
             set_level(std::to_underlying(_config.actstate));
         } else {
             set_level(1 - std::to_underlying(_config.actstate));
