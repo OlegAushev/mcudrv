@@ -115,7 +115,7 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive; 
+        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::state::active : emb::gpio::state::inactive; 
     }
 // TODO
 // private:
@@ -199,21 +199,21 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.active_state)) ? emb::gpio::State::active : emb::gpio::State::inactive;
+        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::state::active : emb::gpio::state::inactive;
     }
 
-    virtual void set(emb::gpio::State state = emb::gpio::State::active) override {
+    virtual void set(emb::gpio::State state = emb::gpio::state::active) override {
         assert(_initialized);
-        if (state == emb::gpio::State::active) {
-            set_level(std::to_underlying(_config.active_state));
+        if (state == emb::gpio::state::active) {
+            set_level(std::to_underlying(_config.actstate));
         } else {
-            set_level(1 - std::to_underlying(_config.active_state));
+            set_level(1 - std::to_underlying(_config.actstate));
         }
     }
 
     virtual void reset() override {
         assert(_initialized);
-        set(emb::gpio::State::inactive);
+        set(emb::gpio::state::inactive);
     }
 
     virtual void toggle() override {
@@ -293,7 +293,7 @@ public:
                                .otype = GPIO_OTYPE_PP,
                                .pupd = GPIO_PUPD_NOPULL},
                        .af_selection{},
-                       .active_state = emb::gpio::ActiveState::high});
+                       .actstate = emb::gpio::active_state::high});
     }
 };
 

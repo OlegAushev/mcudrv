@@ -50,7 +50,7 @@ void Module::init_injected_channel(const PinConfig& pin_config, const InjectedCh
                                   .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
                            .af_selection{},
-                           .active_state{}};
+                           .actstate{}};
     mcu::gpio::AnalogIO input(cfg);
 
     // ADC_ConfigInjectedChannel(_reg, channel_config.channel, channel_config.rank, channel_config.sampletime);
@@ -66,7 +66,7 @@ void Module::init_regular_channel(const PinConfig& pin_config, const RegularChan
                                   .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
                            .af_selection{},
-                           .active_state{}};
+                           .actstate{}};
     mcu::gpio::AnalogIO input(cfg);
 
     for (auto rank : channel_config.ranks) {

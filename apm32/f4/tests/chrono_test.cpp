@@ -17,15 +17,15 @@ void mcu::tests::chrono_test() {
         mcu::delay(std::chrono::milliseconds(101));
         mcu::chrono::steady_clock::run_tasks();
         if (i % 2 != 0) {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::State::active);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::state::active);
         } else {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::State::inactive);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::state::inactive);
         }
 
         if ((i < 2) || (i == 4)) {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), emb::gpio::State::inactive);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), emb::gpio::state::inactive);
         } else {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), emb::gpio::State::active);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), emb::gpio::state::active);
         }
 
         if (i == 2) {

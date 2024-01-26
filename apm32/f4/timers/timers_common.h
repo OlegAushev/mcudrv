@@ -55,7 +55,7 @@ public:
                                         .otype = GPIO_OTYPE_PP,
                                         .pupd = GPIO_PUPD_NOPULL},
                                 .af_selection = config.af_selection,
-                                .active_state = emb::gpio::ActiveState::high});
+                                .actstate = emb::gpio::active_state::high});
     }
 };
 
@@ -84,7 +84,7 @@ public:
                                         .otype = GPIO_OTYPE_PP,
                                         .pupd = config.pull},
                                 .af_selection = config.af_selection,
-                                .active_state = emb::gpio::ActiveState::high});
+                                .actstate = emb::gpio::active_state::high});
     }
 };
 

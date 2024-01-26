@@ -21,7 +21,7 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin_config, const 
                           .Pull = GPIO_NOPULL, // external pullup is required
                           .Speed = GPIO_SPEED_FREQ_HIGH,
                           .Alternate = sda_pin_config.af_selection},
-                  .active_state = emb::gpio::ActiveState::high});
+                  .actstate = emb::gpio::active_state::high});
             
     _scl_pin.init({.port = scl_pin_config.port,
                   .pin = {.Pin = scl_pin_config.pin,
@@ -29,7 +29,7 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin_config, const 
                           .Pull = GPIO_NOPULL, // external pullup is required
                           .Speed = GPIO_SPEED_FREQ_HIGH,
                           .Alternate = scl_pin_config.af_selection},
-                  .active_state = emb::gpio::ActiveState::high});
+                  .actstate = emb::gpio::active_state::high});
 
     _enable_clk(_peripheral);
     _reg = impl::i2c_instances[std::to_underlying(_peripheral)];

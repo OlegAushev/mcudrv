@@ -31,10 +31,10 @@ void mcu::tests::gpio_test()
     out1.reset();
     out2.reset();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::State::inactive);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::State::active);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::State::inactive);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::State::active);
+    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::state::inactive);
+    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::state::active);
+    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::state::inactive);
+    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::state::active);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 0);
     EMB_ASSERT_EQUAL(in1.read_level(), 0);
@@ -44,10 +44,10 @@ void mcu::tests::gpio_test()
     out1.set();
     out2.set();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::State::active);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::State::inactive);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::State::active);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::State::inactive);
+    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::state::active);
+    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::state::inactive);
+    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::state::active);
+    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::state::inactive);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 1);
     EMB_ASSERT_EQUAL(in1.read_level(), 1);
@@ -57,10 +57,10 @@ void mcu::tests::gpio_test()
     out1.toggle();
     out2.toggle();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::State::inactive);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::State::active);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::State::inactive);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::State::active);
+    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::state::inactive);
+    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::state::active);
+    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::state::inactive);
+    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::state::active);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 0);
     EMB_ASSERT_EQUAL(in1.read_level(), 0);

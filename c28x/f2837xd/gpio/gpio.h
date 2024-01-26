@@ -148,7 +148,7 @@ public:
 
     virtual emb::gpio::State read() const {
         assert(_initialized);
-        return (read_level() == _config.active_state.underlying_value()) ? emb::gpio::State::active : emb::gpio::State::inactive;
+        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::state::active : emb::gpio::state::inactive;
     }
 
 public:
@@ -183,7 +183,7 @@ public:
             GPIO_setPadConfig(_config.no, _config.type.underlying_value());
             //set() - is virtual, shouldn't be called in ctor
             GPIO_writePin(_config.no,
-                    1 - (static_cast<uint32_t>(emb::gpio::State::inactive) ^ static_cast<uint32_t>(_config.active_state.underlying_value())));
+                    1 - (static_cast<uint32_t>(emb::gpio::state::inactive) ^ static_cast<uint32_t>(_config.actstate.underlying_value())));
             GPIO_setPinConfig(_config.mux);
             GPIO_setDirectionMode(_config.no, GPIO_DIR_MODE_OUT);
             GPIO_setMasterCore(_config.no, static_cast<GPIO_CoreSelect>(_config.master_core.underlying_value()));
@@ -204,21 +204,21 @@ public:
 
     virtual emb::gpio::State read() const {
         assert(_initialized);
-        return (read_level() == _config.active_state.underlying_value()) ? emb::gpio::State::active : emb::gpio::State::inactive;
+        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::state::active : emb::gpio::state::inactive;
     }
 
-    virtual void set(emb::gpio::State state = emb::gpio::State::active) {
+    virtual void set(emb::gpio::State state = emb::gpio::state::active) {
         assert(_initialized);
-        if (state == emb::gpio::State::active) {
-            set_level(_config.active_state.underlying_value());
+        if (state == emb::gpio::state::active) {
+            set_level(_config.actstate.underlying_value());
         } else {
-            set_level(1 - _config.active_state.underlying_value());
+            set_level(1 - _config.actstate.underlying_value());
         }
     }
 
     virtual void reset() {
         assert(_initialized);
-        set(emb::gpio::State::inactive);
+        set(emb::gpio::state::inactive);
     }
 
     virtual void toggle() {
@@ -242,7 +242,7 @@ public:
             : _pin(pin)
             , _active_debounce_count(active_debounce.count() / acq_period.count())
             , _inactive_debounce_count(inactive_debounce.count() / acq_period.count())
-            , _state(emb::gpio::State::inactive)
+            , _state(emb::gpio::state::inactive)
             , _state_changed(false) {
         _count = _active_debounce_count;
     }
@@ -252,7 +252,7 @@ public:
         emb::gpio::State raw_state = _pin.read();
 
         if (raw_state == _state) {
-            if (_state == emb::gpio::State::active) {
+            if (_state == emb::gpio::state::active) {
                 _count = _inactive_debounce_count;
             } else {
                 _count = _active_debounce_count;
@@ -261,7 +261,7 @@ public:
             if (--_count == 0) {
                 _state = raw_state;
                 _state_changed = true;
-                if (_state == emb::gpio::State::active) {
+                if (_state == emb::gpio::state::active) {
                     _count = _inactive_debounce_count;
                 } else {
                     _count = _active_debounce_count;

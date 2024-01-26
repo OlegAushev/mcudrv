@@ -24,7 +24,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                           .otype = GPIO_OTYPE_PP,
                           .pupd = GPIO_PUPD_NOPULL},
                   .af_selection = rx_pin_config.af_selection,
-                  .active_state{}});
+                  .actstate{}});
 
     _tx_pin.init({.port = tx_pin_config.port,
                   .pin = {.pin = tx_pin_config.pin,
@@ -33,7 +33,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                           .otype = GPIO_OTYPE_PP,
                           .pupd = GPIO_PUPD_NOPULL},
                   .af_selection = tx_pin_config.af_selection,
-                  .active_state{}});
+                  .actstate{}});
 
     _enable_clk(peripheral);
     _reg = impl::can_instances[static_cast<size_t>(_peripheral)];

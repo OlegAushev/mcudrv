@@ -28,7 +28,7 @@ void Module::init_channel(Channel channel, const PinConfig& pin_config, ChannelC
                                   .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
                            .af_selection{},
-                           .active_state{}};
+                           .actstate{}};
     mcu::gpio::AnalogIO output(cfg);
 
     DAC_Config(std::to_underlying(channel), &config.hal_config);
