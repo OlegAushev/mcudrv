@@ -48,7 +48,7 @@ struct ChPinConfig {
 class ChPin {
 public:
     ChPin(const ChPinConfig& config) {
-        mcu::gpio::AlternateIO({.port = config.port, 
+        mcu::gpio::AlternatePin({.port = config.port, 
                                 .pin = {.pin = config.pin,
                                         .mode = GPIO_MODE_AF,
                                         .speed = GPIO_SPEED_50MHz,
@@ -77,7 +77,7 @@ struct BkinPinConfig {
 class BkinPin {
 public:
     BkinPin(const BkinPinConfig& config) {
-        mcu::gpio::AlternateIO({.port = config.port, 
+        mcu::gpio::AlternatePin({.port = config.port, 
                                 .pin = {.pin = config.pin,
                                         .mode = GPIO_MODE_AF,
                                         .speed = GPIO_SPEED_50MHz,
