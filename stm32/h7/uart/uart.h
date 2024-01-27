@@ -85,8 +85,8 @@ private:
     UART_HandleTypeDef _handle = {};
     USART_TypeDef* _reg;
 
-    mcu::gpio::AlternateIO _rx_pin;
-    mcu::gpio::AlternateIO _tx_pin;
+    mcu::gpio::AlternatePin _rx_pin;
+    mcu::gpio::AlternatePin _tx_pin;
 
     uint32_t _rdatamask{0};
     uint32_t _wdatamask{0};

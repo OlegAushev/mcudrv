@@ -124,7 +124,10 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive; 
+        if (read_level() == std::to_underlying(_config.actstate)) {
+            return emb::gpio::pin_state::active;
+        }
+        return emb::gpio::pin_state::inactive; 
     }
 private:
     IRQn_Type _irqn = NonMaskableInt_IRQn;	// use NonMaskableInt_IRQn as value for not initialized interrupt
@@ -207,12 +210,15 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
+        if (read_level() == std::to_underlying(_config.actstate)) {
+            return emb::gpio::pin_state::active;
+        }
+        return emb::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) override {
+    virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) override {
         assert(_initialized);
-        if (st == emb::gpio::pin_state::active) {
+        if (s == emb::gpio::pin_state::active) {
             set_level(std::to_underlying(_config.actstate));
         } else {
             set_level(1 - std::to_underlying(_config.actstate));

@@ -74,8 +74,8 @@ private:
     I2C_HandleTypeDef _handle = {};
     I2C_TypeDef* _reg;
 
-    mcu::gpio::AlternateIO _sda_pin;
-    mcu::gpio::AlternateIO _scl_pin;
+    mcu::gpio::AlternatePin _sda_pin;
+    mcu::gpio::AlternatePin _scl_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled = {};
 public:

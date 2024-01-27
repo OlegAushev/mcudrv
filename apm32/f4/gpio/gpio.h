@@ -293,7 +293,7 @@ public:
                                .otype = GPIO_OTYPE_PP,
                                .pupd = GPIO_PUPD_NOPULL},
                        .af_selection{},
-                       .actstate = emb::gpio::active_state::high});
+                       .actstate = emb::gpio::active_pin_state::high});
     }
 };
 

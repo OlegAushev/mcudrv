@@ -114,8 +114,8 @@ private:
     const Peripheral _peripheral;
     FDCAN_HandleTypeDef _handle = {};
     FDCAN_GlobalTypeDef* _reg;
-    mcu::gpio::AlternateIO _rx_pin;
-    mcu::gpio::AlternateIO _tx_pin;
+    mcu::gpio::AlternatePin _rx_pin;
+    mcu::gpio::AlternatePin _tx_pin;
 
     static inline bool _clk_enabled = false;
 

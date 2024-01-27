@@ -39,7 +39,7 @@ void Module::add_regular_channel(PinConfig pin_config, ChannelConfig channel_con
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::AnalogIO input(cfg);
+    mcu::gpio::AnalogPin input(cfg);
 
     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_init) != HAL_OK) {
         fatal_error("ADC regular channel initialization failed");

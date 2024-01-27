@@ -412,10 +412,10 @@ public:
         assert(static_cast<uint32_t>(xbar_input) <= static_cast<uint32_t>(XBAR_INPUT3));
 
         switch (pin.config().actstate.native_value()) {
-        case emb::gpio::active_state::low:
+        case emb::gpio::active_pin_state::low:
             GPIO_setPadConfig(pin.config().no, GPIO_PIN_TYPE_PULLUP);
             break;
-        case emb::gpio::active_state::high:
+        case emb::gpio::active_pin_state::high:
             GPIO_setPadConfig(pin.config().no, GPIO_PIN_TYPE_INVERT);
             break;
         }
