@@ -67,7 +67,7 @@ protected:
     bool _initialized{false};
     GpioPin() = default;
 public:
-    void init(const Config& config) {
+    void initialize(const Config& config) {
         // enable port clock
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(),
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
@@ -81,7 +81,7 @@ public:
         _initialized = true;
     }
 
-    void deinit() {	
+    void deinitialize() {	
         if (_initialized) {
             HAL_GPIO_DeInit(_config.port, _config.pin.Pin);
             _initialized = false;
@@ -111,7 +111,7 @@ public:
         assert(config.pin.Mode == GPIO_MODE_INPUT
                 || config.pin.Mode == GPIO_MODE_IT_RISING || config.pin.Mode == GPIO_MODE_IT_FALLING || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
                 || config.pin.Mode == GPIO_MODE_EVT_RISING || config.pin.Mode == GPIO_MODE_EVT_FALLING || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
-        init(config);
+        initialize(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -188,7 +188,7 @@ public:
     OutputPin() = default;
     OutputPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
-        init(config);
+        initialize(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -243,7 +243,7 @@ public:
     AlternatePin() = default;
     AlternatePin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_AF_PP || config.pin.Mode == GPIO_MODE_AF_OD);
-        init(config);
+        initialize(config);
     }
 };
 
@@ -253,7 +253,7 @@ public:
     AnalogPin() = default;
     AnalogPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_ANALOG);
-        init(config);
+        initialize(config);
     }
 };
 
@@ -308,7 +308,7 @@ public:
         }
     }
 
-    static OutputPin init(GPIO_TypeDef* port, uint32_t pin) {
+    static OutputPin initialize(GPIO_TypeDef* port, uint32_t pin) {
         return OutputPin({	
             .port = port,
             .pin = {
