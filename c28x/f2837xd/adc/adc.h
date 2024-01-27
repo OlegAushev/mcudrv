@@ -166,10 +166,10 @@ private:
 public:
     Channel() : _adc(static_cast<Module*>(NULL)), _channel(ChannelId::count) {}
     Channel(ChannelId channel) {
-        init(channel);
+        initialize(channel);
     }
 
-    void init(ChannelId channel) {
+    void initialize(ChannelId channel) {
         assert(Module::_channels_and_irqs_initialized);
         assert(Module::_channels[channel.underlying_value()].registered);
         _channel = channel;

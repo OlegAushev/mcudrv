@@ -20,7 +20,7 @@ struct unused{};
 }
 
 
-inline void init_device() {
+inline void initialize_device() {
 #ifdef CPU1
     Device_init();                  // Initialize device clock and peripherals
     Device_initGPIO();              // Disable pin locks and enable internal pull-ups

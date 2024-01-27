@@ -123,9 +123,9 @@ private:
     GPIO_ExternalIntNum _int_num;
 public:
     InputPin() {}
-    InputPin(const Config& config) { init(config); }
+    InputPin(const Config& config) { initialize(config); }
 
-    void init(const Config& config)	{
+    void initialize(const Config& config)	{
         _config = config;
         if (_config.valid) {
             assert(config.direction == Direction::input);
@@ -176,9 +176,9 @@ public:
 class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() {}
-    OutputPin(const Config& config) { init(config); }
+    OutputPin(const Config& config) { initialize(config); }
 
-    void init(const Config& config) {
+    void initialize(const Config& config) {
         _config = config;
         if (_config.valid) {
             assert(config.direction == Direction::output);
