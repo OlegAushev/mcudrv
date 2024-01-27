@@ -66,7 +66,7 @@ class GpioPin
 private:
     static inline std::array<bool, port_count> _clk_enabled = {};
 protected:
-    Config _config;
+    Config _cfg;
     bool _initialized{false};
     GpioPin() = default;
 public:
@@ -79,22 +79,22 @@ public:
             _clk_enabled[port_idx] = true;
         }	
 
-        _config = config;
-        HAL_GPIO_Init(_config.port, &_config.pin);
+        _cfg = config;
+        HAL_GPIO_Init(_cfg.port, &_cfg.pin);
         _initialized = true;
     }
 
     void deinitialize() {	
         if (_initialized) {
-            HAL_GPIO_DeInit(_config.port, _config.pin.Pin);
+            HAL_GPIO_DeInit(_cfg.port, _cfg.pin.Pin);
             _initialized = false;
         }
     }
 
-    const Config& config() const { return _config; }
-    unsigned int pin_no() const { return POSITION_VAL(_config.pin.Pin); }
-    uint16_t pin_bit() const { return static_cast<uint16_t>(_config.pin.Pin); }
-    const GPIO_TypeDef* port() const { return _config.port; }
+    const Config& config() const { return _cfg; }
+    unsigned int pin_no() const { return POSITION_VAL(_cfg.pin.Pin); }
+    uint16_t pin_bit() const { return static_cast<uint16_t>(_cfg.pin.Pin); }
+    const GPIO_TypeDef* port() const { return _cfg.port; }
 };
 
 
@@ -119,7 +119,7 @@ public:
 
     virtual unsigned int read_level() const override {
         assert(_initialized);
-        if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
+        if ((mcu::read_reg(_cfg.port->IDR) & _cfg.pin.Pin) != 0) {
             return 1;
         }
         return 0;
@@ -127,7 +127,7 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(_config.actstate)) {
+        if (read_level() == std::to_underlying(_cfg.actstate)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive; 
@@ -143,7 +143,7 @@ private:
     };
 public:
     void init_interrupt(void(*handler)(void), IrqPriority priority) {
-        switch (_config.pin.Pin) {
+        switch (_cfg.pin.Pin) {
         case GPIO_PIN_0:
             _irqn = EXTI0_IRQn;
             break;
@@ -197,7 +197,7 @@ public:
 
     virtual unsigned int read_level() const override {
         assert(_initialized);
-        if ((mcu::read_reg(_config.port->IDR) & _config.pin.Pin) != 0) {
+        if ((mcu::read_reg(_cfg.port->IDR) & _cfg.pin.Pin) != 0) {
             return 1;
         }
         return 0;
@@ -206,15 +206,15 @@ public:
     virtual void set_level(unsigned int level) override {
         assert(_initialized);
         if(level != 0) {
-            mcu::write_reg(_config.port->BSRR, _config.pin.Pin);
+            mcu::write_reg(_cfg.port->BSRR, _cfg.pin.Pin);
         } else {
-            mcu::write_reg(_config.port->BSRR, _config.pin.Pin << 16);
+            mcu::write_reg(_cfg.port->BSRR, _cfg.pin.Pin << 16);
         }
     }
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(_config.actstate)) {
+        if (read_level() == std::to_underlying(_cfg.actstate)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive;
@@ -223,9 +223,9 @@ public:
     virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) override {
         assert(_initialized);
         if (s == emb::gpio::pin_state::active) {
-            set_level(std::to_underlying(_config.actstate));
+            set_level(std::to_underlying(_cfg.actstate));
         } else {
-            set_level(1 - std::to_underlying(_config.actstate));
+            set_level(1 - std::to_underlying(_cfg.actstate));
         }
     }
 
@@ -236,8 +236,8 @@ public:
 
     virtual void toggle() override {
         assert(_initialized);
-        auto odr_reg = mcu::read_reg(_config.port->ODR);
-        mcu::write_reg(_config.port->BSRR, ((odr_reg & _config.pin.Pin) << 16) | (~odr_reg & _config.pin.Pin));
+        auto odr_reg = mcu::read_reg(_cfg.port->ODR);
+        mcu::write_reg(_cfg.port->BSRR, ((odr_reg & _cfg.pin.Pin) << 16) | (~odr_reg & _cfg.pin.Pin));
     }
 };
 
