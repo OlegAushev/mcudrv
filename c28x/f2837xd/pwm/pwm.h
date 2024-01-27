@@ -405,7 +405,7 @@ public:
         SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
     }
 
-    void init_tripzone(const gpio::Input& pin, XBAR_InputNum xbar_input) {
+    void init_tripzone(const gpio::InputPin& pin, XBAR_InputNum xbar_input) {
 #ifdef CPU2
         assert(false);
 #else
@@ -575,7 +575,7 @@ protected:
 
 public:
 #ifdef CPU1
-    static void preset_pins(const emb::array<mcu::gpio::Config, 2*Phases>& pins, emb::gpio::active_state actstate) {
+    static void preset_pins(const emb::array<mcu::gpio::Config, 2*Phases>& pins, emb::gpio::active_pin_state actstate) {
         for (size_t i = 0; i < pins.size(); ++i) {
             mcu::gpio::Config cfg = mcu::gpio::Config(pins[i].no, pins[i].mux, mcu::gpio::Direction::output, actstate, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
             mcu::gpio::OutputPin pin(cfg);

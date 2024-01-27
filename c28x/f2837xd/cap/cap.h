@@ -51,12 +51,12 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
 private:
     const Peripheral _peripheral;
     impl::Module _module;
-    gpio::Input _pin;
+    gpio::InputPin _pin;
 public:
     Module(Peripheral peripheral, const gpio::Config& pin_config);
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
-    const gpio::Input& pin() const { return _pin; }
+    const gpio::InputPin& pin() const { return _pin; }
     uint32_t counter() const { return ECAP_getTimeBaseCounter(_module.base); }
     uint32_t event_timestamp(ECAP_Events event) const { return ECAP_getEventTimeStamp(_module.base, event); }
 

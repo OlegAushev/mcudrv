@@ -25,7 +25,7 @@ struct Config {
     uint32_t mode;
     uint32_t pull;
     // GPIO_AF_T af_selection;
-    emb::gpio::active_state active_state;
+    emb::gpio::active_pin_state active_state;
 };
 
 

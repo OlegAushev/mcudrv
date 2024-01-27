@@ -61,7 +61,7 @@ struct Config {
     uint32_t no;
     uint32_t mux;
     Direction direction;
-    emb::gpio::active_state actstate;
+    emb::gpio::active_pin_state actstate;
     Type type;
     QualMode qual_mode;
     uint32_t qual_period;
@@ -69,7 +69,7 @@ struct Config {
 
     Config() : valid(false) {}
 
-    Config(uint32_t no_, uint32_t mux_, Direction direction_, emb::gpio::active_state actstate_,
+    Config(uint32_t no_, uint32_t mux_, Direction direction_, emb::gpio::active_pin_state actstate_,
             Type type_, QualMode qual_mode_, uint32_t qual_period_,
             MasterCore master_core_ = MasterCore::cpu1)
             : valid(true)
@@ -96,11 +96,11 @@ struct Config {
 namespace impl {
 
 
-class Gpio {
+class GpioPin {
 protected:
     Config _config;
     bool _initialized;
-    Gpio() : _initialized(false) {}
+    GpioPin() : _initialized(false) {}
 public:
     void set_master_core(MasterCore master_core) {
         assert(_initialized);
@@ -118,12 +118,12 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::input, public impl::Gpio {
+class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
 private:
     GPIO_ExternalIntNum _int_num;
 public:
-    Input() {}
-    Input(const Config& config) { init(config); }
+    InputPin() {}
+    InputPin(const Config& config) { init(config); }
 
     void init(const Config& config)	{
         _config = config;
@@ -148,7 +148,10 @@ public:
 
     virtual emb::gpio::pin_state read() const {
         assert(_initialized);
-        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
+        if (read_level() == _config.actstate.underlying_value()) {
+            return emb::gpio::pin_state::active;
+        }
+        return emb::gpio::pin_state::inactive;
     }
 
 public:
@@ -170,10 +173,10 @@ public:
 };
 
 
-class Output : public emb::gpio::output, public impl::Gpio {
+class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
-    Output() {}
-    Output(const Config& config) { init(config); }
+    OutputPin() {}
+    OutputPin(const Config& config) { init(config); }
 
     void init(const Config& config) {
         _config = config;
@@ -204,12 +207,15 @@ public:
 
     virtual emb::gpio::pin_state read() const {
         assert(_initialized);
-        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
+        if (read_level() == _config.actstate.underlying_value()) {
+            return emb::gpio::pin_state::active;
+        }
+        return emb::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) {
+    virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) {
         assert(_initialized);
-        if (st == emb::gpio::pin_state::active) {
+        if (s == emb::gpio::pin_state::active) {
             set_level(_config.actstate.underlying_value());
         } else {
             set_level(1 - _config.actstate.underlying_value());
@@ -230,14 +236,14 @@ public:
 
 class InputDebouncer {
 private:
-    const Input _pin;
+    const InputPin _pin;
     const int _active_debounce_count;
     const int _inactive_debounce_count;
     int _count;
     emb::gpio::pin_state _state;
     bool _state_changed;
 public:
-    InputDebouncer(const Input& pin, emb::chrono::milliseconds acq_period,
+    InputDebouncer(const InputPin& pin, emb::chrono::milliseconds acq_period,
                     emb::chrono::milliseconds active_debounce, emb::chrono::milliseconds inactive_debounce)
             : _pin(pin)
             , _active_debounce_count(active_debounce.count() / acq_period.count())
@@ -286,7 +292,7 @@ class DurationLogger {
 private:
     const uint32_t _pin;
 public:
-    explicit DurationLogger(const mcu::gpio::Output& pin) : _pin(pin.no()) {
+    explicit DurationLogger(const mcu::gpio::OutputPin& pin) : _pin(pin.no()) {
         if (Mode == DurationLoggerMode::set_reset) {
             GPIO_writePin(_pin, 1);
         } else {
