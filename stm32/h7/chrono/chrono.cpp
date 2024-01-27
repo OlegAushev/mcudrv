@@ -19,7 +19,7 @@ namespace mcu {
 namespace chrono {
 
 
-void steady_clock::init() {
+void steady_clock::initialize() {
 
 }
 

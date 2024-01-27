@@ -15,7 +15,7 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin_config, const 
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
-    _sda_pin.init({.port = sda_pin_config.port, 
+    _sda_pin.initialize({.port = sda_pin_config.port, 
                   .pin = {.Pin = sda_pin_config.pin,
                           .Mode = GPIO_MODE_AF_OD,
                           .Pull = GPIO_NOPULL, // external pullup is required
@@ -23,7 +23,7 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin_config, const 
                           .Alternate = sda_pin_config.af_selection},
                   .actstate = emb::gpio::active_pin_state::high});
             
-    _scl_pin.init({.port = scl_pin_config.port,
+    _scl_pin.initialize({.port = scl_pin_config.port,
                   .pin = {.Pin = scl_pin_config.pin,
                           .Mode = GPIO_MODE_AF_OD,
                           .Pull = GPIO_NOPULL, // external pullup is required
