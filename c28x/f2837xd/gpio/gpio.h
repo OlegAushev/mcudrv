@@ -146,9 +146,9 @@ public:
         return GPIO_readPin(_config.no);
     }
 
-    virtual emb::gpio::state read() const {
+    virtual emb::gpio::pin_state read() const {
         assert(_initialized);
-        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::state::active : emb::gpio::state::inactive;
+        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
     }
 
 public:
@@ -183,7 +183,7 @@ public:
             GPIO_setPadConfig(_config.no, _config.type.underlying_value());
             //set() - is virtual, shouldn't be called in ctor
             GPIO_writePin(_config.no,
-                    1 - (static_cast<uint32_t>(emb::gpio::state::inactive) ^ static_cast<uint32_t>(_config.actstate.underlying_value())));
+                    1 - (static_cast<uint32_t>(emb::gpio::pin_state::inactive) ^ static_cast<uint32_t>(_config.actstate.underlying_value())));
             GPIO_setPinConfig(_config.mux);
             GPIO_setDirectionMode(_config.no, GPIO_DIR_MODE_OUT);
             GPIO_setMasterCore(_config.no, static_cast<GPIO_CoreSelect>(_config.master_core.underlying_value()));
@@ -202,14 +202,14 @@ public:
         GPIO_writePin(_config.no, level);
     }
 
-    virtual emb::gpio::state read() const {
+    virtual emb::gpio::pin_state read() const {
         assert(_initialized);
-        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::state::active : emb::gpio::state::inactive;
+        return (read_level() == _config.actstate.underlying_value()) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::state st = emb::gpio::state::active) {
+    virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) {
         assert(_initialized);
-        if (st == emb::gpio::state::active) {
+        if (st == emb::gpio::pin_state::active) {
             set_level(_config.actstate.underlying_value());
         } else {
             set_level(1 - _config.actstate.underlying_value());
@@ -218,7 +218,7 @@ public:
 
     virtual void reset() {
         assert(_initialized);
-        set(emb::gpio::state::inactive);
+        set(emb::gpio::pin_state::inactive);
     }
 
     virtual void toggle() {
@@ -234,7 +234,7 @@ private:
     const int _active_debounce_count;
     const int _inactive_debounce_count;
     int _count;
-    emb::gpio::state _state;
+    emb::gpio::pin_state _state;
     bool _state_changed;
 public:
     InputDebouncer(const Input& pin, emb::chrono::milliseconds acq_period,
@@ -242,17 +242,17 @@ public:
             : _pin(pin)
             , _active_debounce_count(active_debounce.count() / acq_period.count())
             , _inactive_debounce_count(inactive_debounce.count() / acq_period.count())
-            , _state(emb::gpio::state::inactive)
+            , _state(emb::gpio::pin_state::inactive)
             , _state_changed(false) {
         _count = _active_debounce_count;
     }
 
     void debounce() {
         _state_changed = false;
-        emb::gpio::state raw_state = _pin.read();
+        emb::gpio::pin_state raw_state = _pin.read();
 
         if (raw_state == _state) {
-            if (_state == emb::gpio::state::active) {
+            if (_state == emb::gpio::pin_state::active) {
                 _count = _inactive_debounce_count;
             } else {
                 _count = _active_debounce_count;
@@ -261,7 +261,7 @@ public:
             if (--_count == 0) {
                 _state = raw_state;
                 _state_changed = true;
-                if (_state == emb::gpio::state::active) {
+                if (_state == emb::gpio::pin_state::active) {
                     _count = _inactive_debounce_count;
                 } else {
                     _count = _active_debounce_count;
@@ -270,7 +270,7 @@ public:
         }
     }
 
-    emb::gpio::state state() const { return _state; };
+    emb::gpio::pin_state state() const { return _state; };
     bool state_changed() const { return _state_changed; };
 };
 

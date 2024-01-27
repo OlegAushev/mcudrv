@@ -111,8 +111,8 @@ private:
     CAN_HandleTypeDef _handle{};
     CAN_TypeDef* _reg;
 
-    mcu::gpio::AlternateIO _rx_pin;
-    mcu::gpio::AlternateIO _tx_pin;
+    mcu::gpio::AlternatePin _rx_pin;
+    mcu::gpio::AlternatePin _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 

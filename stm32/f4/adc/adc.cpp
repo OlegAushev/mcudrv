@@ -44,7 +44,7 @@ void Module::init_injected_channel(const PinConfig& pin_config, InjectedChannelC
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::AnalogIO input(cfg);
+    mcu::gpio::AnalogPin input(cfg);
 
     if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC injected channel initialization failed");
@@ -58,7 +58,7 @@ void Module::init_regular_channel(const PinConfig& pin_config, const RegularChan
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
     cfg.pin.Pull = GPIO_NOPULL;
-    mcu::gpio::AnalogIO input(cfg);
+    mcu::gpio::AnalogPin input(cfg);
 
     if (channel_config.ranks.size() > 0) {
         for (auto rank : channel_config.ranks) {

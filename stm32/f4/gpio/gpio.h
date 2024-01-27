@@ -30,7 +30,7 @@ namespace gpio {
 struct Config {
     GPIO_TypeDef* port;
     GPIO_InitTypeDef pin;
-    emb::gpio::active_state actstate;
+    emb::gpio::active_pin_state actstate;
 };
 
 
@@ -58,14 +58,14 @@ inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
 };
 
 
-class Gpio
+class GpioPin
 {
 private:
     static inline std::array<bool, port_count> _clk_enabled{};
 protected:
     Config _config;
     bool _initialized{false};
-    Gpio() = default;
+    GpioPin() = default;
 public:
     void init(const Config& config) {
         // enable port clock
@@ -98,7 +98,7 @@ public:
 } // namespace impl
 
 
-class Input : public emb::gpio::input, public impl::Gpio {
+class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
     friend void ::EXTI0_IRQHandler();
     friend void ::EXTI1_IRQHandler();
     friend void ::EXTI2_IRQHandler();
@@ -106,8 +106,8 @@ class Input : public emb::gpio::input, public impl::Gpio {
     friend void ::EXTI4_IRQHandler();
     friend void ::HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 public:
-    Input() = default;
-    Input(const Config& config) {
+    InputPin() = default;
+    InputPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_INPUT
                 || config.pin.Mode == GPIO_MODE_IT_RISING || config.pin.Mode == GPIO_MODE_IT_FALLING || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
                 || config.pin.Mode == GPIO_MODE_EVT_RISING || config.pin.Mode == GPIO_MODE_EVT_FALLING || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
@@ -122,9 +122,9 @@ public:
         return 0;
     }
 
-    virtual emb::gpio::state read() const override {
+    virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::state::active : emb::gpio::state::inactive; 
+        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive; 
     }
 private:
     IRQn_Type _irqn = NonMaskableInt_IRQn;	// use NonMaskableInt_IRQn as value for not initialized interrupt
@@ -180,10 +180,10 @@ public:
 };
 
 
-class Output : public emb::gpio::output, public impl::Gpio {
+class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
-    Output() = default;
-    Output(const Config& config) {
+    OutputPin() = default;
+    OutputPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
         init(config);
     }
@@ -205,14 +205,14 @@ public:
         }
     }
 
-    virtual emb::gpio::state read() const override {
+    virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::state::active : emb::gpio::state::inactive;
+        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::state st = emb::gpio::state::active) override {
+    virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) override {
         assert(_initialized);
-        if (st == emb::gpio::state::active) {
+        if (st == emb::gpio::pin_state::active) {
             set_level(std::to_underlying(_config.actstate));
         } else {
             set_level(1 - std::to_underlying(_config.actstate));
@@ -221,7 +221,7 @@ public:
 
     virtual void reset() override {
         assert(_initialized);
-        set(emb::gpio::state::inactive);
+        set(emb::gpio::pin_state::inactive);
     }
 
     virtual void toggle() override {
@@ -232,20 +232,20 @@ public:
 };
 
 
-class AlternateIO : public impl::Gpio {
+class AlternatePin : public impl::GpioPin {
 public:
-    AlternateIO() = default;
-    AlternateIO(const Config& config) {
+    AlternatePin() = default;
+    AlternatePin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_AF_PP || config.pin.Mode == GPIO_MODE_AF_OD);
         init(config);
     }
 };
 
 
-class AnalogIO : public impl::Gpio {
+class AnalogPin : public impl::GpioPin {
 public:
-    AnalogIO() = default;
-    AnalogIO(const Config& config) {
+    AnalogPin() = default;
+    AnalogPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_ANALOG);
         init(config);
     }
@@ -266,7 +266,7 @@ private:
     GPIO_TypeDef* _port;
     uint16_t _pin;
 public:
-    DurationLogger(Output& gpio_output)
+    DurationLogger(OutputPin& gpio_output)
             : _port(gpio_output.port())
             , _pin(gpio_output.pin_bit()) {
         if constexpr (Mode == DurationLoggerMode::set_reset) {
@@ -302,8 +302,8 @@ public:
         }
     }
 
-    static Output init(GPIO_TypeDef* port, uint32_t pin) {
-        return Output({	
+    static OutputPin init(GPIO_TypeDef* port, uint32_t pin) {
+        return OutputPin({	
             .port = port,
             .pin = {
                 .Pin = pin,
@@ -312,7 +312,7 @@ public:
                 .Speed = GPIO_SPEED_FREQ_HIGH,
                 .Alternate = 0
             },
-            .actstate = emb::gpio::active_state::high
+            .actstate = emb::gpio::active_pin_state::high
         });
     }
 };
