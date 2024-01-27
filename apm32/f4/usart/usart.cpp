@@ -15,7 +15,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
-    _rx_pin.init({
+    _rx_pin.initialize({
         .port = rx_pin_config.port,
         .pin = {
             .pin = rx_pin_config.pin,
@@ -28,7 +28,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         .actstate = emb::gpio::active_pin_state::high
     });
 
-    _tx_pin.init({
+    _tx_pin.initialize({
         .port = tx_pin_config.port,
         .pin = {
             .pin = tx_pin_config.pin,

@@ -9,7 +9,7 @@
 namespace mcu {
 
 
-void init(const CoreConfig& config) {
+void initialize(const CoreConfig& config) {
     NVIC_ConfigPriorityGroup(config.prigroup);
 }
 

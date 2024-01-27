@@ -18,7 +18,7 @@ namespace mcu {
 namespace chrono {
 
 
-void steady_clock::init() {
+void steady_clock::initialize() {
     // init systick
     SysTick_ConfigCLKSource(SYSTICK_CLK_SOURCE_HCLK);
 

@@ -17,7 +17,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
-    _rx_pin.init({.port = rx_pin_config.port,
+    _rx_pin.initialize({.port = rx_pin_config.port,
                   .pin = {.pin = rx_pin_config.pin,
                           .mode = GPIO_MODE_AF,
                           .speed = GPIO_SPEED_50MHz,
@@ -26,7 +26,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                   .af_selection = rx_pin_config.af_selection,
                   .actstate{}});
 
-    _tx_pin.init({.port = tx_pin_config.port,
+    _tx_pin.initialize({.port = tx_pin_config.port,
                   .pin = {.pin = tx_pin_config.pin,
                           .mode = GPIO_MODE_AF,
                           .speed = GPIO_SPEED_50MHz,

@@ -64,7 +64,7 @@ protected:
     bool _initialized{false};
     Gpio() = default;
 public:
-    void init(const Config& config) {
+    void initialize(const Config& config) {
         // enable port clock
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
@@ -103,7 +103,7 @@ class Input : public emb::gpio::Input, public impl::Gpio {
 public:
     Input() = default;
     Input(const Config& config) {
-        init(config);
+        initialize(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -177,7 +177,7 @@ class Output : public emb::gpio::Output, public impl::Gpio {
 public:
     Output() = default;
     Output(const Config& config) {
-        init(config);
+        initialize(config);
     }
 
     virtual unsigned int read_level() const override {

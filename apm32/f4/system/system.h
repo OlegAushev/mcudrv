@@ -22,7 +22,7 @@ struct CoreConfig {
 };
 
 
-void init(const CoreConfig& config);
+void initialize(const CoreConfig& config);
 
 void reset_device();
 
@@ -33,7 +33,7 @@ void fatal_error(const char* hint, int code = 0);
 
 
 class IrqPriority {
-    friend void init(const CoreConfig&);
+    friend void initialize(const CoreConfig&);
 private:
 #ifdef SILICON_REVISION_A
     static inline uint8_t _preempt_priorities{8};

@@ -59,11 +59,11 @@ class GpioPin
 private:
     static inline std::array<bool, port_count> _clk_enabled{};
 protected:
-    Config _config;
+    Config _cfg;
     bool _initialized{false};
     GpioPin() = default;
 public:
-    void init(const Config& config) {
+    void initialize(const Config& config) {
         // enable port clock
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
@@ -71,20 +71,20 @@ public:
             gpio_clk_enable_funcs[port_idx]();
             _clk_enabled[port_idx] = true;
         }
-        _config = config;
+        _cfg = config;
 
-        if (_config.pin.mode == GPIO_MODE_AF) {
-            GPIO_ConfigPinAF(_config.port, static_cast<GPIO_PIN_SOURCE_T>(bit_position(_config.pin.pin)), _config.af_selection);
+        if (_cfg.pin.mode == GPIO_MODE_AF) {
+            GPIO_ConfigPinAF(_cfg.port, static_cast<GPIO_PIN_SOURCE_T>(bit_position(_cfg.pin.pin)), _cfg.af_selection);
         }
 
-        GPIO_Config(_config.port, &_config.pin);
+        GPIO_Config(_cfg.port, &_cfg.pin);
         _initialized = true;
     }
 
-    const Config& config() const { return _config; }
-    unsigned int pin_no() const { return __CLZ(__RBIT(_config.pin.pin)); }
-    uint16_t pin_bit() const { return static_cast<uint16_t>(_config.pin.pin); }
-    const GPIO_T* port() const { return _config.port; }
+    const Config& config() const { return _cfg; }
+    unsigned int pin_no() const { return __CLZ(__RBIT(_cfg.pin.pin)); }
+    uint16_t pin_bit() const { return static_cast<uint16_t>(_cfg.pin.pin); }
+    const GPIO_T* port() const { return _cfg.port; }
 };
 
 
@@ -102,12 +102,12 @@ public:
     InputPin() = default;
     InputPin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_IN);
-        init(config);
+        initialize(config);
     }
 
     virtual unsigned int read_level() const override {
         assert(_initialized);
-        if ((read_reg(_config.port->IDATA) & _config.pin.pin) != 0) {
+        if ((read_reg(_cfg.port->IDATA) & _cfg.pin.pin) != 0) {
             return 1;
         }
         return 0;
@@ -115,7 +115,7 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(_config.actstate)) {
+        if (read_level() == std::to_underlying(_cfg.actstate)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive; 
@@ -180,12 +180,12 @@ public:
     OutputPin() = default;
     OutputPin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_OUT);
-        init(config);
+        initialize(config);
     }
 
     virtual unsigned int read_level() const override {
         assert(_initialized);
-        if ((read_reg(_config.port->IDATA) & _config.pin.pin) != 0) {
+        if ((read_reg(_cfg.port->IDATA) & _cfg.pin.pin) != 0) {
             return 1;
         }
         return 0;
@@ -194,15 +194,15 @@ public:
     virtual void set_level(unsigned int level) override {
         assert(_initialized);
         if(level != 0) {
-            write_reg(_config.port->BSCL, _config.pin.pin);
+            write_reg(_cfg.port->BSCL, _cfg.pin.pin);
         } else {
-            write_reg(_config.port->BSCH, _config.pin.pin);
+            write_reg(_cfg.port->BSCH, _cfg.pin.pin);
         }
     }
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(_config.actstate)) {
+        if (read_level() == std::to_underlying(_cfg.actstate)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive;
@@ -211,9 +211,9 @@ public:
     virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) override {
         assert(_initialized);
         if (st == emb::gpio::pin_state::active) {
-            set_level(std::to_underlying(_config.actstate));
+            set_level(std::to_underlying(_cfg.actstate));
         } else {
-            set_level(1 - std::to_underlying(_config.actstate));
+            set_level(1 - std::to_underlying(_cfg.actstate));
         }
     }
 
@@ -224,9 +224,9 @@ public:
 
     virtual void toggle() override {
         assert(_initialized);
-        uint16_t odr_reg = static_cast<uint16_t>( read_reg(_config.port->ODATA));
-        write_reg<uint16_t>(_config.port->BSCL, ~odr_reg & _config.pin.pin);
-        write_reg<uint16_t>(_config.port->BSCH, odr_reg & _config.pin.pin);
+        uint16_t odr_reg = static_cast<uint16_t>( read_reg(_cfg.port->ODATA));
+        write_reg<uint16_t>(_cfg.port->BSCL, ~odr_reg & _cfg.pin.pin);
+        write_reg<uint16_t>(_cfg.port->BSCH, odr_reg & _cfg.pin.pin);
     }
 };
 
@@ -236,7 +236,7 @@ public:
     AlternatePin() = default;
     AlternatePin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_AF);
-        init(config);
+        initialize(config);
     }
 };
 
@@ -246,7 +246,7 @@ public:
     AnalogPin() = default;
     AnalogPin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_AN);
-        init(config);
+        initialize(config);
     }
 };
 
@@ -291,7 +291,7 @@ public:
         }
     }
 
-    static OutputPin init(GPIO_T* port, uint16_t pin) {
+    static OutputPin initialize(GPIO_T* port, uint16_t pin) {
         return OutputPin({.port = port,
                        .pin = {.pin = pin,
                                .mode = GPIO_MODE_OUT,
