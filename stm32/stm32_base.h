@@ -19,6 +19,36 @@
 namespace mcu {
 
 
+enum class bit_type {
+    rw,
+    r,
+    w,
+    rc_w0,
+    rc_w1,
+    rc_w,
+    rc_r,
+    rs_r,
+    rs,
+    rwo,
+    t,
+    rt_w1
+};
+
+
+namespace impl {
+
+
+template <bit_type B>
+concept BitClearableW0 = ( B == bit_type::rw || B == bit_type::rc_w0 || B == bit_type::rc_w );
+
+
+template <bit_type B>
+concept BitClearableW1 = ( B == bit_type::rc_w1 );
+
+
+}
+
+
 template <typename T>
 bool bit_is_set(const volatile T& reg, T bit) { return (reg & bit) == bit; }
 
@@ -31,8 +61,12 @@ template <typename T>
 void set_bit(volatile T& reg, T bit) { reg |= bit; }
 
 
-template <typename T>
-void clear_bit(volatile T& reg, T bit) { reg &= ~bit; }
+template <typename T, bit_type B = bit_type::rw>
+void clear_bit(volatile T& reg, T bit) requires impl::BitClearableW0<B> { reg &= ~bit; }
+
+
+template <typename T, bit_type B = bit_type::rw>
+void clear_bit(volatile T& reg, T bit) requires impl::BitClearableW1<B> { reg |= bit; }
 
 
 template <typename T>

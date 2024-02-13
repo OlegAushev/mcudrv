@@ -125,11 +125,11 @@ public:
     } 
 
     void acknowledge_injected_conversion() {
-        set_bit<uint32_t>(_reg->ISR, ADC_ISR_JEOC);
+        clear_bit<uint32_t, bit_type::rc_w1>(_reg->ISR, ADC_ISR_JEOC);
     }
 
     void acknowledge_injected_sequence() {
-        set_bit<uint32_t>(_reg->ISR, ADC_ISR_JEOS);
+        clear_bit<uint32_t, bit_type::rc_w1>(_reg->ISR, ADC_ISR_JEOS);
     }
 
     void start_regular() {
@@ -152,12 +152,17 @@ public:
     }
 
     void acknowledge_regular_conversion() {
-        set_bit<uint32_t>(_reg->ISR, ADC_ISR_EOC);
+        clear_bit<uint32_t, bit_type::rc_w1>(_reg->ISR, ADC_ISR_EOC);
     }
 
     void acknowledge_regular_sequence() {
-        set_bit<uint32_t>(_reg->ISR, ADC_ISR_EOS);
+        clear_bit<uint32_t, bit_type::rc_w1>(_reg->ISR, ADC_ISR_EOS);
     }
+
+public:
+    void initialize_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
+    void enable_interrupts() { enable_irq(ADC_IRQn); }
+    void disable_interrupts() { disable_irq(ADC_IRQn); }
 
 //     void enable_dma(dma::StreamController& dma_stream) {
 //         _handle.DMA_Handle = dma_stream.handle();
