@@ -5,8 +5,8 @@
 #ifdef STM32H7xx
 
 
-#include "../stm32_h7_base.h"
-#include "../system/system.h"
+#include <mcudrv/stm32/h7/stm32_h7_base.h>
+#include <mcudrv/stm32/h7/system/system.h>
 
 
 namespace mcu {

@@ -5,10 +5,10 @@
 #ifdef STM32H7xx
 
 
-#include "../stm32_h7_base.h"
-#include "../system/system.h"
-#include "../gpio/gpio.h"
-#include "../dma/dma.h"
+#include <mcudrv/stm32/h7/stm32_h7_base.h>
+#include <mcudrv/stm32/h7/system/system.h>
+#include <mcudrv/stm32/h7/gpio/gpio.h>
+#include <mcudrv/stm32/h7/dma/dma.h>
 #include <initializer_list>
 #include <utility>
 
@@ -97,7 +97,13 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void calibrate();
+    void enable() {
+        set_bit<uint32_t>(_reg->CR, ADC_CR_ADEN);
+        while (bit_is_clear<uint32_t>(_reg->ISR, ADC_ISR_ADRDY)) {
+            // wait
+        }
+    }
+
     void initialize_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config);
     void initialize_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config);
     void initialize_injected_internal_channel(InjectedChannelConfig channel_config);
@@ -201,6 +207,7 @@ public:
 //     void (*on_completed)() = [](){ fatal_error("uninitialized callback"); };
 //     void (*on_error)() = [](){ fatal_error("uninitialized callback"); };
 protected:
+    void _calibrate();
     static void _enable_clk(Peripheral peripheral);
 };
 

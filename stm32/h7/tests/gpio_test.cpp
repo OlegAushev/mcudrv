@@ -2,7 +2,7 @@
 #ifdef STM32H7xx
 
 
-#include "tests.h"
+#include <mcudrv/stm32/h7/tests/tests.h>
 
 
 void mcu::tests::gpio_test()

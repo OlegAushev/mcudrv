@@ -6,8 +6,7 @@
 
 
 /// @brief Mandatory HAL-lib tick handler.
-extern "C" void SysTick_Handler()
-{
+extern "C" void SysTick_Handler() {
     HAL_IncTick();
     mcu::chrono::steady_clock::on_interrupt();
 }

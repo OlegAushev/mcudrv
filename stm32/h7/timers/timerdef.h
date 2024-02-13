@@ -5,8 +5,8 @@
 #ifdef STM32H7xx
 
 
-#include "../system/system.h"
-#include "../gpio/gpio.h"
+#include <mcudrv/stm32/h7/system/system.h>
+#include <mcudrv/stm32/h7/gpio/gpio.h>
 
 
 namespace mcu {

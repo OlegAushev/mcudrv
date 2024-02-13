@@ -24,10 +24,21 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
     if (HAL_ADC_Init(&_handle) != HAL_OK) {
         fatal_error("ADC module initialization failed");
     }
+
+    _calibrate();
+
+    set_bit<uint32_t>(_reg->CR, ADC_CR_ADEN);
+    while (bit_is_clear<uint32_t>(_reg->ISR, ADC_ISR_ADRDY)) {
+        // wait
+    }
+
+    if (dma) {
+        write_reg(dma->stream_reg()->PAR, uint32_t(&(_reg->DR)));
+    }
 }
 
 
-void Module::calibrate() {
+void Module::_calibrate() {
     /* Run the ADC calibration in single-ended mode */
     if (HAL_ADCEx_Calibration_Start(&_handle, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
         fatal_error("ADC module calibration failed");
@@ -54,6 +65,20 @@ void Module::calibrate() {
 //         fatal_error("ADC internal channel initialization failed");
 //     }
 // }
+
+
+void Module::initialize_injected_internal_channel(InjectedChannelConfig channel_config) {
+    if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
+        fatal_error("ADC injected channel initialization failed");
+    }
+}
+
+
+void Module::initialize_regular_internal_channel(RegularChannelConfig channel_config) {
+    if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
+        fatal_error("ADC internal channel initialization failed");
+    }
+}
 
 
 void Module::_enable_clk(Peripheral peripheral) {

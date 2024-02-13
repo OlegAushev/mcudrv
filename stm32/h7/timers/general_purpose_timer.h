@@ -5,7 +5,7 @@
 #ifdef STM32H7xx
 
 
-#include "timerdef.h"
+#include <mcudrv/stm32/h7/timers/timerdef.h>
 #include <utility>
 
 

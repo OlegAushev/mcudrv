@@ -4,7 +4,7 @@
 #ifdef MCUDRV_STM32
 
 
-#include "../config.h"
+#include <mcudrv/config.h>
 #include <cstdint>
 #include <cassert>
 
@@ -12,7 +12,7 @@
 #if defined(STM32F4xx)
 #include <stm32f4xx.h>
 #elif defined(STM32H7xx)
-#include "stm32h7xx.h"
+#include <stm32h7xx.h>
 #endif
 
 

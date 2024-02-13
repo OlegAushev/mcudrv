@@ -5,28 +5,100 @@
 #include <mcudrv/stm32/h7/dma/dma.h>
 
 
-extern "C" void DMA1_Stream0_IRQHandler(void) {
-    using namespace mcu::dma;
-    HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream0)->peripheral_handle());
+namespace mcu {
+
+
+namespace dma {
+
+
+Stream::Stream(const Config& config)
+        : emb::interrupt_invoker_array<Stream, stream_count>(this, std::to_underlying(config.stream_id))
+        , _stream_id(config.stream_id) {
+    _enable_clk(_stream_id);
+    _stream_reg = impl::dma_stream_instances[std::to_underlying(_stream_id)];
+    _handle.Instance = _stream_reg;
+    _handle.Init = config.hal_config;
+
+    if (HAL_DMA_DeInit(&_handle) != HAL_OK) {
+        fatal_error("DMA stream deinitialization failed");
+    }
+    if (HAL_DMA_Init(&_handle) != HAL_OK) {
+        fatal_error("DMA stream initialization failed");
+    }
+
+    _base_reg = reinterpret_cast<impl::DMA_Base_Registers*>(_handle.StreamBaseAddress);
 }
 
 
-extern "C" void DMA1_Stream1_IRQHandler(void) {
-    using namespace mcu::dma;
-    HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream1)->peripheral_handle());
+void Stream::_enable_clk(StreamId stream_id) {
+    switch (stream_id) {
+    case StreamId::dma1_stream0:
+    case StreamId::dma1_stream1:
+    case StreamId::dma1_stream2:
+    case StreamId::dma1_stream3:
+    case StreamId::dma1_stream4:
+    case StreamId::dma1_stream5:
+    case StreamId::dma1_stream6:
+    case StreamId::dma1_stream7:
+        if (_clk_enabled[0]) {
+            return;
+        }
+        impl::dma_clk_enable_funcs[0]();
+        _clk_enabled[0] = true;
+        break;
+    case StreamId::dma2_stream0:
+    case StreamId::dma2_stream1:
+    case StreamId::dma2_stream2:
+    case StreamId::dma2_stream3:
+    case StreamId::dma2_stream4:
+    case StreamId::dma2_stream5:
+    case StreamId::dma2_stream6:
+    case StreamId::dma2_stream7:
+        if (_clk_enabled[1]) {
+            return;
+        }
+        impl::dma_clk_enable_funcs[1]();
+        _clk_enabled[1] = true;
+        break;
+    }
 }
 
 
-extern "C" void DMA1_Stream2_IRQHandler(void) {
-    using namespace mcu::dma;
-    HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream2)->peripheral_handle());
+void Stream::init_interrupts(uint32_t interrupt_list,mcu::IrqPriority priority) {
+    write_reg<uint32_t>(_base_reg->IFCR, 0x3FUL << _handle.StreamIndex); // clear all interrupt flags
+    set_bit(_stream_reg->CR, interrupt_list);
+    set_irq_priority(impl::dma_irqn[std::to_underlying(_stream_id)], priority);
 }
 
 
-extern "C" void DMA1_Stream3_IRQHandler(void) {
-    using namespace mcu::dma;
-    HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream3)->peripheral_handle());
-}
+} // namespace dma
+
+
+} // namespace mcu
+
+
+// extern "C" void DMA1_Stream0_IRQHandler(void) {
+//     using namespace mcu::dma;
+//     HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream0)->peripheral_handle());
+// }
+
+
+// extern "C" void DMA1_Stream1_IRQHandler(void) {
+//     using namespace mcu::dma;
+//     HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream1)->peripheral_handle());
+// }
+
+
+// extern "C" void DMA1_Stream2_IRQHandler(void) {
+//     using namespace mcu::dma;
+//     HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream2)->peripheral_handle());
+// }
+
+
+// extern "C" void DMA1_Stream3_IRQHandler(void) {
+//     using namespace mcu::dma;
+//     HAL_DMA_IRQHandler(StreamController::instance(Stream::dma1_stream3)->peripheral_handle());
+// }
 
 
 #endif
