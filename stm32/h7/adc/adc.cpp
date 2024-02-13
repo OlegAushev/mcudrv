@@ -33,6 +33,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
     }
 
     if (dma) {
+        //modify_reg<uint32_t>(_reg->CFGR, ADC_CFGR_DMNGT, config.hal_config.ConversionDataManagement);
         write_reg(dma->stream_reg()->PAR, uint32_t(&(_reg->DR)));
     }
 }
@@ -42,6 +43,31 @@ void Module::_calibrate() {
     /* Run the ADC calibration in single-ended mode */
     if (HAL_ADCEx_Calibration_Start(&_handle, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
         fatal_error("ADC module calibration failed");
+    }
+}
+
+
+void Module::initialize_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
+    mcu::gpio::Config cfg{};
+    cfg.port = pin_config.port;
+    cfg.pin.Pin = pin_config.pin;
+    cfg.pin.Mode = GPIO_MODE_ANALOG;
+    cfg.pin.Pull = GPIO_NOPULL;
+    mcu::gpio::AnalogPin input(cfg);
+
+    if (channel_config.ranks.size() > 0) {
+        for (auto rank : channel_config.ranks) {
+            auto config = channel_config;
+            config.hal_config.Rank = rank;
+            if (HAL_ADC_ConfigChannel(&_handle, &config.hal_config) != HAL_OK) {
+                fatal_error("ADC regular channel initialization failed");
+            }
+        }
+    } else {
+        auto config = channel_config;
+        if (HAL_ADC_ConfigChannel(&_handle, &config.hal_config) != HAL_OK) {
+            fatal_error("ADC regular channel initialization failed");
+        }
     }
 }
 

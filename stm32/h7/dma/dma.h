@@ -189,10 +189,10 @@ protected:
 template <typename T, size_t Size>
 class MemoryBuffer {
 private:
-    std::array<T, Size> _data __attribute__((aligned(32)));
+    std::array<T, Size>& _data;// __attribute__((aligned(32)));
     Stream& _stream;
 public:
-    MemoryBuffer(Stream& stream) : _stream(stream) {
+    MemoryBuffer(Stream& stream, std::array<T, Size>& buf) : _data(buf), _stream(stream) {
         write_reg(_stream.stream_reg()->NDTR, uint32_t(_data.size()));
         write_reg(_stream.stream_reg()->M0AR, uint32_t(_data.data()));
     }
@@ -208,20 +208,20 @@ public:
 };
 
 
-template <typename T, size_t Size>
-class MemoryDoubleBuffer {
-private:
-    Stream& _stream;
-public:
-    MemoryBuffer<T, Size> buf0;
-    MemoryBuffer<T, Size> buf1;
-    MemoryDoubleBuffer(Stream& stream) : _stream(stream), buf0(stream), buf1(stream) {
-        set_bit<uint32_t>(_stream.stream_reg()->CR, DMA_SxCR_DBM);
-        write_reg(_stream.stream_reg()->NDTR, uint32_t(Size));
-        write_reg(_stream.stream_reg()->M0AR, uint32_t(buf0.data()));
-        write_reg(_stream.stream_reg()->M1AR, uint32_t(buf1.data()));
-    }
-};
+// template <typename T, size_t Size>
+// class MemoryDoubleBuffer {
+// private:
+//     Stream& _stream;
+// public:
+//     MemoryBuffer<T, Size> buf0;
+//     MemoryBuffer<T, Size> buf1;
+//     MemoryDoubleBuffer(Stream& stream) : _stream(stream), buf0(stream), buf1(stream) {
+//         set_bit<uint32_t>(_stream.stream_reg()->CR, DMA_SxCR_DBM);
+//         write_reg(_stream.stream_reg()->NDTR, uint32_t(Size));
+//         write_reg(_stream.stream_reg()->M0AR, uint32_t(buf0.data()));
+//         write_reg(_stream.stream_reg()->M1AR, uint32_t(buf1.data()));
+//     }
+// };
 
 
 // template <typename T, uint32_t Size>
