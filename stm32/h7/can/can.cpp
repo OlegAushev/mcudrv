@@ -49,8 +49,8 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     HAL_FDCAN_ConfigGlobalFilter(&_handle, FDCAN_REJECT, FDCAN_REJECT, FDCAN_REJECT_REMOTE, FDCAN_REJECT_REMOTE);
 
     // Default interrupt config
-    init_interrupts(FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_BUFFER_NEW_MESSAGE, FDCAN_INTERRUPT_LINE0);
-	init_interrupts(FDCAN_IT_RX_FIFO1_NEW_MESSAGE, FDCAN_INTERRUPT_LINE1);
+    initialize_interrupts(FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_BUFFER_NEW_MESSAGE, FDCAN_INTERRUPT_LINE0);
+	initialize_interrupts(FDCAN_IT_RX_FIFO1_NEW_MESSAGE, FDCAN_INTERRUPT_LINE1);
 }
 
 
@@ -171,7 +171,7 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) {
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list, uint32_t interrupt_line)
+void Module::initialize_interrupts(uint32_t interrupt_list, uint32_t interrupt_line)
 {
     if (HAL_FDCAN_ConfigInterruptLines(&_handle, interrupt_list, interrupt_line) != HAL_OK) {
         fatal_error("CAN interrupt configuration failed");

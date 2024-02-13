@@ -204,7 +204,7 @@ public:
         _on_buffer_frame_received = callback;
     }
 
-    void init_interrupts(uint32_t interrupt_list, uint32_t interrupt_line);
+    void initialize_interrupts(uint32_t interrupt_list, uint32_t interrupt_line);
     void set_fifo_watermark(uint32_t fifo, uint32_t watermark);
 
     void set_interrupt_priority(IrqPriority line0_priority, IrqPriority line1_priority) {

@@ -142,7 +142,7 @@ private:
         emb::invalid_function, emb::invalid_function, emb::invalid_function, emb::invalid_function,
     };
 public:
-    void init_interrupt(void(*handler)(void), IrqPriority priority) {
+    void initialize_interrupt(void(*handler)(void), IrqPriority priority) {
         switch (_cfg.pin.Pin) {
         case GPIO_PIN_0:
             _irqn = EXTI0_IRQn;
