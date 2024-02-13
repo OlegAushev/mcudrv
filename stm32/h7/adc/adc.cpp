@@ -33,16 +33,21 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
     }
 
     if (dma) {
-        //modify_reg<uint32_t>(_reg->CFGR, ADC_CFGR_DMNGT, config.hal_config.ConversionDataManagement);
         write_reg(dma->stream_reg()->PAR, uint32_t(&(_reg->DR)));
     }
 }
 
 
-void Module::_calibrate() {
-    /* Run the ADC calibration in single-ended mode */
-    if (HAL_ADCEx_Calibration_Start(&_handle, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
-        fatal_error("ADC module calibration failed");
+void Module::initialize_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
+    mcu::gpio::Config cfg = {};
+    cfg.port = pin_config.port;
+    cfg.pin.Pin = pin_config.pin;
+    cfg.pin.Mode = GPIO_MODE_ANALOG;
+    cfg.pin.Pull = GPIO_NOPULL;
+    mcu::gpio::AnalogPin input(cfg);
+
+    if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
+        fatal_error("ADC injected channel initialization failed");
     }
 }
 
@@ -72,27 +77,6 @@ void Module::initialize_regular_channel(const PinConfig& pin_config, const Regul
 }
 
 
-// void Module::initialize_regular_channel(PinConfig pin_config, ChannelConfig channel_config) {
-//     mcu::gpio::Config cfg = {};
-//     cfg.port = pin_config.port;
-//     cfg.pin.Pin = pin_config.pin;
-//     cfg.pin.Mode = GPIO_MODE_ANALOG;
-//     cfg.pin.Pull = GPIO_NOPULL;
-//     mcu::gpio::AnalogPin input(cfg);
-
-//     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
-//         fatal_error("ADC regular channel initialization failed");
-//     }
-// }
-
-
-// void Module::initialize_internal_channel(ChannelConfig channel_config) {
-//     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
-//         fatal_error("ADC internal channel initialization failed");
-//     }
-// }
-
-
 void Module::initialize_injected_internal_channel(InjectedChannelConfig channel_config) {
     if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC injected channel initialization failed");
@@ -103,6 +87,23 @@ void Module::initialize_injected_internal_channel(InjectedChannelConfig channel_
 void Module::initialize_regular_internal_channel(RegularChannelConfig channel_config) {
     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC internal channel initialization failed");
+    }
+}
+
+
+void Module::initialize_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
+    clear_bit<uint32_t, bit_type::rc_w1>(_reg->ISR, ADC_ISR_ADRDY | ADC_ISR_EOSMP
+            | ADC_ISR_EOC | ADC_ISR_EOS | ADC_ISR_OVR | ADC_ISR_JEOC | ADC_ISR_JEOS
+            | ADC_ISR_AWD1 | ADC_ISR_AWD2 | ADC_ISR_AWD3 | ADC_ISR_JQOVF);
+    set_bit(_reg->IER, interrupt_list);
+    mcu::set_irq_priority(ADC_IRQn, priority);
+}
+
+
+void Module::_calibrate() {
+    /* Run the ADC calibration in single-ended mode */
+    if (HAL_ADCEx_Calibration_Start(&_handle, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
+        fatal_error("ADC module calibration failed");
     }
 }
 

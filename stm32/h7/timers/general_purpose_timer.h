@@ -170,7 +170,7 @@ public:
 
     float freq() const { return _freq; }
 
-    void init_update_interrupts(IrqPriority priority) {
+    void initialize_update_interrupts(IrqPriority priority) {
         set_bit<uint32_t>(_reg->DIER, TIM_DIER_UIE);
         set_irq_priority(impl::gp_timer_irqn[std::to_underlying(_peripheral)], priority);
     }

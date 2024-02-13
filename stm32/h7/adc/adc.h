@@ -170,42 +170,6 @@ public:
     void enable_interrupts() { enable_irq(ADC_IRQn); }
     void disable_interrupts() { disable_irq(ADC_IRQn); }
 
-//     void enable_dma(dma::StreamController& dma_stream) {
-//         _handle.DMA_Handle = dma_stream.handle();
-//         dma_stream.handle()->Parent = &_handle;
-//     }
-
-    // DrvStatus start_regular_conversion() {
-    //     DrvStatus status = static_cast<DrvStatus>(HAL_ADC_Start(&_handle));
-    //     if constexpr (strict_error_check) {
-    //         if (status != DrvStatus::ok) {
-    //             fatal_error("regular ADC conversion start failed");
-    //         }
-    //     }
-    //     return status;
-    // }
-
-//     template <uint32_t DmaBufSize>
-//     DrvStatus start_regular_conversion_with_dma(mcu::dma::Buffer<uint16_t, DmaBufSize>& buf) {
-//         DrvStatus status = static_cast<DrvStatus>(
-//                 HAL_ADC_Start_DMA(&_handle, reinterpret_cast<uint32_t*>(buf.data()), buf.size()));
-//         if constexpr (strict_error_check) {
-//             if (status != DrvStatus::ok) {
-//                 fatal_error("regular ADC conversion with DMA start failed");
-//             }
-//         }
-//         return status;
-//     }
-
-//     DrvStatus poll() { return static_cast<DrvStatus>(HAL_ADC_PollForConversion(&_handle, 0)); }
-//     uint32_t read_regular_conversion() { return HAL_ADC_GetValue(&_handle); }
-//     uint32_t read_injected_conversion(uint32_t injected_rank) { return HAL_ADCEx_InjectedGetValue(&_handle, injected_rank); }
-
-//     /* INTERRUPTS */
-// public:
-//     void (*on_half_completed)() = [](){ fatal_error("uninitialized callback"); };
-//     void (*on_completed)() = [](){ fatal_error("uninitialized callback"); };
-//     void (*on_error)() = [](){ fatal_error("uninitialized callback"); };
 protected:
     void _calibrate();
     static void _enable_clk(Peripheral peripheral);

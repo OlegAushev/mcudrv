@@ -94,7 +94,7 @@ void Module::init_regular_internal_channel(RegularChannelConfig channel_config) 
 void Module::init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
     clear_bit<uint32_t>(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
     set_bit(_reg->CR1, interrupt_list);
-     mcu::set_irq_priority(ADC_IRQn, priority);
+    mcu::set_irq_priority(ADC_IRQn, priority);
 }
 
 
