@@ -124,7 +124,10 @@ private:
     std::array<T, Size>& _data;// __attribute__((aligned(32)));
     Stream& _stream;
 public:
-    MemoryBuffer(Stream& stream, std::array<T, Size>& buf) : _data(buf), _stream(stream) {
+    MemoryBuffer(Stream& stream, std::array<T, Size>& underlying_buffer)
+            : _data(underlying_buffer)
+            , _stream(stream)
+    {
         write_reg(_stream.stream_reg()->NDTR, uint32_t(_data.size()));
         write_reg(_stream.stream_reg()->M0AR, uint32_t(_data.data()));
     }
@@ -136,6 +139,10 @@ public:
 
     void invalidate_dcache(size_t offset_, size_t size_) {
         SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t*>(&_data[offset_]), int32_t(size_ * sizeof(T)));
+    }
+
+    void invalidate_dcache() {
+        SCB_InvalidateDCache_by_Addr(reinterpret_cast<void*>(_data.data()), int32_t(_data.size() * sizeof(T)));
     }
 };
 
