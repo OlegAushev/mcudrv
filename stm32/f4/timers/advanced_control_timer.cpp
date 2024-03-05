@@ -103,7 +103,7 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_c
 void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
     if (config.hal_bdt_config.DeadTime == 0) {
         // deadtime specified by deadtime_ns
-        _deadtime_ns = config.deadtime_ns;
+        _deadtime = config.deadtime_ns * 1E-09f;
         if (config.deadtime_ns <= 0X7F * _t_dts_ns) {
             config.hal_bdt_config.DeadTime = uint32_t(config.deadtime_ns / _t_dts_ns);
         } else if (config.deadtime_ns <= 127 * 2 * _t_dts_ns) {
@@ -121,13 +121,13 @@ void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
     } else {
         auto dtg = config.hal_bdt_config.DeadTime;
         if ((dtg & 0x80) == 0) {
-            _deadtime_ns = float(dtg) * _t_dts_ns;
+            _deadtime = float(dtg) * _t_dts_ns * 1E-09f;
         } else if ((dtg & 0xC0) == 0x80) {
-            _deadtime_ns = float(64 + (dtg & 0x3F)) * 2 * _t_dts_ns;
+            _deadtime = float(64 + (dtg & 0x3F)) * 2 * _t_dts_ns * 1E-09f;
         } else if ((dtg & 0xE0) == 0xC0) {
-            _deadtime_ns = float(32 + (dtg & 0x1F)) * 8 * _t_dts_ns;
+            _deadtime = float(32 + (dtg & 0x1F)) * 8 * _t_dts_ns * 1E-09f;
         } else if ((dtg & 0xE0) == 0xE0) {
-            _deadtime_ns = float(32 + (dtg & 0x1F)) * 16 * _t_dts_ns;
+            _deadtime = float(32 + (dtg & 0x1F)) * 16 * _t_dts_ns * 1E-09f;
         } else {
             fatal_error("timer dead-time initialization failed");
         }

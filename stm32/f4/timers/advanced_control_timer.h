@@ -62,7 +62,7 @@ private:
 
     float _freq{0};
     float _t_dts_ns{0};
-    float _deadtime_ns{0};
+    float _deadtime{0};
 
     bool _brk_enabled{false};
 public:
@@ -124,7 +124,7 @@ public:
     }
 
     float freq() const { return _freq; }
-    float deadtime_ns() const { return _deadtime_ns; }
+    float deadtime() const { return _deadtime; }
 
     void init_update_interrupts(IrqPriority priority);
 
