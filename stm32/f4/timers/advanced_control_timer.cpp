@@ -14,7 +14,7 @@ namespace timers {
 namespace adv {
 
 
-Timer::Timer(Peripheral peripheral, const Config& config)
+Timer::Timer(Peripheral peripheral, const PwmConfig& config)
         : emb::interrupt_invoker_array<Timer, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk(peripheral);

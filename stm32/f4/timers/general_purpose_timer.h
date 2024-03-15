@@ -74,18 +74,29 @@ inline constexpr std::array<IRQn_Type, peripheral_count> irq_nums = {
 };
 
 
+class AbstractTimer : public emb::interrupt_invoker_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
+private:
+    const Peripheral _peripheral;
+    TIM_HandleTypeDef _handle{};
+    TIM_TypeDef* _reg;
+
+    static inline std::array<bool, peripheral_count> _clk_enabled{};
+public:
+    AbstractTimer(Peripheral peripheral);
+private:
+    static void _enable_clk(Peripheral peripheral);
+};
+
+
 } // namespace impl
 
 
+class InputCaptureTimer : public impl::AbstractTimer {
+private:
 
-
-
-
-
-
-
-
-
+public:
+    InputCaptureTimer(Peripheral peripheral, const InputCaptureConfig& config);
+};
 
 
 } // namespace gp

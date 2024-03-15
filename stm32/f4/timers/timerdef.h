@@ -16,18 +16,14 @@ namespace mcu {
 namespace timers {
 
 
-enum class OpMode {
-    timebase,
-    output_compare,
-    pwm,
-    input_capture,
-    one_pulse
+struct PwmConfig {
+    float freq;
+    TIM_Base_InitTypeDef hal_base_config;
 };
 
 
-struct Config {
-    float freq;
-    TIM_Base_InitTypeDef hal_base_config;
+struct InputCaptureConfig {
+
 };
 
 

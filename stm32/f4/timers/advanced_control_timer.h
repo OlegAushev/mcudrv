@@ -66,7 +66,7 @@ private:
 
     bool _brk_enabled{false};
 public:
-    Timer(Peripheral peripheral, const Config& config);
+    Timer(Peripheral peripheral, const PwmConfig& config);
     Peripheral peripheral() const { return _peripheral; }
     TIM_HandleTypeDef* handle() { return &_handle; }
     TIM_TypeDef* reg() { return _reg; }
