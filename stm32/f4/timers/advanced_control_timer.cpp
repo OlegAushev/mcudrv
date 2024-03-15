@@ -11,12 +11,15 @@ namespace mcu {
 namespace timers {
 
 
-AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral, const Config& config)
-        : emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>(this, std::to_underlying(peripheral))
+namespace adv {
+
+
+Timer::Timer(Peripheral peripheral, const Config& config)
+        : emb::interrupt_invoker_array<Timer, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk(peripheral);
 
-    _reg = impl::adv_timer_instances[std::to_underlying(_peripheral)];
+    _reg = impl::instances[std::to_underlying(_peripheral)];
     _handle.Instance = _reg;
     _handle.Init = config.hal_base_config;
 
@@ -74,18 +77,18 @@ AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral,
 }
 
 
-void AdvancedControlTimer::_enable_clk(AdvancedControlPeripheral peripheral) {
+void Timer::_enable_clk(Peripheral peripheral) {
     auto timer_idx = std::to_underlying(peripheral);
     if (_clk_enabled[timer_idx]) {
         return;
     }
 
-    impl::adv_timer_clk_enable_funcs[timer_idx]();
+    impl::clk_enable_funcs[timer_idx]();
     _clk_enabled[timer_idx] = true;
 }
 
 
-void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
+void Timer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_oc_config, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("timer pwm channel initialization failed");
     }
@@ -100,7 +103,7 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_c
 }
 
 
-void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
+void Timer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
     if (config.hal_bdt_config.DeadTime == 0) {
         // deadtime specified by deadtime_ns
         _deadtime = config.deadtime_ns * 1E-09f;
@@ -139,17 +142,20 @@ void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
 }
 
 
-void AdvancedControlTimer::init_update_interrupts(IrqPriority priority) {
+void Timer::init_update_interrupts(IrqPriority priority) {
     set_bit<uint32_t>(_reg->DIER, TIM_DIER_UIE);
-    set_irq_priority(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)], priority);
+    set_irq_priority(impl::up_irq_nums[std::to_underlying(_peripheral)], priority);
 }
 
 
-void AdvancedControlTimer::init_break_interrupts(IrqPriority priority) {
+void Timer::init_break_interrupts(IrqPriority priority) {
     set_bit<uint32_t>(_reg->DIER, TIM_DIER_BIE);
-    set_irq_priority(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)], priority);
+    set_irq_priority(impl::brk_irq_nums[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;
 }
+
+
+} // namespace adv
 
 
 } // namespace timers
