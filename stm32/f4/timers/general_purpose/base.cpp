@@ -2,7 +2,7 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/general_purpose_timer.h>
+#include <mcudrv/stm32/f4/timers/general_purpose/base.h>
 
 
 namespace mcu {
@@ -14,12 +14,12 @@ namespace timers {
 namespace gp {
 
 
-impl::AbstractTimer::AbstractTimer(Peripheral peripheral)
+impl::AbstractTimer::AbstractTimer(Peripheral peripheral, OpMode mode)
         : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
+        , _mode(mode)
 {
     _enable_clk(peripheral);
-
     _reg = impl::instances[std::to_underlying(_peripheral)];
     _handle.Instance = _reg;
 }
@@ -36,8 +36,7 @@ void impl::AbstractTimer::_enable_clk(Peripheral peripheral) {
 }
 
 
-
-}
+} // namespace gp
 
 
 } // namespace timers
