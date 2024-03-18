@@ -1,4 +1,3 @@
-#include "mcudrv/stm32/f4/gpio/gpio.h"
 #ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 

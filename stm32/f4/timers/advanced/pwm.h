@@ -5,7 +5,7 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/advanced_control/base.h>
+#include <mcudrv/stm32/f4/timers/advanced/advanced.h>
 
 
 namespace mcu {
@@ -14,7 +14,7 @@ namespace mcu {
 namespace timers {
 
 
-namespace adv {
+namespace advanced {
 
 
 class PwmTimer : public impl::AbstractTimer {
@@ -100,7 +100,7 @@ public:
 };
 
 
-} // namespace adv
+} // namespace advanced
 
 
 } // namespace timers

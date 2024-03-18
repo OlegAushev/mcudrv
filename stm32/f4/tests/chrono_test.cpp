@@ -1,7 +1,7 @@
 #ifdef MCUDRV_STM32
 #ifdef STM32F4xx
 
-#include "tests.h"
+#include <mcudrv/stm32/f4/tests/tests.h>
 
 
 void mcu::tests::chrono_test() {

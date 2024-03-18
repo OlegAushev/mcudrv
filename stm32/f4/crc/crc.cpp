@@ -2,7 +2,7 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/h7/crc/crc.h>
+#include <mcudrv/stm32/f4/crc/crc.h>
 
 
 #endif

@@ -5,7 +5,7 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/general_purpose/base.h>
+#include <mcudrv/stm32/f4/timers/general/general.h>
 
 
 namespace mcu {
@@ -14,7 +14,7 @@ namespace mcu {
 namespace timers {
     
     
-namespace gp {
+namespace general {
 
 
 class InputCaptureTimer : public impl::AbstractTimer {
@@ -25,7 +25,7 @@ public:
 };
 
 
-} // namespace gp
+} // namespace general
 
 
 } // namespace timers

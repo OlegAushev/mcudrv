@@ -2,7 +2,7 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/advanced_control/pwm.h>
+#include <mcudrv/stm32/f4/timers/advanced/pwm.h>
 
 
 namespace mcu {
@@ -11,7 +11,7 @@ namespace mcu {
 namespace timers {
 
 
-namespace adv {
+namespace advanced {
 
 
 PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config)
@@ -140,7 +140,7 @@ void PwmTimer::initialize_break_interrupts(IrqPriority priority) {
 }
 
 
-} // namespace adv
+} // namespace advanced
 
 
 } // namespace timers

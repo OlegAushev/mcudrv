@@ -5,7 +5,7 @@
 #ifdef STM32F4xx
 
 
-#include "../stm32_base.h"
+#include <mcudrv/stm32/stm32_base.h>
 
 
 namespace mcu {

@@ -2,7 +2,7 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/general_purpose/input_capture.h>
+#include <mcudrv/stm32/f4/timers/general/input_capture.h>
 
 
 namespace mcu {
@@ -11,14 +11,14 @@ namespace mcu {
 namespace timers {
 
 
-namespace gp {
+namespace general {
 
 
 
 
 
 
-} // namespace gp
+} // namespace general
 
 
 } // namespace timers
