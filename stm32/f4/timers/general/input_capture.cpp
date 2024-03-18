@@ -14,7 +14,11 @@ namespace timers {
 namespace general {
 
 
-
+InputCaptureTimer::InputCaptureTimer(Peripheral peripheral, const InputCaptureConfig& config)
+        : impl::AbstractTimer(peripheral, OpMode::input_capture)
+{
+    
+}
 
 
 

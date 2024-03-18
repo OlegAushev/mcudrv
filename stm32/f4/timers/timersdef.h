@@ -33,7 +33,7 @@ struct PwmConfig {
 
 
 struct InputCaptureConfig {
-
+    TIM_Base_InitTypeDef hal_base_config;
 };
 
 
