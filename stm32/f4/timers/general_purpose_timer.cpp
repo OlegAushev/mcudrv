@@ -18,6 +18,8 @@ impl::AbstractTimer::AbstractTimer(Peripheral peripheral)
         : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
+    _enable_clk(peripheral);
+
     _reg = impl::instances[std::to_underlying(_peripheral)];
     _handle.Instance = _reg;
 }

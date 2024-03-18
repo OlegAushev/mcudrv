@@ -14,13 +14,31 @@ namespace timers {
 namespace adv {
 
 
-Timer::Timer(Peripheral peripheral, const PwmConfig& config)
-        : emb::interrupt_invoker_array<Timer, peripheral_count>(this, std::to_underlying(peripheral))
-        , _peripheral(peripheral) {
+impl::AbstractTimer::AbstractTimer(Peripheral peripheral, OpMode mode)
+        : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
+        , _peripheral(peripheral)
+        , _mode(mode)
+{
     _enable_clk(peripheral);
-
     _reg = impl::instances[std::to_underlying(_peripheral)];
     _handle.Instance = _reg;
+}
+
+
+void impl::AbstractTimer::_enable_clk(Peripheral peripheral) {
+    auto timer_idx = std::to_underlying(peripheral);
+    if (_clk_enabled[timer_idx]) {
+        return;
+    }
+
+    impl::clk_enable_funcs[timer_idx]();
+    _clk_enabled[timer_idx] = true;
+}
+
+
+PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config)
+        : impl::AbstractTimer(peripheral, OpMode::pwm_generation) 
+{
     _handle.Init = config.hal_base_config;
 
     float timebase_freq = float(core_clk_freq()) / float(config.hal_base_config.Prescaler+1);
@@ -77,18 +95,7 @@ Timer::Timer(Peripheral peripheral, const PwmConfig& config)
 }
 
 
-void Timer::_enable_clk(Peripheral peripheral) {
-    auto timer_idx = std::to_underlying(peripheral);
-    if (_clk_enabled[timer_idx]) {
-        return;
-    }
-
-    impl::clk_enable_funcs[timer_idx]();
-    _clk_enabled[timer_idx] = true;
-}
-
-
-void Timer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
+void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_oc_config, std::to_underlying(channel)) != HAL_OK) {
         fatal_error("timer pwm channel initialization failed");
     }
@@ -103,7 +110,7 @@ void Timer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConf
 }
 
 
-void Timer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
+void PwmTimer::initialize_bdt(BkinPin* pin_bkin, BdtConfig config) {
     if (config.hal_bdt_config.DeadTime == 0) {
         // deadtime specified by deadtime_ns
         _deadtime = config.deadtime_ns * 1E-09f;
@@ -142,13 +149,13 @@ void Timer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
 }
 
 
-void Timer::init_update_interrupts(IrqPriority priority) {
+void PwmTimer::initialize_update_interrupts(IrqPriority priority) {
     set_bit<uint32_t>(_reg->DIER, TIM_DIER_UIE);
     set_irq_priority(impl::up_irq_nums[std::to_underlying(_peripheral)], priority);
 }
 
 
-void Timer::init_break_interrupts(IrqPriority priority) {
+void PwmTimer::initialize_break_interrupts(IrqPriority priority) {
     set_bit<uint32_t>(_reg->DIER, TIM_DIER_BIE);
     set_irq_priority(impl::brk_irq_nums[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;

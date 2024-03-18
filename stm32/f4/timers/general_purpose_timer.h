@@ -75,7 +75,7 @@ inline constexpr std::array<IRQn_Type, peripheral_count> irq_nums = {
 
 
 class AbstractTimer : public emb::interrupt_invoker_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
-private:
+protected:
     const Peripheral _peripheral;
     TIM_HandleTypeDef _handle{};
     TIM_TypeDef* _reg;
