@@ -5,7 +5,7 @@
 #ifdef APM32F4xx
 
 
-#include "../system/system.h"
+#include <mcudrv/apm32/f4/system/system.h>
 #include <apm32f4xx_dma.h>
 #include <apm32f4xx_rcm.h>
 #include <emblib/core.h>

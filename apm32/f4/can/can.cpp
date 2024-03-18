@@ -2,8 +2,8 @@
 #ifdef APM32F4xx
 
 
-#include "can.h"
-#include "../chrono/chrono.h"
+#include <mcudrv/apm32/f4/can/can.h>
+#include <mcudrv/apm32/f4/chrono/chrono.h>
 #include <emblib/chrono.h>
 
 

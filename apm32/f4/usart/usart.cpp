@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include "usart.h"
+#include <mcudrv/apm32/f4/usart/usart.h>
 
 
 namespace mcu {

@@ -2,8 +2,8 @@
 #ifdef APM32F4xx
 
 
-#include "system.h"
-#include "../chrono/chrono.h"
+#include <mcudrv/apm32/f4/system/system.h>
+#include <mcudrv/apm32/f4/chrono/chrono.h>
 
 
 namespace mcu {

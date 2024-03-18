@@ -5,7 +5,7 @@
 #ifdef APM32F4xx
 
 
-#include "../apm32_common.h"
+#include <mcudrv/apm32/apm32_base.h>
 
 
 namespace mcu {

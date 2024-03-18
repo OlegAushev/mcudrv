@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include "advanced_control_timer.h"
+#include <mcudrv/apm32/f4/timers/advanced/pwm.h>
 
 
 namespace mcu {
@@ -11,12 +11,12 @@ namespace mcu {
 namespace timers {
 
 
-AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral, Config config)
-        : emb::interrupt_invoker_array<AdvancedControlTimer, adv_timer_peripheral_count>(this, std::to_underlying(peripheral))
-        , _peripheral(peripheral) {
-    _enable_clk(peripheral);
-    _reg = impl::adv_timer_instances[std::to_underlying(_peripheral)];
+namespace advanced {
 
+
+PwmTimer::PwmTimer(Peripheral peripheral, PwmConfig config)
+        : impl::AbstractTimer(peripheral, OpMode::pwm_generation) 
+{
     if (config.hal_base_config.period == 0 && config.freq != 0) {
         // period specified by freq
         _freq = config.freq;
@@ -54,18 +54,7 @@ AdvancedControlTimer::AdvancedControlTimer(AdvancedControlPeripheral peripheral,
 }
 
 
-void AdvancedControlTimer::_enable_clk(AdvancedControlPeripheral peripheral) {
-    auto timer_idx = std::to_underlying(peripheral);
-    if (_clk_enabled[timer_idx]) {
-        return;
-    }
-
-    impl::adv_timer_clk_enable_funcs[timer_idx]();
-    _clk_enabled[timer_idx] = true;
-}
-
-
-void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
+void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
     switch (channel) {
     case Channel::channel1:
         _reg->CCM1_COMPARE_B.OC1PEN = config.oc_preload;
@@ -94,7 +83,7 @@ void AdvancedControlTimer::init_pwm(Channel channel, ChPin* pin_ch, ChPin* pin_c
 }
 
 
-void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
+void PwmTimer::initialize_bdt(BkinPin* pin_bkin, BdtConfig config) {
     if (config.hal_bdt_config.deadTime == 0 && config.deadtime_ns != 0) {
         // deadtime specified by deadtime_ns
         if (config.deadtime_ns <= 0X7F * _t_dts_ns) {
@@ -117,17 +106,20 @@ void AdvancedControlTimer::init_bdt(BkinPin* pin_bkin, BdtConfig config) {
 }
 
 
-void AdvancedControlTimer::init_update_interrupts(IrqPriority priority) {
+void PwmTimer::initialize_update_interrupts(IrqPriority priority) {
     _reg->DIEN_B.UIEN = 1;
-    set_irq_priority(impl::adv_timer_up_irqn[std::to_underlying(_peripheral)], priority);
+    set_irq_priority(impl::up_irq_nums[std::to_underlying(_peripheral)], priority);
 }
 
 
-void AdvancedControlTimer::init_break_interrupts(IrqPriority priority) {
+void PwmTimer::initialize_break_interrupts(IrqPriority priority) {
     _reg->DIEN_B.BRKIEN = 1;
-    set_irq_priority(impl::adv_timer_brk_irqn[std::to_underlying(_peripheral)], priority);
+    set_irq_priority(impl::brk_irq_nums[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;
 }
+
+
+} // namespace adv
 
 
 } // namespace timers

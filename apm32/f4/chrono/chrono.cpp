@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include "chrono.h"
+#include <mcudrv/apm32/f4/chrono/chrono.h>
 
 
 extern "C" void SysTick_Handler()

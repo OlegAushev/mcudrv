@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include "dma.h"
+#include <mcudrv/apm32/f4/dma/dma.h>
 
 
 namespace mcu {

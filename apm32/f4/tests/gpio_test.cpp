@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include "tests.h"
+#include <mcudrv/apm32/f4/tests/tests.h>
 
 
 void mcu::tests::gpio_test()

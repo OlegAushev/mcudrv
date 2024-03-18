@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include "dac.h"
+#include <mcudrv/apm32/f4/dac/dac.h>
 
 
 namespace mcu {

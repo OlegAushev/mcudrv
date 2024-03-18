@@ -5,7 +5,7 @@
 #ifdef APM32F4xx
 
 
-#include "../apm32f4_common.h"
+#include <mcudrv/apm32/f4/apm32f4_base.h>
 #include <apm32f4xx_gpio.h>
 #include <apm32f4xx_rcm.h>
 #include <emblib/interfaces/gpio.h>
