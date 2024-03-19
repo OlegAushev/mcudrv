@@ -5,13 +5,13 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/general/general.h>
+#include <mcudrv/stm32/f4/tim/general/general.h>
 
 
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
     
     
 namespace general {

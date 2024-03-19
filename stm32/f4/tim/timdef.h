@@ -13,7 +13,7 @@
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
 enum class OpMode {
@@ -26,22 +26,8 @@ enum class OpMode {
 };
 
 
-struct PwmConfig {
-    float freq;
-    TIM_Base_InitTypeDef hal_base_config;
-};
-
-
 struct InputCaptureConfig {
     TIM_Base_InitTypeDef hal_base_config;
-};
-
-
-enum class Channel : unsigned int {
-    channel1 = TIM_CHANNEL_1,
-    channel2 = TIM_CHANNEL_2,
-    channel3 = TIM_CHANNEL_3,
-    channel4 = TIM_CHANNEL_4,
 };
 
 
@@ -71,12 +57,6 @@ public:
             },
             .actstate = emb::gpio::active_pin_state::high});
     }
-};
-
-
-struct BdtConfig {
-    float deadtime_ns;
-    TIM_BreakDeadTimeConfigTypeDef hal_bdt_config;
 };
 
 

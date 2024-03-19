@@ -2,19 +2,19 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/advanced/pwm.h>
+#include <mcudrv/stm32/f4/tim/adv/pwm.h>
 
 
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
-namespace advanced {
+namespace adv {
 
 
-PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config)
+PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_bkin)
         : impl::AbstractTimer(peripheral, OpMode::pwm_generation) 
 {
     _handle.Init = config.hal_base_config;
@@ -49,7 +49,7 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config)
             break;
         }
     } else {
-        fatal_error("invalid config");
+        fatal_error();
     }
 
     switch (config.hal_base_config.ClockDivision) {
@@ -63,51 +63,46 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config)
         _t_dts_ns = 4 * float(config.hal_base_config.Prescaler+1) * 1000000000.f / float(core_clk_freq());
         break;
     default:
-        fatal_error("timer initialization failed");
+        fatal_error();
         break;
     }
 
     if (HAL_TIM_PWM_Init(&_handle) != HAL_OK) {
-        fatal_error("timer initialization failed");
+        fatal_error();
     }
+
+    _initialize_bdt(config, pin_bkin);
 }
 
 
-void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
-    if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_oc_config, std::to_underlying(channel)) != HAL_OK) {
-        fatal_error("timer pwm channel initialization failed");
+void PwmTimer::_initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
+    if (config.hal_bdt_config.BreakState == TIM_BREAK_ENABLE) {
+        if (pin_bkin == nullptr) {
+            fatal_error();
+        }
     }
+    
+    auto bdt_config = config.hal_bdt_config;
 
-    if (pin_ch) {
-        set_bit(_reg->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
-    }
-
-    if (pin_chn) {
-        set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
-    }
-}
-
-
-void PwmTimer::initialize_bdt(BkinPin* pin_bkin, BdtConfig config) {
-    if (config.hal_bdt_config.DeadTime == 0) {
+    if (bdt_config.DeadTime == 0) {
         // deadtime specified by deadtime_ns
         _deadtime = config.deadtime_ns * 1E-09f;
         if (config.deadtime_ns <= 0X7F * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = uint32_t(config.deadtime_ns / _t_dts_ns);
+            bdt_config.DeadTime = uint32_t(config.deadtime_ns / _t_dts_ns);
         } else if (config.deadtime_ns <= 127 * 2 * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = uint32_t((config.deadtime_ns - 64 * 2 * _t_dts_ns) / (2 * _t_dts_ns));
-            config.hal_bdt_config.DeadTime |= 0x80;
+            bdt_config.DeadTime = uint32_t((config.deadtime_ns - 64 * 2 * _t_dts_ns) / (2 * _t_dts_ns));
+            bdt_config.DeadTime |= 0x80;
         } else if (config.deadtime_ns <= 63 * 8 * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = uint32_t((config.deadtime_ns - 32 * 8 * _t_dts_ns) / (8 * _t_dts_ns));
-            config.hal_bdt_config.DeadTime |= 0xC0;
+            bdt_config.DeadTime = uint32_t((config.deadtime_ns - 32 * 8 * _t_dts_ns) / (8 * _t_dts_ns));
+            bdt_config.DeadTime |= 0xC0;
         } else if (config.deadtime_ns <= 63 * 16 * _t_dts_ns) {
-            config.hal_bdt_config.DeadTime = uint32_t((config.deadtime_ns - 32 * 16 * _t_dts_ns) / (16 * _t_dts_ns));
-            config.hal_bdt_config.DeadTime |= 0xE0;
+            bdt_config.DeadTime = uint32_t((config.deadtime_ns - 32 * 16 * _t_dts_ns) / (16 * _t_dts_ns));
+            bdt_config.DeadTime |= 0xE0;
         } else {
-            fatal_error("timer dead-time initialization failed");
+            fatal_error();
         }
     } else {
-        auto dtg = config.hal_bdt_config.DeadTime;
+        auto dtg = bdt_config.DeadTime;
         if ((dtg & 0x80) == 0) {
             _deadtime = float(dtg) * _t_dts_ns * 1E-09f;
         } else if ((dtg & 0xC0) == 0x80) {
@@ -117,12 +112,27 @@ void PwmTimer::initialize_bdt(BkinPin* pin_bkin, BdtConfig config) {
         } else if ((dtg & 0xE0) == 0xE0) {
             _deadtime = float(32 + (dtg & 0x1F)) * 16 * _t_dts_ns * 1E-09f;
         } else {
-            fatal_error("timer dead-time initialization failed");
+            fatal_error();
         }
     }
 
-    if (HAL_TIMEx_ConfigBreakDeadTime(&_handle, &config.hal_bdt_config) != HAL_OK) {
-        fatal_error("timer dead-time initialization failed");
+    if (HAL_TIMEx_ConfigBreakDeadTime(&_handle, &bdt_config) != HAL_OK) {
+        fatal_error();
+    }
+}
+
+
+void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
+    if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_oc_config, std::to_underlying(channel)) != HAL_OK) {
+        fatal_error();
+    }
+
+    if (pin_ch) {
+        set_bit(_reg->CCER, uint32_t(TIM_CCx_ENABLE) << std::to_underlying(channel));
+    }
+
+    if (pin_chn) {
+        set_bit(_reg->CCER, uint32_t(TIM_CCxN_ENABLE) << std::to_underlying(channel));
     }
 }
 

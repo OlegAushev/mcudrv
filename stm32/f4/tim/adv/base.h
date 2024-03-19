@@ -5,16 +5,16 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/timersdef.h>
+#include <mcudrv/stm32/f4/tim/timdef.h>
 
 
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
-namespace advanced {
+namespace adv {
 
 
 enum class Peripheral : unsigned int {
@@ -24,6 +24,14 @@ enum class Peripheral : unsigned int {
 
 
 constexpr size_t peripheral_count = 2;
+
+
+enum class Channel : unsigned int {
+    channel1 = TIM_CHANNEL_1,
+    channel2 = TIM_CHANNEL_2,
+    channel3 = TIM_CHANNEL_3,
+    channel4 = TIM_CHANNEL_4,
+};
 
 
 namespace impl {
@@ -51,12 +59,21 @@ inline constexpr std::array<IRQn_Type, peripheral_count> brk_irq_nums = {TIM1_BR
 class AbstractTimer : public emb::interrupt_invoker_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
 protected:
     const Peripheral _peripheral;
+    TIM_TypeDef* const _reg;
     const OpMode _mode;
     TIM_HandleTypeDef _handle{};
-    TIM_TypeDef* _reg;
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
-    AbstractTimer(Peripheral peripheral, OpMode mode);
+    AbstractTimer(Peripheral peripheral, OpMode mode)
+            : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
+            , _peripheral(peripheral)
+            , _reg(impl::instances[std::to_underlying(peripheral)])
+            , _mode(mode)
+    {
+        _enable_clk(peripheral);
+        _handle.Instance = _reg;
+    }
+
     OpMode mode() const { return _mode; }
     Peripheral peripheral() const { return _peripheral; }
     TIM_HandleTypeDef* handle() { return &_handle; }
@@ -70,7 +87,15 @@ public:
         clear_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);
     }
 private:
-    static void _enable_clk(Peripheral peripheral);
+    static void _enable_clk(Peripheral peripheral)  {
+        auto timer_idx = std::to_underlying(peripheral);
+        if (_clk_enabled[timer_idx]) {
+            return;
+        }
+
+        impl::clk_enable_funcs[timer_idx]();
+        _clk_enabled[timer_idx] = true;
+    }
 };
 
 

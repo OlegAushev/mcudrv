@@ -2,16 +2,16 @@
 #ifdef STM32F4xx
 
 
-#include <mcudrv/stm32/f4/timers/advanced/advanced.h>
+#include <mcudrv/stm32/f4/tim/general/general.h>
 
 
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
-namespace advanced {
+namespace general {
 
 
 impl::AbstractTimer::AbstractTimer(Peripheral peripheral, OpMode mode)
@@ -36,7 +36,7 @@ void impl::AbstractTimer::_enable_clk(Peripheral peripheral) {
 }
 
 
-} // namespace advanced
+} // namespace general
 
 
 } // namespace timers

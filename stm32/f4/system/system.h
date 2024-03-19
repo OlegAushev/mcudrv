@@ -26,6 +26,9 @@ inline uint32_t core_clk_freq() { return SystemCoreClock; }
 void reset_device();
 
 
+void fatal_error();
+
+
 void fatal_error(const char* hint, int code = 0);
 
 
