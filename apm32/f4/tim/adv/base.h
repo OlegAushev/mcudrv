@@ -5,22 +5,30 @@
 #ifdef APM32F4xx
 
 
-#include <mcudrv/apm32/f4/timers/timersdef.h>
+#include <mcudrv/apm32/f4/tim/timdef.h>
 
 
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
-namespace advanced {
+namespace adv {
 
 
 constexpr size_t peripheral_count = 2;
 enum class Peripheral : unsigned int {
     tim1,
     tim8
+};
+
+
+enum class Channel : unsigned int {
+    channel1 = TMR_CHANNEL_1,
+    channel2 = TMR_CHANNEL_2,
+    channel3 = TMR_CHANNEL_3,
+    channel4 = TMR_CHANNEL_4,
 };
 
 
@@ -54,7 +62,15 @@ protected:
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
-    AbstractTimer(Peripheral peripheral, OpMode mode);
+    AbstractTimer(Peripheral peripheral, OpMode mode)
+            : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
+            , _peripheral(peripheral)
+            , _reg(impl::instances[std::to_underlying(peripheral)])
+            , _mode(mode)
+    {
+        _enable_clk(peripheral);   
+    }
+
     Peripheral peripheral() const { return _peripheral; }
     TMR_T* reg() { return _reg; }
     OpMode mode() const { return _mode; }
@@ -67,7 +83,15 @@ public:
         _reg->CTRL1_B.CNTEN = 0;
     }
 private:
-    static void _enable_clk(Peripheral peripheral);
+    static void _enable_clk(Peripheral peripheral) {
+        auto timer_idx = std::to_underlying(peripheral);
+        if (_clk_enabled[timer_idx]) {
+            return;
+        }
+
+        impl::clk_enable_funcs[timer_idx]();
+        _clk_enabled[timer_idx] = true;
+    }
 };
 
 

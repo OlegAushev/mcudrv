@@ -24,9 +24,14 @@ struct CoreConfig {
 
 void initialize(const CoreConfig& config);
 
+
 void reset_device();
 
+
 void delay(std::chrono::milliseconds delay);
+
+
+void fatal_error();
 
 
 void fatal_error(const char* hint, int code = 0);

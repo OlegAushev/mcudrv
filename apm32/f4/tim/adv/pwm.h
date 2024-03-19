@@ -5,34 +5,43 @@
 #ifdef APM32F4xx
 
 
-#include <mcudrv/apm32/f4/timers/advanced/advanced.h>
+#include <mcudrv/apm32/f4/tim/adv/base.h>
 
 
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
-namespace advanced {
+namespace adv {
+
+
+struct PwmConfig {
+    float freq;
+    float deadtime_ns;
+    bool arr_preload;
+    TMR_BaseConfig_T hal_base_config;
+    TMR_BDTConfig_T hal_bdt_config;
+};
 
 
 class PwmTimer : public impl::AbstractTimer {
 private:
     float _freq{0};
     float _t_dts_ns{0};
+    float _deadtime{0};
     bool _brk_enabled{false};
 public:
-    PwmTimer(Peripheral peripheral, PwmConfig config);
+    PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_bkin);
 
     static PwmTimer* instance(Peripheral peripheral) {
         assert(impl::AbstractTimer::instance(std::to_underlying(peripheral))->mode() == OpMode::pwm_generation);
         return static_cast<PwmTimer*>(impl::AbstractTimer::instance(std::to_underlying(peripheral)));
     }
 
-    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config);
-    void initialize_bdt(BkinPin* pin_bkin, BdtConfig config);
-
+    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const ChannelConfig& config);
+    
     bool active() const {
         return _reg->BDT_B.MOEN == 1;
     }
@@ -96,6 +105,8 @@ public:
     void disable_break_interrupts() {
         disable_irq(impl::brk_irq_nums[std::to_underlying(_peripheral)]);
     }
+private:
+    void _initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin);
 };
 
 

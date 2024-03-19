@@ -14,7 +14,7 @@
 namespace mcu {
 
 
-namespace timers {
+namespace tim {
 
 
 enum class OpMode {
@@ -24,21 +24,6 @@ enum class OpMode {
     output_compare,
     pwm_generation,
     one_pulse
-};
-
-
-struct PwmConfig {
-    float freq;
-    TMR_BaseConfig_T hal_base_config;
-    bool arr_preload;
-};
-
-
-enum class Channel : unsigned int {
-    channel1 = TMR_CHANNEL_1,
-    channel2 = TMR_CHANNEL_2,
-    channel3 = TMR_CHANNEL_3,
-    channel4 = TMR_CHANNEL_4,
 };
 
 
@@ -67,12 +52,6 @@ public:
                                 .af_selection = config.af_selection,
                                 .actstate = emb::gpio::active_pin_state::high});
     }
-};
-
-
-struct BdtConfig {
-    float deadtime_ns;
-    TMR_BDTConfig_T hal_bdt_config;
 };
 
 
