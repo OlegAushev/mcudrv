@@ -43,6 +43,19 @@ public:
             return read_reg(_reg->CCR4); 
         }
     }
+
+    void initialize_interrupts(std::initializer_list<InterruptSource> sources, IrqPriority priority);
+    
+    void enable_interrupts() {
+        clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF | TIM_SR_CC1IF | TIM_SR_CC2IF | TIM_SR_CC3IF | TIM_SR_CC4IF |
+                                      TIM_SR_TIF | TIM_SR_CC1OF | TIM_SR_CC2OF | TIM_SR_CC3OF | TIM_SR_CC4OF);
+        clear_pending_irq(impl::irq_nums[std::to_underlying(_peripheral)]);
+        enable_irq(impl::irq_nums[std::to_underlying(_peripheral)]);
+    }
+
+    void disable_interrupts() {
+        disable_irq(impl::irq_nums[std::to_underlying(_peripheral)]);
+    }    
 };
 
 

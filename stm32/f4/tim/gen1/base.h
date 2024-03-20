@@ -28,12 +28,12 @@ enum class Channel : unsigned int {
 };
 
 
-enum class InterruptSource {
-    update = TIM_IT_UPDATE,
-    cc1 = TIM_IT_CC1,
-    cc2 = TIM_IT_CC2,
-    cc3 = TIM_IT_CC3,
-    cc4 = TIM_IT_CC4,
+enum class InterruptSource : unsigned int {
+    update  = TIM_IT_UPDATE,
+    cc1     = TIM_IT_CC1,
+    cc2     = TIM_IT_CC2,
+    cc3     = TIM_IT_CC3,
+    cc4     = TIM_IT_CC4,
     trigger = TIM_IT_TRIGGER
 };
 

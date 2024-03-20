@@ -35,6 +35,19 @@ void InputCaptureTimer::initialize_channel(Channel channel, ChPin* pin_ch, const
 }
 
 
+void InputCaptureTimer::initialize_interrupts(std::initializer_list<InterruptSource> sources, IrqPriority priority) {
+    if (sources.size() == 0) {
+        return;
+    }
+
+    for (auto source : sources) {
+        set_bit<uint32_t>(_reg->DIER, std::to_underlying(source));
+    }
+
+    set_irq_priority(impl::irq_nums[std::to_underlying(_peripheral)], priority);
+}
+
+
 } // namespace general
 } // namespace timers
 } // namespace mcu
