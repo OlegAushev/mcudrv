@@ -23,9 +23,7 @@ void CAN2_TX_IRQHandler();
 }
 
 
-namespace mcu {
-
-    
+namespace mcu { 
 namespace can {
 
 
@@ -155,7 +153,7 @@ public:
     std::optional<RxMessageAttribute> recv(can_frame& frame, RxFifo fifo) const;
 
 public:
-    void init_interrupts(uint32_t interrupt_list);
+    void initialize_interrupts(uint32_t interrupt_list);
     void set_interrupt_priority(IrqPriority rx0_priority, IrqPriority rx1_priority, IrqPriority tx_priority);
     void enable_interrupts();
     void disable_interrupts();
@@ -177,8 +175,6 @@ private:
 
 
 } // namespace can
-
-
 } // namespace mcu
 
 

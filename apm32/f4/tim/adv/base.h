@@ -9,11 +9,7 @@
 
 
 namespace mcu {
-
-
 namespace tim {
-
-
 namespace adv {
 
 
@@ -99,11 +95,7 @@ private:
 
 
 } // namespace adv
-
-
 } // namespace timers
-
-
 } // namepsace mcu
 
 

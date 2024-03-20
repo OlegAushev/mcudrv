@@ -42,7 +42,7 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
 }
 
 
-void Module::init_injected_channel(const PinConfig& pin_config, const InjectedChannelConfig& channel_config) {
+void Module::initialzie_injected_channel(const PinConfig& pin_config, const InjectedChannelConfig& channel_config) {
     mcu::gpio::Config cfg{.port = pin_config.port,
                           .pin = {.pin = pin_config.pin,
                                   .mode = GPIO_MODE_AN,
@@ -58,7 +58,7 @@ void Module::init_injected_channel(const PinConfig& pin_config, const InjectedCh
 }
 
 
-void Module::init_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
+void Module::initialize_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
     mcu::gpio::Config cfg{.port = pin_config.port,
                           .pin = {.pin = pin_config.pin,
                                   .mode = GPIO_MODE_AN,
@@ -75,7 +75,7 @@ void Module::init_regular_channel(const PinConfig& pin_config, const RegularChan
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
+void Module::initialize_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
     _reg->STS_B.AWDFLG = 0;
     _reg->STS_B.EOCFLG = 0;
     _reg->STS_B.INJEOCFLG = 0;

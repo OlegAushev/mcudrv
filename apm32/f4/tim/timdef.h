@@ -12,8 +12,6 @@
 
 
 namespace mcu {
-
-
 namespace tim {
 
 
@@ -24,12 +22,6 @@ enum class OpMode {
     output_compare,
     pwm_generation,
     one_pulse
-};
-
-
-struct ChannelConfig {
-    TMR_OCConfig_T hal_oc_config;
-    TMR_OC_PRELOAD_T oc_preload;
 };
 
 
@@ -44,13 +36,13 @@ class ChPin {
 public:
     ChPin(const ChPinConfig& config) {
         mcu::gpio::AlternatePin({.port = config.port, 
-                                .pin = {.pin = config.pin,
-                                        .mode = GPIO_MODE_AF,
-                                        .speed = GPIO_SPEED_50MHz,
-                                        .otype = GPIO_OTYPE_PP,
-                                        .pupd = GPIO_PUPD_NOPULL},
-                                .af_selection = config.af_selection,
-                                .actstate = emb::gpio::active_pin_state::high});
+                                 .pin = {.pin = config.pin,
+                                         .mode = GPIO_MODE_AF,
+                                         .speed = GPIO_SPEED_50MHz,
+                                         .otype = GPIO_OTYPE_PP,
+                                         .pupd = GPIO_PUPD_NOPULL},
+                                 .af_selection = config.af_selection,
+                                 .actstate = emb::gpio::active_pin_state::high});
     }
 };
 
@@ -67,20 +59,18 @@ class BkinPin {
 public:
     BkinPin(const BkinPinConfig& config) {
         mcu::gpio::AlternatePin({.port = config.port, 
-                                .pin = {.pin = config.pin,
-                                        .mode = GPIO_MODE_AF,
-                                        .speed = GPIO_SPEED_50MHz,
-                                        .otype = GPIO_OTYPE_PP,
-                                        .pupd = config.pull},
-                                .af_selection = config.af_selection,
-                                .actstate = emb::gpio::active_pin_state::high});
+                                 .pin = {.pin = config.pin,
+                                         .mode = GPIO_MODE_AF,
+                                         .speed = GPIO_SPEED_50MHz,
+                                         .otype = GPIO_OTYPE_PP,
+                                         .pupd = config.pull},
+                                 .af_selection = config.af_selection,
+                                 .actstate = emb::gpio::active_pin_state::high});
     }
 };
 
 
 } // namespace timers
-
-
 } // namepsace mcu
 
 

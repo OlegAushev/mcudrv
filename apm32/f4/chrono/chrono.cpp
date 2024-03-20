@@ -13,8 +13,6 @@ extern "C" void SysTick_Handler()
 
 
 namespace mcu {
-
-
 namespace chrono {
 
 
@@ -31,8 +29,6 @@ void steady_clock::initialize() {
 
 
 } //namespace chrono
-
-
 } // namespace mcu
 
 

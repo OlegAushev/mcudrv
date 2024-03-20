@@ -6,8 +6,6 @@
 
 
 namespace mcu {
-
-
 namespace dma {
 
 
@@ -55,7 +53,7 @@ void Stream::_enable_clk(StreamId stream_id) {
 }
 
 
-void Stream::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority) {
+void Stream::initialize_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority) {
     if ((interrupt_bitset & DMA_INT_FEIFLG) == DMA_INT_FEIFLG) {
         _stream_reg->FCTRL_B.FEIEN = 1;
     }
@@ -69,8 +67,6 @@ void Stream::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priorit
 
 
 } // namespace dma
-
-
 } // namespace mcu
 
 

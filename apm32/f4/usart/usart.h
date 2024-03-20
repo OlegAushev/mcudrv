@@ -13,8 +13,6 @@
 
 
 namespace mcu {
-
-
 namespace usart {
 
 
@@ -130,8 +128,6 @@ protected:
 
 
 } // namespace usart
-
-
 } // namespace mcu
 
 

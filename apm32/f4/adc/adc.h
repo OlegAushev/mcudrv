@@ -102,8 +102,8 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    void init_injected_channel(const PinConfig& pin_config, const InjectedChannelConfig& channel_config);
-    void init_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config);
+    void initialzie_injected_channel(const PinConfig& pin_config, const InjectedChannelConfig& channel_config);
+    void initialize_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config);
 
     void start_injected() {
         if (_reg->STS_B.INJCSFLG == 1) {
@@ -156,7 +156,7 @@ public:
     }
 
 public:
-    void init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
+    void initialize_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
     void enable_interrupts() { enable_irq(ADC_IRQn); }
     void disable_interrupts() { disable_irq(ADC_IRQn); }
     

@@ -6,8 +6,6 @@
 
 
 namespace mcu {
-
-
 namespace usart {
 
 
@@ -61,8 +59,6 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace usart
-
-
 } // namespace mcu
 
 

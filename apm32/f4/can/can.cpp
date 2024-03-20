@@ -8,8 +8,6 @@
 
 
 namespace mcu {
-
-    
 namespace can {
 
 
@@ -178,7 +176,7 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list) {
+void Module::initialize_interrupts(uint32_t interrupt_list) {
     set_bit(_reg->INTEN, interrupt_list);
 }
 
@@ -214,8 +212,6 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace can
-
-
 } // namespace mcu
 
 

@@ -17,8 +17,6 @@ extern "C" void SysTick_Handler();
 
 
 namespace mcu {
-
-
 namespace chrono {
 
 
@@ -39,8 +37,6 @@ protected:
 
 
 } // namespace chrono
-
-
 } // namespace mcu
 
 

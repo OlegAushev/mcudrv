@@ -9,11 +9,7 @@
 
 
 namespace mcu {
-
-
 namespace tim {
-
-
 namespace adv {
 
 
@@ -23,6 +19,12 @@ struct PwmConfig {
     bool arr_preload;
     TMR_BaseConfig_T hal_base_config;
     TMR_BDTConfig_T hal_bdt_config;
+};
+
+
+struct PwmChannelConfig {
+    TMR_OCConfig_T hal_oc_config;
+    TMR_OC_PRELOAD_T oc_preload;
 };
 
 
@@ -40,7 +42,7 @@ public:
         return static_cast<PwmTimer*>(impl::AbstractTimer::instance(std::to_underlying(peripheral)));
     }
 
-    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const ChannelConfig& config);
+    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const PwmChannelConfig& config);
     
     bool active() const {
         return _reg->BDT_B.MOEN == 1;
@@ -80,7 +82,7 @@ public:
         }
     }
 
-    float freq() const { return _freq; }
+    float frequency() const { return _freq; }
 
     void initialize_update_interrupts(IrqPriority priority);
 
@@ -111,11 +113,7 @@ private:
 
 
 } // namespace adv
-
-
 } // namespace timers
-
-
 } // namepsace mcu
 
 
