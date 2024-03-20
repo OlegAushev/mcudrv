@@ -9,11 +9,7 @@
 
 
 namespace mcu {
-
-
 namespace tim {
-
-
 namespace adv {
 
 
@@ -22,6 +18,11 @@ struct PwmConfig {
     float deadtime_ns;
     TIM_Base_InitTypeDef hal_base_config;
     TIM_BreakDeadTimeConfigTypeDef hal_bdt_config;
+};
+
+
+struct PwmChannelConfig {
+    TIM_OC_InitTypeDef hal_oc_config;
 };
 
 
@@ -39,7 +40,7 @@ public:
         return static_cast<PwmTimer*>(impl::AbstractTimer::instance(std::to_underlying(peripheral)));
     }
 
-    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config);
+    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config);
 
     bool active() const {
         return bit_is_set<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
@@ -62,7 +63,7 @@ public:
     }
 
     void set_duty_cycle(Channel channel, float duty_cycle) {
-        uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(__HAL_TIM_GET_AUTORELOAD(&_handle)));
+        uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(_reg->ARR));
         switch (channel) {
         case Channel::channel1:
             write_reg(_reg->CCR1, compare_value); 
@@ -111,12 +112,8 @@ private:
 };
 
 
-} // namespace advanced
-
-
+} // namespace adv
 } // namespace timers
-
-
 } // namepsace mcu
 
 

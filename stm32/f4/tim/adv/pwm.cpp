@@ -6,11 +6,7 @@
 
 
 namespace mcu {
-
-
 namespace tim {
-
-
 namespace adv {
 
 
@@ -122,7 +118,7 @@ void PwmTimer::_initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
 }
 
 
-void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, ChannelConfig config) {
+void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config) {
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_oc_config, std::to_underlying(channel)) != HAL_OK) {
         fatal_error();
     }
@@ -150,12 +146,8 @@ void PwmTimer::initialize_break_interrupts(IrqPriority priority) {
 }
 
 
-} // namespace advanced
-
-
+} // namespace adv
 } // namespace timers
-
-
 } // namespace mcu
 
 

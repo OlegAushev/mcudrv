@@ -14,10 +14,10 @@
 namespace mcu {
 
 
-void init_hal();
+void initialize_hal();
 
 
-void init_device_clk();
+void initialize_device_clock();
 
 
 inline uint32_t core_clk_freq() { return SystemCoreClock; }

@@ -9,21 +9,15 @@
 
 
 namespace mcu {
-
-
 namespace tim {
-
-
 namespace adv {
 
 
+constexpr size_t peripheral_count = 2;
 enum class Peripheral : unsigned int {
     tim1,
     tim8
 };
-
-
-constexpr size_t peripheral_count = 2;
 
 
 enum class Channel : unsigned int {
@@ -102,12 +96,8 @@ private:
 } // namespace impl
 
 
-} // namespace advanced
-
-
+} // namespace adv
 } // namespace timers
-
-
 } // namepsace mcu
 
 

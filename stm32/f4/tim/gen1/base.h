@@ -9,38 +9,39 @@
 
 
 namespace mcu {
+namespace tim {    
+namespace gen1 {
 
 
-namespace tim {
-    
-    
-namespace general {
-
-
+constexpr size_t peripheral_count = 2;
 enum class Peripheral : unsigned int {
     tim2,
-    tim3,
-    tim4,
     tim5,
-    tim9,
-    tim10,
-    tim11,
-    tim12,
-    tim13,
-    tim14
 };
 
 
-constexpr size_t peripheral_count = 10;
+enum class Channel : unsigned int {
+    channel1 = TIM_CHANNEL_1,
+    channel2 = TIM_CHANNEL_2,
+    channel3 = TIM_CHANNEL_3,
+    channel4 = TIM_CHANNEL_4,
+};
+
+
+enum class InterruptSource {
+    update = TIM_IT_UPDATE,
+    cc1 = TIM_IT_CC1,
+    cc2 = TIM_IT_CC2,
+    cc3 = TIM_IT_CC3,
+    cc4 = TIM_IT_CC4,
+    trigger = TIM_IT_TRIGGER
+};
 
 
 namespace impl {
 
 
-inline const std::array<TIM_TypeDef*, peripheral_count> instances = {
-    TIM2, TIM3, TIM4, TIM5,
-    TIM9, TIM10, TIM11, TIM12, TIM13, TIM14
-};
+inline const std::array<TIM_TypeDef*, peripheral_count> instances = {TIM2, TIM5};
 
 
 inline Peripheral to_peripheral(const TIM_TypeDef* instance) {
@@ -51,37 +52,31 @@ inline Peripheral to_peripheral(const TIM_TypeDef* instance) {
 
 inline std::array<void(*)(void), peripheral_count> clk_enable_funcs = {
     [](){ __HAL_RCC_TIM2_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM3_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM4_CLK_ENABLE(); },
     [](){ __HAL_RCC_TIM5_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM9_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM10_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM11_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM12_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM13_CLK_ENABLE(); },
-    [](){ __HAL_RCC_TIM14_CLK_ENABLE(); },
 };
 
 
-inline std::array<bool, peripheral_count> clk_enabled = {};
-
-
-inline constexpr std::array<IRQn_Type, peripheral_count> irq_nums = {
-    TIM2_IRQn, TIM3_IRQn, TIM4_IRQn, TIM5_IRQn,
-    TIM1_BRK_TIM9_IRQn, TIM1_UP_TIM10_IRQn, TIM1_TRG_COM_TIM11_IRQn,
-    TIM8_BRK_TIM12_IRQn, TIM8_UP_TIM13_IRQn, TIM8_TRG_COM_TIM14_IRQn
-};
+inline constexpr std::array<IRQn_Type, peripheral_count> irq_nums = {TIM2_IRQn, TIM5_IRQn};
 
 
 class AbstractTimer : public emb::interrupt_invoker_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
 protected:
     const Peripheral _peripheral;
+    TIM_TypeDef* const _reg;
     const OpMode _mode;
     TIM_HandleTypeDef _handle{};
-    TIM_TypeDef* _reg;
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
-    AbstractTimer(Peripheral peripheral, OpMode mode);
+    AbstractTimer(Peripheral peripheral, OpMode mode)
+            : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
+            , _peripheral(peripheral)
+            , _reg(impl::instances[std::to_underlying(peripheral)])
+            , _mode(mode)
+    {
+        _enable_clk(peripheral);
+        _handle.Instance = _reg;
+    }
+
     OpMode mode() const { return _mode; }
     Peripheral peripheral() const { return _peripheral; }
     TIM_HandleTypeDef* handle() { return &_handle; }
@@ -95,7 +90,15 @@ public:
         clear_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);
     }
 private:
-    static void _enable_clk(Peripheral peripheral);
+    static void _enable_clk(Peripheral peripheral)  {
+        auto timer_idx = std::to_underlying(peripheral);
+        if (_clk_enabled[timer_idx]) {
+            return;
+        }
+
+        impl::clk_enable_funcs[timer_idx]();
+        _clk_enabled[timer_idx] = true;
+    }
 };
 
 
@@ -103,11 +106,7 @@ private:
 
 
 } // namespace general
-
-
 } // namespace timers
-
-
 } // namepsace mcu
 
 

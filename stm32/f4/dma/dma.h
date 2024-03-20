@@ -100,7 +100,7 @@ public:
         return emb::interrupt_invoker_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
     }
 
-    void init_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
+    void initialize_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority);
 
     void enable_interrupts() {
         enable_irq(impl::dma_irqn[std::to_underlying(_stream_id)]);

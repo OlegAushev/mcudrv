@@ -11,8 +11,6 @@
 
 
 namespace mcu {
-
-
 namespace tim {
 
 
@@ -23,16 +21,6 @@ enum class OpMode {
     output_compare,
     pwm_generation,
     one_pulse
-};
-
-
-struct InputCaptureConfig {
-    TIM_Base_InitTypeDef hal_base_config;
-};
-
-
-struct ChannelConfig {
-    TIM_OC_InitTypeDef hal_oc_config;
 };
 
 
@@ -86,8 +74,6 @@ public:
 
 
 } // namespace timers
-
-
 } // namepsace mcu
 
 

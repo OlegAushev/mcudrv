@@ -78,7 +78,7 @@ private:
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
     Module(Peripheral peripheral);
-    void init_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config);
+    void initialize_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config);
     
     Peripheral peripheral() const { return _peripheral; }
     DAC_HandleTypeDef* handle() { return &_handle; }

@@ -187,7 +187,7 @@ std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) co
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_list) {
+void Module::initialize_interrupts(uint32_t interrupt_list) {
     set_bit(_reg->IER, interrupt_list);
 }
 
