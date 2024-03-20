@@ -12,8 +12,6 @@
 
 
 namespace mcu {
-
-
 namespace dma {
 
 
@@ -153,8 +151,6 @@ public:
 
 
 } // namespace dma
-
-
 } // namespace mcu
 
 

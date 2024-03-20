@@ -7,8 +7,6 @@
 
 
 namespace mcu {
-
-    
 namespace can {
 
 
@@ -224,8 +222,6 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace can
-
-
 } // namespace mcu
 
 

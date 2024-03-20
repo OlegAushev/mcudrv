@@ -6,8 +6,6 @@
 
 
 namespace mcu {
-
-
 namespace dma {
 
 
@@ -72,8 +70,6 @@ void Stream::initialize_interrupts(uint32_t interrupt_list,mcu::IrqPriority prio
 
 
 } // namespace dma
-
-
 } // namespace mcu
 
 

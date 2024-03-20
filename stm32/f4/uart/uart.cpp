@@ -6,8 +6,6 @@
 
 
 namespace mcu {
-
-
 namespace uart {
 
 
@@ -70,8 +68,6 @@ void Module::_enable_clk(Peripheral peripheral) {
 
 
 } // namespace uart
-
-
 } // namespace mcu
 
 

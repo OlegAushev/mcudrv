@@ -15,8 +15,6 @@
 
 
 namespace mcu {
-
-
 namespace uart {
 
 
@@ -122,8 +120,6 @@ private:
 
 
 } // namespace uart
-
-
 } // namespace mcu
 
 

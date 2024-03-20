@@ -10,8 +10,6 @@
 
 
 namespace mcu {
-
-
 namespace crc {
 
 
@@ -66,8 +64,6 @@ inline uint32_t calc_crc32(const uint8_t* buf, size_t len) {
 
 
 } // namespace crc
-
-
 } // namespace mcu
 
 

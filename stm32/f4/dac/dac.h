@@ -12,8 +12,6 @@
 
 
 namespace mcu {
-
-
 namespace dac {
 
 
@@ -105,8 +103,6 @@ protected:
 
 
 } // namespace dac
-
-
 } // namespace mcu
 
 

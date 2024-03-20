@@ -21,8 +21,6 @@ extern "C" void EXTI4_IRQHandler();
 
 
 namespace mcu {
-
-
 namespace gpio {
 
 
@@ -324,8 +322,6 @@ public:
 
 
 } // namespace gpio
-
-
 } // namespace mcu
 
 
