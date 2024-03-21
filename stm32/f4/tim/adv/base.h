@@ -20,6 +20,7 @@ enum class Peripheral : unsigned int {
 };
 
 
+constexpr size_t channel_count = 4;
 enum class Channel : unsigned int {
     channel1 = TIM_CHANNEL_1,
     channel2 = TIM_CHANNEL_2,

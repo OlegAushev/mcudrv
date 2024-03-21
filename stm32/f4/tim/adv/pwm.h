@@ -42,7 +42,7 @@ public:
 
     void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config);
 
-    bool active() const {
+    bool pwm_enabled() const {
         return bit_is_set<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
     }
 
@@ -95,6 +95,10 @@ public:
         disable_irq(impl::up_irq_nums[std::to_underlying(_peripheral)]);
     }
 
+    void acknowledge_update_interrupt() {
+        clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF);
+    }
+
     void initialize_break_interrupts(IrqPriority priority);
 
     void enable_break_interrupts() {
@@ -107,6 +111,9 @@ public:
         disable_irq(impl::brk_irq_nums[std::to_underlying(_peripheral)]);
     }
 
+    void acknowledge_break_interrupt() {
+        clear_bit<uint32_t>(_reg->SR, TIM_SR_BIF);
+    }
 private:
     void _initialize_bdt(const PwmConfig& bdt_config, BkinPin* pin_bkin);
 };
