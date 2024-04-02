@@ -55,6 +55,7 @@ inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
 class GpioPin
 {
 private:
+    static inline std::array<uint16_t, port_count> _assigned{};
     static inline std::array<bool, port_count> _clk_enabled{};
 protected:
     Config _cfg;
@@ -62,9 +63,13 @@ protected:
     GpioPin() = default;
 public:
     void initialize(const Config& config) {
-        // enable port clock
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
+        if (_assigned[port_idx] & config.pin.Pin) {
+            fatal_error();
+        }
+        _assigned[port_idx] |= uint16_t(config.pin.Pin);
+
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
             _clk_enabled[port_idx] = true;
