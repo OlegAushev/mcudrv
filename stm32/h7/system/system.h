@@ -30,6 +30,9 @@ inline uint32_t d2_clk_freq() { return SystemD2Clock; }
 void reset_device();
 
 
+void fatal_error();
+
+
 void fatal_error(const char* hint, int code = 0);
 
 

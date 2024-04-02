@@ -18,6 +18,11 @@ void reset_device() {
 }
 
 
+void fatal_error() {
+    emb::fatal_error("mcudrv: fatal error");
+}
+
+
 void fatal_error(const char* hint, int code) {
     emb::fatal_error(hint, code);
 }
