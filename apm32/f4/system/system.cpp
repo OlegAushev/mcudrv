@@ -9,6 +9,11 @@
 namespace mcu {
 
 
+__attribute__((weak)) void initialize_device_clock() {
+    fatal_error("device init clock func not implemented");
+}
+
+
 void initialize(const CoreConfig& config) {
     NVIC_ConfigPriorityGroup(config.prigroup);
 }
