@@ -6,6 +6,7 @@
 
 
 #include <mcudrv/apm32/f4/apm32f4_base.h>
+#include <mcudrv/apm32/f4/system/system.h>
 #include <apm32f4xx_gpio.h>
 #include <apm32f4xx_rcm.h>
 #include <emblib/interfaces/gpio.h>
@@ -65,10 +66,10 @@ public:
     void initialize(const Config& config) {
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
-        if (_assigned[port_idx] & config.pin.Pin) {
+        if (_assigned[port_idx] & config.pin.pin) {
             fatal_error();
         }
-        _assigned[port_idx] |= uint16_t(config.pin.Pin);
+        _assigned[port_idx] |= uint16_t(config.pin.pin);
 
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
