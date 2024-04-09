@@ -52,7 +52,7 @@ Module::Module(Peripheral peripheral,
                                         .otype = GPIO_OTYPE_PP,
                                         .pupd = GPIO_PUPD_NOPULL},
                                 .af_selection = cs_pin_config.value().af_selection,
-                                .actstate = emb::gpio::active_pin_state::high});
+                                .actstate = emb::gpio::active_pin_state::low});
     }
 
     _enable_clk(peripheral);
