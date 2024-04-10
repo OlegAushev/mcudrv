@@ -82,6 +82,8 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
+    bool busy() const { return _reg->STS_B.BSYFLG == 1; }
+
     DrvStatus put_data(uint16_t data) {
         if (_reg->STS_B.TXBEFLG == 0) {
             return DrvStatus::busy;
