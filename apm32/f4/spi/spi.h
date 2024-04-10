@@ -10,6 +10,7 @@
 #include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <apm32f4xx_spi.h>
 #include <optional>
+#include <vector>
 
 
 namespace mcu {
@@ -30,7 +31,8 @@ enum class Direction { rx, tx };
 struct MosiPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 struct MisoPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 struct ClkPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
-struct CsPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
+struct HwCsPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
+struct SwCsPinConfig { GPIO_T* port; uint16_t pin; };
 
 
 struct Config {
@@ -68,13 +70,20 @@ private:
     mcu::gpio::AlternatePin _miso_pin;
     mcu::gpio::AlternatePin _clk_pin;
     mcu::gpio::AlternatePin _cs_pin;
+    std::vector<mcu::gpio::OutputPin> _cs_pins;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
     Module(Peripheral peripheral,
            const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
-           const ClkPinConfig& clk_pin_config, std::optional<CsPinConfig> cs_pin_config,
+           const ClkPinConfig& clk_pin_config, std::optional<HwCsPinConfig> cs_pin_config,
            const Config& config);
+
+    Module(Peripheral peripheral,
+           const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
+           const ClkPinConfig& clk_pin_config, const std::vector<SwCsPinConfig>& cs_pin_configs,
+           const Config& config);
+
     Peripheral peripheral() const { return _peripheral; }
     SPI_T* reg() { return _reg; }
 
@@ -112,6 +121,9 @@ public:
     }
 protected:
     static void _enable_clk(Peripheral peripheral);
+    void _init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
+                             const MisoPinConfig& miso_pin_config,
+                             const ClkPinConfig& clk_pin_config);
 };
 
 
