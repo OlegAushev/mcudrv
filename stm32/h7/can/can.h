@@ -156,7 +156,7 @@ public:
         return 0;
     }
 
-    DrvStatus send(can_frame& frame) {
+    DrvStatus put_frame(can_frame& frame) {
         FDCAN_TxHeaderTypeDef header = {
             .Identifier = frame.id,
             .IdType = FDCAN_STANDARD_ID,
@@ -177,7 +177,7 @@ public:
         return status;
     }
 
-    DrvStatus send(FDCAN_TxHeaderTypeDef& header, can_payload& payload) {
+    DrvStatus put_frame(FDCAN_TxHeaderTypeDef& header, can_payload& payload) {
         DrvStatus status = static_cast<DrvStatus>(
                 HAL_FDCAN_AddMessageToTxFifoQ(&_handle, &header, payload.data()));
         if (status != DrvStatus::ok) {
@@ -186,7 +186,7 @@ public:
         return status;		
     }
 
-    std::optional<RxMessageAttribute> recv(can_frame& frame, RxFifo fifo);
+    std::optional<RxMessageAttribute> get_frame(can_frame& frame, RxFifo fifo);
 
     /* INTERRUPTS */
 private:

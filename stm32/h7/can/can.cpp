@@ -97,7 +97,7 @@ RxMessageAttribute Module::register_message(FDCAN_FilterTypeDef& filter) {
 }
 
 
-std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) {
+std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fifo) {
     if (rxfifo_level(fifo) == 0) {
         return {};
     }
