@@ -69,7 +69,7 @@ void Module::start() {
     emb::chrono::timeout start_timeout(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 1) {
         if (start_timeout.expired()) {
-             fatal_error("CAN module start failed");
+            fatal_error("CAN module start failed");
         }
     }
 }
@@ -86,7 +86,7 @@ void Module::stop() {
 }
 
 
-DrvStatus Module::send(const can_frame& frame) {
+DrvStatus Module::put_frame(const can_frame& frame) {
     if (mailbox_full()) {
         if (_txqueue.full()) {
             return DrvStatus::overflow;
@@ -132,7 +132,7 @@ DrvStatus Module::send(const can_frame& frame) {
 }
 
 
-std::optional<RxMessageAttribute> Module::recv(can_frame& frame, RxFifo fifo) const {
+std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fifo) const {
     if (rxfifo_level(fifo) == 0) {
         return {};
     }

@@ -24,6 +24,9 @@ enum class Peripheral : unsigned int {
 };
 
 
+enum class Direction { rx, tx };
+
+
 struct MosiPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 struct MisoPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 struct ClkPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
@@ -79,6 +82,32 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
+    DrvStatus put_data(uint16_t data) {
+        if (_reg->STS_B.TXBEFLG == 0) {
+            return DrvStatus::busy;
+        }
+        _reg->DATA_B.DATA = data; 
+        return DrvStatus::ok;
+    }
+
+    std::optional<uint16_t> get_data() {
+        if (_reg->STS_B.RXBNEFLG == 0) {
+            return {};
+        }
+        uint16_t data = _reg->DATA_B.DATA;
+        return {data};
+    }
+
+    void set_bidirectional_mode(Direction dir) {
+        switch (dir) {
+            case Direction::rx:
+                _reg->CTRL1_B.BMOEN = 0;
+                break;
+            case Direction::tx:
+                _reg->CTRL1_B.BMOEN = 1;
+                break;
+        }
+    }
 protected:
     static void _enable_clk(Peripheral peripheral);
 };
