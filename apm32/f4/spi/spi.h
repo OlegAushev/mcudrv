@@ -9,6 +9,7 @@
 #include <mcudrv/apm32/f4/system/system.h>
 #include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <apm32f4xx_spi.h>
+#include <initializer_list>
 #include <optional>
 #include <vector>
 
@@ -76,12 +77,12 @@ private:
 public:
     Module(Peripheral peripheral,
            const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
-           const ClkPinConfig& clk_pin_config, std::optional<HwCsPinConfig> cs_pin_config,
+           const ClkPinConfig& clk_pin_config, const HwCsPinConfig& cs_pin_config,
            const Config& config);
 
     Module(Peripheral peripheral,
            const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
-           const ClkPinConfig& clk_pin_config, const std::vector<SwCsPinConfig>& cs_pin_configs,
+           const ClkPinConfig& clk_pin_config, std::initializer_list<SwCsPinConfig> cs_pin_configs,
            const Config& config);
 
     Peripheral peripheral() const { return _peripheral; }
@@ -91,13 +92,18 @@ public:
         return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
-    bool busy() const { return _reg->STS_B.BSYFLG == 1; }
+    void enable() { _reg->CTRL1_B.SPIEN = 1; }
+    void disable() { _reg->CTRL1_B.SPIEN = 0; }
+
+    bool busy() const { return _reg->STS_B.BSYFLG == 0; }
+    bool rx_empty() const { return _reg->STS_B.RXBNEFLG == 0; }
+    bool tx_empty() const { return _reg->STS_B.TXBEFLG == 1; }
 
     DrvStatus put_data(uint16_t data) {
         if (_reg->STS_B.TXBEFLG == 0) {
             return DrvStatus::busy;
         }
-        _reg->DATA_B.DATA = data; 
+        _reg->DATA_B.DATA = data;
         return DrvStatus::ok;
     }
 
@@ -118,6 +124,20 @@ public:
                 _reg->CTRL1_B.BMOEN = 1;
                 break;
         }
+    }
+
+    void set_cs(size_t cs_idx = 0) {
+        if (cs_idx >= _cs_pins.size()) {
+            return;
+        }
+        _cs_pins[cs_idx].set();
+    }
+
+    void reset_cs(size_t cs_idx = 0) {
+        if (cs_idx >= _cs_pins.size()) {
+            return;
+        }
+        _cs_pins[cs_idx].reset();
     }
 protected:
     static void _enable_clk(Peripheral peripheral);

@@ -11,7 +11,7 @@ namespace spi {
 
 Module::Module(Peripheral peripheral,
                const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
-               const ClkPinConfig& clk_pin_config, std::optional<HwCsPinConfig> cs_pin_config,
+               const ClkPinConfig& clk_pin_config, const HwCsPinConfig& cs_pin_config,
                const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
@@ -19,16 +19,14 @@ Module::Module(Peripheral peripheral,
 {
     _init_mosi_miso_clk(mosi_pin_config, miso_pin_config, clk_pin_config);
 
-    if (cs_pin_config.has_value()) {
-        _cs_pin.initialize({.port = cs_pin_config.value().port,
-                                .pin = {.pin = cs_pin_config.value().pin,
-                                        .mode = GPIO_MODE_AF,
-                                        .speed = GPIO_SPEED_25MHz,
-                                        .otype = GPIO_OTYPE_PP,
-                                        .pupd = GPIO_PUPD_NOPULL},
-                                .altfunc = cs_pin_config.value().altfunc,
-                                .actstate = emb::gpio::active_pin_state::low});
-    }
+    _cs_pin.initialize({.port = cs_pin_config.port,
+                        .pin = {.pin = cs_pin_config.pin,
+                                .mode = GPIO_MODE_AF,
+                                .speed = GPIO_SPEED_25MHz,
+                                .otype = GPIO_OTYPE_PP,
+                                .pupd = GPIO_PUPD_NOPULL},
+                        .altfunc = cs_pin_config.altfunc,
+                        .actstate = emb::gpio::active_pin_state::low});
 
     _enable_clk(peripheral);
 
@@ -40,15 +38,19 @@ Module::Module(Peripheral peripheral,
 
 Module::Module(Peripheral peripheral,
                const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
-               const ClkPinConfig& clk_pin_config, const std::vector<SwCsPinConfig>& cs_pin_configs,
+               const ClkPinConfig& clk_pin_config, std::initializer_list<SwCsPinConfig> cs_pin_configs,
                const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
         , _reg(impl::instances[std::to_underlying(peripheral)])
 {
+    if (cs_pin_configs.size() != 0 && config.hal_config.mode != SPI_MODE_MASTER) {
+        fatal_error();
+    }
+
     _init_mosi_miso_clk(mosi_pin_config, miso_pin_config, clk_pin_config);
 
-    for (const auto& pincfg : cs_pin_configs) {
+    for (auto pincfg : cs_pin_configs) {
         _cs_pins.emplace_back(mcu::gpio::OutputPin(mcu::gpio::Config{.port = pincfg.port,
                 .pin = {.pin = pincfg.pin,
                         .mode = GPIO_MODE_OUT,
@@ -63,7 +65,7 @@ Module::Module(Peripheral peripheral,
 
     auto spi_config = config.hal_config;
     SPI_Config(_reg, &spi_config);
-    SPI_Enable(_reg);
+    // SPI_Enable(_reg);
 }
 
 
