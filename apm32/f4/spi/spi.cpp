@@ -23,7 +23,7 @@ Module::Module(Peripheral peripheral,
                                     .speed = GPIO_SPEED_100MHz,
                                     .otype = GPIO_OTYPE_PP,
                                     .pupd = GPIO_PUPD_NOPULL},
-                            .af_selection = mosi_pin_config.af_selection,
+                            .altfunc = mosi_pin_config.altfunc,
                             .actstate = emb::gpio::active_pin_state::high});
 
     _miso_pin.initialize({.port = miso_pin_config.port,
@@ -32,7 +32,7 @@ Module::Module(Peripheral peripheral,
                                     .speed = GPIO_SPEED_100MHz,
                                     .otype = GPIO_OTYPE_PP,
                                     .pupd = GPIO_PUPD_NOPULL},
-                            .af_selection = miso_pin_config.af_selection,
+                            .altfunc = miso_pin_config.altfunc,
                             .actstate = emb::gpio::active_pin_state::high});
 
     _clk_pin.initialize({.port = clk_pin_config.port,
@@ -41,7 +41,7 @@ Module::Module(Peripheral peripheral,
                                     .speed = GPIO_SPEED_100MHz,
                                     .otype = GPIO_OTYPE_PP,
                                     .pupd = GPIO_PUPD_NOPULL},
-                            .af_selection = clk_pin_config.af_selection,
+                            .altfunc = clk_pin_config.altfunc,
                             .actstate = emb::gpio::active_pin_state::high});
 
     if (cs_pin_config.has_value()) {
@@ -51,7 +51,7 @@ Module::Module(Peripheral peripheral,
                                         .speed = GPIO_SPEED_100MHz,
                                         .otype = GPIO_OTYPE_PP,
                                         .pupd = GPIO_PUPD_NOPULL},
-                                .af_selection = cs_pin_config.value().af_selection,
+                                .altfunc = cs_pin_config.value().altfunc,
                                 .actstate = emb::gpio::active_pin_state::low});
     }
 

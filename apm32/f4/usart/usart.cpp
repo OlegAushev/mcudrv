@@ -22,7 +22,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
             .otype = GPIO_OTYPE_PP,
             .pupd = GPIO_PUPD_NOPULL
         },
-        .af_selection = rx_pin_config.af_selection,
+        .altfunc = rx_pin_config.altfunc,
         .actstate = emb::gpio::active_pin_state::high
     });
 
@@ -35,7 +35,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
             .otype = GPIO_OTYPE_PP,
             .pupd = GPIO_PUPD_NOPULL
         },
-        .af_selection = tx_pin_config.af_selection,
+        .altfunc = tx_pin_config.altfunc,
         .actstate = emb::gpio::active_pin_state::high
     });
 

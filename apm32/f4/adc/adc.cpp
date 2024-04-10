@@ -49,7 +49,7 @@ void Module::initialzie_injected_channel(const PinConfig& pin_config, const Inje
                                   .speed{},
                                   .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
-                           .af_selection{},
+                           .altfunc{},
                            .actstate{}};
     mcu::gpio::AnalogPin input(cfg);
 
@@ -65,7 +65,7 @@ void Module::initialize_regular_channel(const PinConfig& pin_config, const Regul
                                   .speed{},
                                   .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
-                           .af_selection{},
+                           .altfunc{},
                            .actstate{}};
     mcu::gpio::AnalogPin input(cfg);
 

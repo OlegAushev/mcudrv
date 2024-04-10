@@ -21,7 +21,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                           .speed = GPIO_SPEED_50MHz,
                           .otype = GPIO_OTYPE_PP,
                           .pupd = GPIO_PUPD_NOPULL},
-                  .af_selection = rx_pin_config.af_selection,
+                  .altfunc = rx_pin_config.altfunc,
                   .actstate{}});
 
     _tx_pin.initialize({.port = tx_pin_config.port,
@@ -30,7 +30,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                           .speed = GPIO_SPEED_50MHz,
                           .otype = GPIO_OTYPE_PP,
                           .pupd = GPIO_PUPD_NOPULL},
-                  .af_selection = tx_pin_config.af_selection,
+                  .altfunc = tx_pin_config.altfunc,
                   .actstate{}});
 
     _enable_clk(peripheral);

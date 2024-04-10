@@ -28,7 +28,7 @@ enum class OpMode {
 struct ChPinConfig {
     GPIO_T* port;
     uint16_t pin;
-    GPIO_AF_T af_selection;
+    GPIO_AF_T altfunc;
 };
 
 
@@ -41,7 +41,7 @@ public:
                                          .speed = GPIO_SPEED_50MHz,
                                          .otype = GPIO_OTYPE_PP,
                                          .pupd = GPIO_PUPD_NOPULL},
-                                 .af_selection = config.af_selection,
+                                 .altfunc = config.altfunc,
                                  .actstate = emb::gpio::active_pin_state::high});
     }
 };
@@ -51,7 +51,7 @@ struct BkinPinConfig {
     GPIO_T* port;
     uint16_t pin;
     GPIO_PUPD_T pull;
-    GPIO_AF_T af_selection;
+    GPIO_AF_T altfunc;
 };
 
 
@@ -64,7 +64,7 @@ public:
                                          .speed = GPIO_SPEED_50MHz,
                                          .otype = GPIO_OTYPE_PP,
                                          .pupd = config.pull},
-                                 .af_selection = config.af_selection,
+                                 .altfunc = config.altfunc,
                                  .actstate = emb::gpio::active_pin_state::high});
     }
 };

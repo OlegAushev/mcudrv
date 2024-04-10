@@ -25,7 +25,7 @@ void Module::initialize_channel(Channel channel, const PinConfig& pin_config, Ch
                                   .speed{},
                                   .otype{},
                                   .pupd = GPIO_PUPD_NOPULL},
-                           .af_selection{},
+                           .altfunc{},
                            .actstate{}};
     mcu::gpio::AnalogPin output(cfg);
 

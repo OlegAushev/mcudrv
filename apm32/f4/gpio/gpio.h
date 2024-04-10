@@ -22,7 +22,7 @@ namespace gpio {
 struct Config {
     GPIO_T* port;
     GPIO_Config_T pin;
-    GPIO_AF_T af_selection;
+    GPIO_AF_T altfunc;
     emb::gpio::active_pin_state actstate;
 };
 
@@ -78,7 +78,7 @@ public:
         _cfg = config;
 
         if (_cfg.pin.mode == GPIO_MODE_AF) {
-            GPIO_ConfigPinAF(_cfg.port, static_cast<GPIO_PIN_SOURCE_T>(bit_position(_cfg.pin.pin)), _cfg.af_selection);
+            GPIO_ConfigPinAF(_cfg.port, static_cast<GPIO_PIN_SOURCE_T>(bit_position(_cfg.pin.pin)), _cfg.altfunc);
         }
 
         GPIO_Config(_cfg.port, &_cfg.pin);
@@ -302,7 +302,7 @@ public:
                                .speed = GPIO_SPEED_100MHz,
                                .otype = GPIO_OTYPE_PP,
                                .pupd = GPIO_PUPD_NOPULL},
-                       .af_selection{},
+                       .altfunc{},
                        .actstate = emb::gpio::active_pin_state::high});
     }
 };

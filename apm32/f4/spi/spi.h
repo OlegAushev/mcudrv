@@ -24,10 +24,10 @@ enum class Peripheral : unsigned int {
 };
 
 
-struct MosiPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T af_selection; };
-struct MisoPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T af_selection; };
-struct ClkPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T af_selection; };
-struct CsPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T af_selection; };
+struct MosiPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
+struct MisoPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
+struct ClkPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
+struct CsPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 
 
 struct Config {
