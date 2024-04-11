@@ -147,9 +147,6 @@ protected:
 };
 
 
-
-
-
 } // namespace spi
 } // namespace mcu
 
