@@ -6,6 +6,7 @@
 
 
 #include <mcudrv/apm32/f4/apm32f4_base.h>
+#include <mcudrv/apm32/f4/chrono/chrono.h>
 #include <apm32f4xx.h>
 #include <algorithm>
 #include <chrono>
@@ -15,8 +16,6 @@ namespace mcu {
 
 
 void initialize_device_clock();
-
-
 inline uint32_t core_clk_freq() { return SystemCoreClock; }
 
 
@@ -29,15 +28,6 @@ void initialize(const CoreConfig& config);
 
 
 void reset_device();
-
-
-void delay(std::chrono::milliseconds delay);
-
-
-void fatal_error();
-
-
-void fatal_error(const char* hint, int code = 0);
 
 
 class IrqPriority {

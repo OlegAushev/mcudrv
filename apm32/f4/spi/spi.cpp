@@ -65,7 +65,6 @@ Module::Module(Peripheral peripheral,
 
     auto spi_config = config.hal_config;
     SPI_Config(_reg, &spi_config);
-    // SPI_Enable(_reg);
 }
 
 
