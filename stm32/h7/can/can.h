@@ -110,6 +110,8 @@ class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, pr
     friend void ::HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef*, uint32_t);
     friend void ::HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef*, uint32_t);
     friend void ::HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan);
+    friend void ::HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs);
+    friend void ::HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan);
 private:
     const Peripheral _peripheral;
     FDCAN_HandleTypeDef _handle = {};
@@ -124,6 +126,9 @@ private:
     unsigned int _rxbuffer_count = 0;
 
     uint64_t _tx_error_counter = 0;
+
+    uint32_t _error_status_count{0};
+    uint32_t _error_count{0};
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, const Config& config);
     RxMessageAttribute register_message(FDCAN_FilterTypeDef& filter);
@@ -188,11 +193,17 @@ public:
 
     std::optional<RxMessageAttribute> get_frame(can_frame& frame, RxFifo fifo);
 
+    uint32_t error_status_count() const { return _error_status_count; }
+    uint32_t error_count() const { return _error_count; }
+
     /* INTERRUPTS */
 private:
     void (*_on_fifo0_frame_received)(Module&, const RxMessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
     void (*_on_fifo1_frame_received)(Module&, const RxMessageAttribute&, const can_frame&) = [](auto, auto, auto){ fatal_error("uninitialized callback"); };
     void (*_on_buffer_frame_received)() = [](){ fatal_error("uninitialized callback"); };
+    void (*_on_error_status)(Module&, uint32_t error_status) = [](auto, auto){};
+    void (*_on_bus_off)(Module&) = [](auto){};
+    void (*_on_error)(Module&) = [](auto){};
 public:
     void register_on_fifo0_frame_received_callback(void(*callback)(Module&, const RxMessageAttribute&, const can_frame&)) {
         _on_fifo0_frame_received = callback;
@@ -202,6 +213,9 @@ public:
     }
     void register_on_buffer_frame_received_callback(void(*callback)()) {
         _on_buffer_frame_received = callback;
+    }
+    void register_on_bus_off_callback(void(*callback)(Module&)) {
+        _on_bus_off = callback;
     }
 
     void initialize_interrupts(uint32_t interrupt_list, uint32_t interrupt_line);

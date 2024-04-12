@@ -49,7 +49,11 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     HAL_FDCAN_ConfigGlobalFilter(&_handle, FDCAN_REJECT, FDCAN_REJECT, FDCAN_REJECT_REMOTE, FDCAN_REJECT_REMOTE);
 
     // Default interrupt config
-    initialize_interrupts(FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_BUFFER_NEW_MESSAGE, FDCAN_INTERRUPT_LINE0);
+    initialize_interrupts(FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_BUFFER_NEW_MESSAGE
+            | FDCAN_IT_ERROR_PASSIVE | FDCAN_IT_ERROR_WARNING | FDCAN_IT_BUS_OFF
+            | FDCAN_IT_RAM_ACCESS_FAILURE | FDCAN_IT_ERROR_LOGGING_OVERFLOW | FDCAN_IT_RAM_WATCHDOG
+            | FDCAN_IT_ARB_PROTOCOL_ERROR | FDCAN_IT_DATA_PROTOCOL_ERROR |FDCAN_IT_RESERVED_ADDRESS_ACCESS
+            , FDCAN_INTERRUPT_LINE0);
 	initialize_interrupts(FDCAN_IT_RX_FIFO1_NEW_MESSAGE, FDCAN_INTERRUPT_LINE1);
 }
 
@@ -257,6 +261,31 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* handle, uint32_t interrupt_f
 void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *handle) {
     using namespace mcu::can;
     Module::instance(impl::to_peripheral(handle->Instance))->_on_buffer_frame_received();
+}
+
+
+void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *handle, uint32_t error_status) {
+    using namespace mcu::can;
+    auto module = Module::instance(impl::to_peripheral(handle->Instance));
+    ++module->_error_status_count;
+
+    FDCAN_ProtocolStatusTypeDef status;
+    HAL_FDCAN_GetProtocolStatus(handle, &status);
+    if (status.BusOff) {
+        mcu::clear_bit<uint32_t>(module->_reg->CCCR, FDCAN_CCCR_INIT);
+        module->_on_bus_off(*module);
+    }
+
+    module->_on_error_status(*module, error_status);
+}
+
+
+void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *handle) {
+    using namespace mcu::can;
+    handle->ErrorCode = 0;
+    auto module = Module::instance(impl::to_peripheral(handle->Instance));
+    ++module->_error_count;
+    module->_on_error(*module);
 }
 
 
