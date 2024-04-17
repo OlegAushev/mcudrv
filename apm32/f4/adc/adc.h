@@ -9,6 +9,7 @@
 #include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <mcudrv/apm32/f4/dma/dma.h>
 #include <apm32f4xx_adc.h>
+#include <optional>
 #include <utility>
 
 
@@ -34,11 +35,29 @@ struct PinConfig {
 };
 
 
+struct InjectedConfig {
+    uint8_t conv_num;
+    bool auto_conv;
+    bool discontinuous_mode;
+    ADC_EXT_TRIG_INJEC_EDGE_T ext_trigger_edge;
+    ADC_EXT_TRIG_INJEC_CONV_T ext_trigger;
+};
+
+
 struct Config {
-    ADC_CommonConfig_T hal_common_config;
-    ADC_Config_T hal_config;
-    bool eoc_on_each_conv;
-    bool dma_continuous_requests;
+    ADC_CommonConfig_T  hal_common_config;
+    ADC_RESOLUTION_T    resolution;
+    bool                scan_mode;
+    bool                continuous_mode;
+    ADC_EXT_TRIG_EDGE_T ext_trigger_edge;
+    ADC_EXT_TRIG_CONV_T ext_trigger;
+    ADC_DATA_ALIGN_T    data_align;
+    uint8_t             conv_num;
+    bool                eoc_on_each_conv;
+    bool                dma_continuous_requests;
+    bool                discontinuous_mode;
+    uint8_t             discontinuous_conv_num;
+    std::optional<InjectedConfig> injected;
 };
 
 
@@ -49,16 +68,19 @@ struct RegularChannelConfig {
 };
 
 
+enum class InjectedChannelRank {
+    rank1 = ADC_INJEC_CHANNEL_1,
+    rank2 = ADC_INJEC_CHANNEL_2,
+    rank3 = ADC_INJEC_CHANNEL_3,
+    rank4 = ADC_INJEC_CHANNEL_4
+};
+
+
 struct InjectedChannelConfig {
     ADC_CHANNEL_T channel;
-    uint8_t rank;
     ADC_SAMPLETIME_T sampletime;
+    InjectedChannelRank rank;
     uint16_t offset;
-    uint8_t conv_nbr;
-    bool discontinuous_conv_mode;
-    bool auto_conv;
-    ADC_EXT_TRIG_INJEC_CONV_T ext_trigger;
-    ADC_EXT_TRIG_INJEC_EDGE_T ext_trigger_edge;
 };
 
 
@@ -112,19 +134,22 @@ public:
         _reg->CTRL2_B.INJSWSC = 1;
     }
 
-    // TODO uint32_t read_injected(InjectedChannelRank rank) {
-    //     switch (rank) {
-    //     case InjectedChannelRank::rank1:
-    //         return _reg->INJDATA1;
-    //     case InjectedChannelRank::rank2:
-    //         return _reg->INJDATA2;
-    //     case InjectedChannelRank::rank3:
-    //         return _reg->INJDATA3;
-    //     case InjectedChannelRank::rank4:
-    //         return _reg->INJDATA4;
-    //     }
-    //     return 0xFFFFFFFF;
-    // }
+    bool injected_busy() const { return (_reg->STS_B.INJCSFLG == 1); }
+    bool injected_ready() const { return (_reg->STS_B.INJEOCFLG == 1); }
+
+    uint32_t read_injected(InjectedChannelRank rank) {
+        switch (rank) {
+        case InjectedChannelRank::rank1:
+            return _reg->INJDATA1;
+        case InjectedChannelRank::rank2:
+            return _reg->INJDATA2;
+        case InjectedChannelRank::rank3:
+            return _reg->INJDATA3;
+        case InjectedChannelRank::rank4:
+            return _reg->INJDATA4;
+        }
+        return 0xFFFFFFFF;
+    }
 
     void ack_injected() {
         _reg->STS_B.INJCSFLG = 0;
@@ -138,17 +163,10 @@ public:
         _reg->CTRL2_B.REGSWSC = 1;
     }
 
-    bool busy() const {
-        return (_reg->STS_B.REGCSFLG == 1);
-    }
+    bool regular_busy() const { return (_reg->STS_B.REGCSFLG == 1); }
+    bool regular_ready() const { return (_reg->STS_B.EOCFLG == 1); }
 
-    bool regular_ready() const {
-        return (_reg->STS_B.EOCFLG == 1);
-    }
-
-    uint32_t read_regular() {
-        return _reg->REGDATA;
-    }
+    uint32_t read_regular() { return _reg->REGDATA; }
 
     void ack_regular() {
         _reg->STS_B.REGCSFLG = 0;
@@ -159,7 +177,26 @@ public:
     void init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority);
     void enable_interrupts() { enable_irq(ADC_IRQn); }
     void disable_interrupts() { disable_irq(ADC_IRQn); }
-    
+    bool check_interrupt(ADC_INT_T interrupt) const {
+        auto sts = _reg->STS_B;
+        auto cr1 = _reg->CTRL1_B;
+
+        switch (interrupt) {
+        case ADC_INT_EOC:
+            return sts.EOCFLG && cr1.EOCIEN;
+            break;
+        case ADC_INT_AWD:
+            return sts.AWDFLG && cr1.AWDIEN;
+            break;
+        case ADC_INT_INJEOC:
+            return sts.INJEOCFLG && cr1.INJEOCIEN;
+            break;
+        case ADC_INT_OVR:
+            return sts.OVREFLG && cr1.OVRIEN;
+            break;
+        }
+        return false;
+    }
 protected:
     static void _enable_clk(Peripheral peripheral);
 };
