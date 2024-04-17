@@ -30,7 +30,7 @@ private:
 
 public:
     InputCaptureTimer(Peripheral peripheral, const InputCaptureConfig& config);
-    void initialize_channel(Channel channel, ChPin* pin_ch, const InputCaptureChannelConfig& config);
+    void init_channel(Channel channel, ChPin* pin_ch, const InputCaptureChannelConfig& config);
     
     uint32_t read_captured(Channel channel) const {
         switch (channel) {
@@ -66,7 +66,7 @@ public:
         return captured;
     }
 
-    void initialize_interrupts(std::initializer_list<InterruptSource> sources, IrqPriority priority);
+    void init_interrupts(std::initializer_list<InterruptSource> sources, IrqPriority priority);
     
     void enable_interrupts() {
         clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF | TIM_SR_CC1IF | TIM_SR_CC2IF | TIM_SR_CC3IF | TIM_SR_CC4IF |

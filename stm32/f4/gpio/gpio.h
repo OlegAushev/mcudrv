@@ -66,7 +66,7 @@ protected:
     bool _initialized{false};
     GpioPin() = default;
 public:
-    void initialize(const Config& config) {
+    void init(const Config& config) {
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(),
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (_assigned[port_idx] & config.pin.Pin) {
@@ -84,7 +84,7 @@ public:
         _initialized = true;
     }
 
-    void deinitialize() {	
+    void deinit() {	
         if (_initialized) {
             HAL_GPIO_DeInit(_cfg.port, _cfg.pin.Pin);
             _initialized = false;
@@ -114,7 +114,7 @@ public:
         assert(config.pin.Mode == GPIO_MODE_INPUT
                 || config.pin.Mode == GPIO_MODE_IT_RISING || config.pin.Mode == GPIO_MODE_IT_FALLING || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
                 || config.pin.Mode == GPIO_MODE_EVT_RISING || config.pin.Mode == GPIO_MODE_EVT_FALLING || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
-        initialize(config);
+        init(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -141,7 +141,7 @@ private:
         emb::invalid_function, emb::invalid_function, emb::invalid_function, emb::invalid_function,
     };
 public:
-    void initialize_interrupt(void(*handler)(void), IrqPriority priority) {
+    void init_interrupts(void(*handler)(void), IrqPriority priority) {
         switch (_cfg.pin.Pin) {
         case GPIO_PIN_0:
             _irqn = EXTI0_IRQn;
@@ -191,7 +191,7 @@ public:
     OutputPin() = default;
     OutputPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
-        initialize(config);
+        init(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -246,7 +246,7 @@ public:
     AlternatePin() = default;
     AlternatePin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_AF_PP || config.pin.Mode == GPIO_MODE_AF_OD);
-        initialize(config);
+        init(config);
     }
 };
 
@@ -256,7 +256,7 @@ public:
     AnalogPin() = default;
     AnalogPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_ANALOG);
-        initialize(config);
+        init(config);
     }
 };
 
@@ -311,7 +311,7 @@ public:
         }
     }
 
-    static OutputPin initialize(GPIO_TypeDef* port, uint32_t pin) {
+    static OutputPin init(GPIO_TypeDef* port, uint32_t pin) {
         return OutputPin({	
             .port = port,
             .pin = {

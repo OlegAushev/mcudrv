@@ -29,7 +29,7 @@ class steady_clock {
     friend void ::SysTick_Handler();
 public:
     steady_clock() = delete;
-    static void initialize();
+    static void init();
 private:
     static inline volatile int64_t _time{0};
     static constexpr std::chrono::milliseconds time_step{1};

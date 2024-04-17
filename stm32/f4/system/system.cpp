@@ -8,7 +8,7 @@
 namespace mcu {
 
 
-void initialize_hal() {
+void init_hal() {
     HAL_Init();
 }
 

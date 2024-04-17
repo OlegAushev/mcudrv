@@ -22,7 +22,7 @@ Module::Module(Peripheral peripheral)
 }
 
 
-void Module::initialize_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config) {
+void Module::init_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;

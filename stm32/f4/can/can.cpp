@@ -14,7 +14,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
-    _rx_pin.initialize({
+    _rx_pin.init({
     .port = rx_pin_config.port,
     .pin = {
         .Pin = rx_pin_config.pin,
@@ -25,7 +25,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
     },
     .actstate = emb::gpio::active_pin_state::high});
 
-    _tx_pin.initialize({
+    _tx_pin.init({
         .port = tx_pin_config.port,
         .pin = {
             .Pin = tx_pin_config.pin,
@@ -185,8 +185,8 @@ std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fif
 }
 
 
-void Module::initialize_interrupts(uint32_t interrupt_list) {
-    set_bit(_reg->IER, interrupt_list);
+void Module::init_interrupts(uint32_t interrupt_bitset) {
+    set_bit(_reg->IER, interrupt_bitset);
 }
 
 

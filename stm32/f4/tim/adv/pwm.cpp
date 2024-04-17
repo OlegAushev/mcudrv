@@ -67,11 +67,11 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_
         fatal_error();
     }
 
-    _initialize_bdt(config, pin_bkin);
+    _init_bdt(config, pin_bkin);
 }
 
 
-void PwmTimer::_initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
+void PwmTimer::_init_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
     if (config.hal_bdt_config.BreakState == TIM_BREAK_ENABLE) {
         if (pin_bkin == nullptr) {
             fatal_error();
@@ -118,7 +118,7 @@ void PwmTimer::_initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
 }
 
 
-void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config) {
+void PwmTimer::init_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config) {
     if (HAL_TIM_PWM_ConfigChannel(&_handle, &config.hal_oc_config, std::to_underlying(channel)) != HAL_OK) {
         fatal_error();
     }
@@ -133,13 +133,13 @@ void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn
 }
 
 
-void PwmTimer::initialize_update_interrupts(IrqPriority priority) {
+void PwmTimer::init_update_interrupts(IrqPriority priority) {
     set_bit<uint32_t>(_reg->DIER, TIM_DIER_UIE);
     set_irq_priority(impl::up_irq_nums[std::to_underlying(_peripheral)], priority);
 }
 
 
-void PwmTimer::initialize_break_interrupts(IrqPriority priority) {
+void PwmTimer::init_break_interrupts(IrqPriority priority) {
     set_bit<uint32_t>(_reg->DIER, TIM_DIER_BIE);
     set_irq_priority(impl::brk_irq_nums[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;

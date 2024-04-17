@@ -37,7 +37,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
 }
 
 
-void Module::initialize_injected_channel(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
+void Module::init_injected(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -51,7 +51,7 @@ void Module::initialize_injected_channel(const PinConfig& pin_config, InjectedCh
 }
 
 
-void Module::initialize_regular_channel(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
+void Module::init_regular(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
     mcu::gpio::Config cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
@@ -76,23 +76,23 @@ void Module::initialize_regular_channel(const PinConfig& pin_config, const Regul
 }
 
 
-void Module::initialize_injected_internal_channel(InjectedChannelConfig channel_config) {
+void Module::init_injected_internal(InjectedChannelConfig channel_config) {
     if (HAL_ADCEx_InjectedConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC injected channel initialization failed");
     }
 }
 
 
-void Module::initialize_regular_internal_channel(RegularChannelConfig channel_config) {
+void Module::init_regular_internal(RegularChannelConfig channel_config) {
     if (HAL_ADC_ConfigChannel(&_handle, &channel_config.hal_config) != HAL_OK) {
         fatal_error("ADC internal channel initialization failed");
     }
 }
 
 
-void Module::initialize_interrupts(uint32_t interrupt_list, mcu::IrqPriority priority) {
+void Module::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority) {
     clear_bit<uint32_t>(_reg->SR, ADC_SR_AWD | ADC_SR_EOC | ADC_SR_JEOC | ADC_SR_JSTRT | ADC_SR_STRT | ADC_SR_OVR);
-    set_bit(_reg->CR1, interrupt_list);
+    set_bit(_reg->CR1, interrupt_bitset);
     mcu::set_irq_priority(ADC_IRQn, priority);
 }
 

@@ -21,7 +21,7 @@ InputCaptureTimer::InputCaptureTimer(Peripheral peripheral, const InputCaptureCo
 }
 
 
-void InputCaptureTimer::initialize_channel(Channel channel, ChPin* pin_ch, const InputCaptureChannelConfig& config) {
+void InputCaptureTimer::init_channel(Channel channel, ChPin* pin_ch, const InputCaptureChannelConfig& config) {
     if (pin_ch == nullptr) {
         fatal_error();
     }
@@ -35,7 +35,7 @@ void InputCaptureTimer::initialize_channel(Channel channel, ChPin* pin_ch, const
 }
 
 
-void InputCaptureTimer::initialize_interrupts(std::initializer_list<InterruptSource> sources, IrqPriority priority) {
+void InputCaptureTimer::init_interrupts(std::initializer_list<InterruptSource> sources, IrqPriority priority) {
     if (sources.size() == 0) {
         return;
     }

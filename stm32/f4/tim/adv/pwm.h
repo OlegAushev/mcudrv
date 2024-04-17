@@ -40,7 +40,7 @@ public:
         return static_cast<PwmTimer*>(impl::AbstractTimer::instance(std::to_underlying(peripheral)));
     }
 
-    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config);
+    void init_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config);
 
     bool pwm_enabled() const {
         return bit_is_set<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
@@ -83,7 +83,7 @@ public:
     float freq() const { return _freq; }
     float deadtime() const { return _deadtime; }
 
-    void initialize_update_interrupts(IrqPriority priority);
+    void init_update_interrupts(IrqPriority priority);
 
     void enable_update_interrupts() {
         clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF);
@@ -99,7 +99,7 @@ public:
         clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF);
     }
 
-    void initialize_break_interrupts(IrqPriority priority);
+    void init_break_interrupts(IrqPriority priority);
 
     void enable_break_interrupts() {
         clear_bit<uint32_t>(_reg->SR, TIM_SR_BIF);
@@ -115,7 +115,7 @@ public:
         clear_bit<uint32_t>(_reg->SR, TIM_SR_BIF);
     }
 private:
-    void _initialize_bdt(const PwmConfig& bdt_config, BkinPin* pin_bkin);
+    void _init_bdt(const PwmConfig& bdt_config, BkinPin* pin_bkin);
 };
 
 

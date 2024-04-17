@@ -13,7 +13,7 @@ namespace mcu {
 namespace crc {
 
 
-inline void initialize() {
+inline void init() {
     __HAL_RCC_CRC_CLK_ENABLE();
 }
 
