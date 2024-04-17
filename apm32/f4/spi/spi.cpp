@@ -19,7 +19,7 @@ Module::Module(Peripheral peripheral,
 {
     _init_mosi_miso_clk(mosi_pin_config, miso_pin_config, clk_pin_config);
 
-    _cs_pin.initialize({.port = cs_pin_config.port,
+    _cs_pin.init({.port = cs_pin_config.port,
                         .pin = {.pin = cs_pin_config.pin,
                                 .mode = GPIO_MODE_AF,
                                 .speed = GPIO_SPEED_25MHz,
@@ -82,7 +82,7 @@ void Module::_enable_clk(Peripheral peripheral) {
 void Module::_init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
                                  const MisoPinConfig& miso_pin_config,
                                  const ClkPinConfig& clk_pin_config) {
-    _mosi_pin.initialize({.port = mosi_pin_config.port,
+    _mosi_pin.init({.port = mosi_pin_config.port,
                             .pin = {.pin = mosi_pin_config.pin,
                                     .mode = GPIO_MODE_AF,
                                     .speed = GPIO_SPEED_100MHz,
@@ -91,7 +91,7 @@ void Module::_init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
                             .altfunc = mosi_pin_config.altfunc,
                             .actstate = emb::gpio::active_pin_state::high});
 
-    _miso_pin.initialize({.port = miso_pin_config.port,
+    _miso_pin.init({.port = miso_pin_config.port,
                             .pin = {.pin = miso_pin_config.pin,
                                     .mode = GPIO_MODE_AF,
                                     .speed = GPIO_SPEED_100MHz,
@@ -100,7 +100,7 @@ void Module::_init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
                             .altfunc = miso_pin_config.altfunc,
                             .actstate = emb::gpio::active_pin_state::high});
 
-    _clk_pin.initialize({.port = clk_pin_config.port,
+    _clk_pin.init({.port = clk_pin_config.port,
                             .pin = {.pin = clk_pin_config.pin,
                                     .mode = GPIO_MODE_AF,
                                     .speed = GPIO_SPEED_100MHz,

@@ -67,10 +67,10 @@ void mcu::tests::gpio_test()
     EMB_ASSERT_EQUAL(out2.read_level(), 1);
     EMB_ASSERT_EQUAL(in2.read_level(), 1);  
 
-    out1.deinitialize();
-    out2.deinitialize();
-    in1.deinitialize();
-    in2.deinitialize();
+    out1.deinit();
+    out2.deinit();
+    in1.deinit();
+    in2.deinit();
 #endif
 }
 

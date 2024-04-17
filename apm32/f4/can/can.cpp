@@ -15,7 +15,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
-    _rx_pin.initialize({.port = rx_pin_config.port,
+    _rx_pin.init({.port = rx_pin_config.port,
                   .pin = {.pin = rx_pin_config.pin,
                           .mode = GPIO_MODE_AF,
                           .speed = GPIO_SPEED_50MHz,
@@ -24,7 +24,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
                   .altfunc = rx_pin_config.altfunc,
                   .actstate{}});
 
-    _tx_pin.initialize({.port = tx_pin_config.port,
+    _tx_pin.init({.port = tx_pin_config.port,
                   .pin = {.pin = tx_pin_config.pin,
                           .mode = GPIO_MODE_AF,
                           .speed = GPIO_SPEED_50MHz,
@@ -176,8 +176,8 @@ std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fif
 }
 
 
-void Module::initialize_interrupts(uint32_t interrupt_list) {
-    set_bit(_reg->INTEN, interrupt_list);
+void Module::init_interrupts(uint32_t interrupt_bitset) {
+    set_bit(_reg->INTEN, interrupt_bitset);
 }
 
 

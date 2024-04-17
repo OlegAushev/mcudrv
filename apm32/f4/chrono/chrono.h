@@ -27,7 +27,7 @@ private:
     static constexpr std::chrono::milliseconds time_step{1};
 public:
     steady_clock() = delete;
-    static void initialize();
+    static void init();
     static bool initialized() { return _initialized; }
     static std::chrono::milliseconds now() { return std::chrono::milliseconds(_time); }
     static std::chrono::milliseconds step() { return time_step; }
@@ -47,7 +47,7 @@ private:
     static inline uint32_t _ticks_usec{1};
 public:
     high_resolution_clock() = delete;
-    static void initialize();
+    static void init();
     static bool initialized() { return _initialized; }
     
     static std::chrono::microseconds now() {

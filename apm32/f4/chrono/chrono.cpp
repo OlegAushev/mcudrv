@@ -17,7 +17,7 @@ namespace mcu {
 namespace chrono {
 
 
-void steady_clock::initialize() {
+void steady_clock::init() {
     // init systick
     SysTick_ConfigCLKSource(SYSTICK_CLK_SOURCE_HCLK);
 
@@ -31,7 +31,7 @@ void steady_clock::initialize() {
 }
 
 
-void high_resolution_clock::initialize() {
+void high_resolution_clock::init() {
     if (!steady_clock::initialized()) {
         fatal_error();
     }

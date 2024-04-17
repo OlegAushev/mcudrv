@@ -8,12 +8,12 @@
 namespace mcu {
 
 
-__attribute__((weak)) void initialize_device_clock() {
+__attribute__((weak)) void init_clk() {
     fatal_error("device init clock func not implemented");
 }
 
 
-void initialize(const CoreConfig& config) {
+void init_core(const CoreConfig& config) {
     NVIC_ConfigPriorityGroup(config.prigroup);
 }
 

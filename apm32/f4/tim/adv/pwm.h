@@ -84,7 +84,7 @@ public:
 
     float frequency() const { return _freq; }
 
-    void initialize_update_interrupts(IrqPriority priority);
+    void init_update_interrupts(IrqPriority priority);
 
     void enable_update_interrupts() {
         _reg->STS_B.UIFLG = 0;
@@ -96,7 +96,7 @@ public:
         disable_irq(impl::up_irq_nums[std::to_underlying(_peripheral)]);
     }
 
-    void initialize_break_interrupts(IrqPriority priority);
+    void init_break_interrupts(IrqPriority priority);
 
     void enable_break_interrupts() {
         _reg->STS_B.BRKIFLG = 0;

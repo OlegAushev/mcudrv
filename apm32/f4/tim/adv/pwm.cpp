@@ -144,13 +144,13 @@ void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn
 }
 
 
-void PwmTimer::initialize_update_interrupts(IrqPriority priority) {
+void PwmTimer::init_update_interrupts(IrqPriority priority) {
     _reg->DIEN_B.UIEN = 1;
     set_irq_priority(impl::up_irq_nums[std::to_underlying(_peripheral)], priority);
 }
 
 
-void PwmTimer::initialize_break_interrupts(IrqPriority priority) {
+void PwmTimer::init_break_interrupts(IrqPriority priority) {
     _reg->DIEN_B.BRKIEN = 1;
     set_irq_priority(impl::brk_irq_nums[std::to_underlying(_peripheral)], priority);
     _brk_enabled = true;

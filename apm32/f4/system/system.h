@@ -15,7 +15,7 @@
 namespace mcu {
 
 
-void initialize_device_clock();
+void init_clk();
 inline uint32_t core_clk_freq() { return SystemCoreClock; }
 
 
@@ -24,14 +24,13 @@ struct CoreConfig {
 };
 
 
-void initialize(const CoreConfig& config);
+void init_core(const CoreConfig& config);
 
 
 void reset_device();
 
 
 class IrqPriority {
-    friend void initialize(const CoreConfig&);
 private:
 #ifdef SILICON_REVISION_A
     static inline uint8_t _preempt_priorities{8};

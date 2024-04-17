@@ -63,7 +63,7 @@ protected:
     bool _initialized{false};
     GpioPin() = default;
 public:
-    void initialize(const Config& config) {
+    void init(const Config& config) {
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (_assigned[port_idx] & config.pin.pin) {
@@ -106,7 +106,7 @@ public:
     InputPin() = default;
     InputPin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_IN);
-        initialize(config);
+        init(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -184,7 +184,7 @@ public:
     OutputPin() = default;
     OutputPin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_OUT);
-        initialize(config);
+        init(config);
     }
 
     virtual unsigned int read_level() const override {
@@ -240,7 +240,7 @@ public:
     AlternatePin() = default;
     AlternatePin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_AF);
-        initialize(config);
+        init(config);
     }
 };
 
@@ -250,7 +250,7 @@ public:
     AnalogPin() = default;
     AnalogPin(const Config& config) {
         assert(config.pin.mode == GPIO_MODE_AN);
-        initialize(config);
+        init(config);
     }
 };
 
@@ -295,7 +295,7 @@ public:
         }
     }
 
-    static OutputPin initialize(GPIO_T* port, uint16_t pin) {
+    static OutputPin init(GPIO_T* port, uint16_t pin) {
         return OutputPin({.port = port,
                        .pin = {.pin = pin,
                                .mode = GPIO_MODE_OUT,
