@@ -66,11 +66,11 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_
 
     TMR_ConfigTimeBase(_reg, &cfg.hal_base_config);
 
-    _initialize_bdt(config, pin_bkin);
+    _init_bdt(config, pin_bkin);
 }
 
 
-void PwmTimer::_initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
+void PwmTimer::_init_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
     if (config.hal_bdt_config.BRKState == TMR_BRK_STATE_ENABLE && pin_bkin == nullptr) {
         fatal_error();
     }
@@ -113,7 +113,7 @@ void PwmTimer::_initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
 }
 
 
-void PwmTimer::initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const PwmChannelConfig& config) {
+void PwmTimer::init_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const PwmChannelConfig& config) {
     auto cfg = config;
 
     switch (channel) {

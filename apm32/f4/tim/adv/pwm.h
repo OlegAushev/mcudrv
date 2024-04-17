@@ -42,7 +42,7 @@ public:
         return static_cast<PwmTimer*>(impl::AbstractTimer::instance(std::to_underlying(peripheral)));
     }
 
-    void initialize_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const PwmChannelConfig& config);
+    void init_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, const PwmChannelConfig& config);
     
     bool active() const {
         return _reg->BDT_B.MOEN == 1;
@@ -82,7 +82,7 @@ public:
         }
     }
 
-    float frequency() const { return _freq; }
+    float freq() const { return _freq; }
 
     void init_update_interrupts(IrqPriority priority);
 
@@ -96,6 +96,10 @@ public:
         disable_irq(impl::up_irq_nums[std::to_underlying(_peripheral)]);
     }
 
+    void ack_update_interrupt() {
+        _reg->STS_B.UIFLG = 0;
+    }
+
     void init_break_interrupts(IrqPriority priority);
 
     void enable_break_interrupts() {
@@ -107,8 +111,12 @@ public:
     void disable_break_interrupts() {
         disable_irq(impl::brk_irq_nums[std::to_underlying(_peripheral)]);
     }
+
+    void ack_break_interrupt() {
+        _reg->STS_B.BRKIFLG = 0;
+    }
 private:
-    void _initialize_bdt(const PwmConfig& config, BkinPin* pin_bkin);
+    void _init_bdt(const PwmConfig& config, BkinPin* pin_bkin);
 };
 
 
