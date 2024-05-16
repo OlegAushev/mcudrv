@@ -13,6 +13,11 @@ __attribute__((weak)) void init_clk() {
 }
 
 
+__attribute__((weak)) void update_clk() {
+    fatal_error("device update clock func not implemented");
+}
+
+
 void init_core(const CoreConfig& config) {
     NVIC_ConfigPriorityGroup(config.prigroup);
 }

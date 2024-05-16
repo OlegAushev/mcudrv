@@ -16,6 +16,7 @@ namespace mcu {
 
 
 void init_clk();
+void update_clk();
 inline uint32_t core_clk_freq() { return SystemCoreClock; }
 
 
