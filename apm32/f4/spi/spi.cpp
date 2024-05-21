@@ -59,6 +59,7 @@ Module::Module(Peripheral peripheral,
                         .pupd = GPIO_PUPD_UP},
                 .altfunc{},
                 .actstate = emb::gpio::active_pin_state::low}));
+        _cs_pins.back().reset();
     }
     
     _enable_clk(peripheral);
