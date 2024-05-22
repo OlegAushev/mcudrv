@@ -95,7 +95,7 @@ public:
     void enable() { _reg->CTRL1_B.SPIEN = 1; }
     void disable() { _reg->CTRL1_B.SPIEN = 0; }
 
-    bool busy() const { return _reg->STS_B.BSYFLG == 0; }
+    bool busy() const { return _reg->STS_B.BSYFLG == 1; }
     bool rx_empty() const { return _reg->STS_B.RXBNEFLG == 0; }
     bool tx_empty() const { return _reg->STS_B.TXBEFLG == 1; }
 
