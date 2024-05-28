@@ -99,16 +99,16 @@ public:
     bool rx_empty() const { return _reg->STS_B.RXBNEFLG == 0; }
     bool tx_empty() const { return _reg->STS_B.TXBEFLG == 1; }
 
-    DrvStatus put_data(uint16_t data) {
-        if (_reg->STS_B.TXBEFLG == 0) {
-            return DrvStatus::busy;
+    exec_status put_data(uint16_t data) {
+        if (!tx_empty()) {
+            return exec_status::busy;
         }
         _reg->DATA_B.DATA = data;
-        return DrvStatus::ok;
+        return exec_status::ok;
     }
 
-    std::optional<uint16_t> get_data() {
-        if (_reg->STS_B.RXBNEFLG == 0) {
+    std::optional<uint16_t> get_data() const {
+        if (rx_empty()) {
             return {};
         }
         uint16_t data = _reg->DATA_B.DATA;

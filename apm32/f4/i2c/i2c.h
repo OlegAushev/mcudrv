@@ -26,6 +26,32 @@ enum class Peripheral : unsigned int {
 enum class Direction { rx, tx };
 
 
+enum class Event : uint32_t {
+    ev5_master_mode_select                      = 0x00030001,  /*!< BUSBSYFLG, MSFLG and STARTFLG flag */
+    ev6_master_transmitter_mode_selected        = 0x00070082,  /*!< BUSBSYFLG, MSFLG, ADDRFLG, TXBEFLG and TRFLG flags */
+    ev6_master_receiver_mode_selected           = 0x00030002,  /*!< BUSBSYFLG, MSFLG and ADDRFLG flags */
+    ev9_master_mode_address10                   = 0x00030008,  /*!< BUSBSYFLG, MSFLG and ADDR10FLG flags */
+    ev7_master_byte_received                    = 0x00030040,  /*!< BUSBSYFLG, MSFLG and RXBNEFLG flags */
+    ev8_master_byte_transmitting                = 0x00070080,  /*!< TRFLG, BUSBSYFLG, MSFLG, TXBEFLG flags */
+    ev8_2_master_byte_transmitted               = 0x00070084,  /*!< TRFLG, BUSBSYFLG, MSFLG, TXBEFLG and BTCFLG flags */
+
+    ev1_slave_receiver_address_matched          = 0x00020002, /*!< BUSBSYFLG and ADDRFLG flags */
+    ev1_slave_transmitter_address_matched       = 0x00060082, /*!< TRFLG, BUSBSYFLG, TXBEFLG and ADDRFLG flags */
+    ev1_slave_receiver_secondaddress_matched    = 0x00820000, /*!< DUALF and BUSBSYFLG flags */
+    ev1_slave_transmitter_secondaddress_matched = 0x00860080, /*!< DUALF, TRFLG, BUSBSYFLG and TXBEFLG flags */
+    ev1_slave_generalcalladdress_matched        = 0x00120000, /*!< GENCALL and BUSBSYFLG flags */
+    ev2_slave_byte_received                     = 0x00020040, /*!< BUSBSYFLG and RXBNEFLG flags */
+    ev2_slave_byte_received1                    = 0x00820040, /*!< DUALADDRFLG, BUSBSYFLG and RXBNEFLG flags */
+    ev2_slave_byte_received2                    = 0x00120040, /*!< GENCALLFLG, BUSBSYFLG and RXBNEFLG flags */
+    ev4_slave_stop_detected                     = 0x00000010, /*!< STOPFLG flag */
+    ev3_slave_byte_transmitted                  = 0x00060084, /*!< TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
+    ev3_slave_byte_transmitted1                 = 0x00860084, /*!< DUALADDRFLG, TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
+    ev3_slave_byte_transmitted2                 = 0x00160084, /*!< GENCALLFLG, TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
+    ev3_slave_byte_transmitting                 = 0x00060080, /*!< TRFLG, BUSBSYFLG and TXBEFLG flags */
+    ev3_2_slave_ack_failure                     = 0x00000400, /*!< AEFLG flag */   
+};
+
+
 struct SdaPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 struct SclPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
 
@@ -83,7 +109,18 @@ public:
     void toggle_start(bool v = true) { _reg->CTRL1_B.START = v; }
     void toggle_stop(bool v = true) { _reg->CTRL1_B.STOP = v; }
 
+    bool busy() const { return _reg->STS2_B.BUSBSYFLG == 1; }
+    bool rx_empty() const { return _reg->STS1_B.RXBNEFLG == 0; }
+    bool tx_empty() const { return _reg->STS1_B.TXBEFLG == 1; }
+
+    uint32_t read_event() const {
+        uint32_t sts1 = _reg->STS1 & 0x0000FFFF;
+        uint32_t sts2 = _reg->STS2 & 0x000000FF;
+        return sts1 | (sts2 << 16);
+    }
+
     void put_addr(uint8_t addr, Direction dir) {
+        addr = uint8_t((addr & 0x7F) << 1);
         if (dir == Direction::rx) {
             _reg->DATA_B.DATA = addr | 0x01;
         } else {
@@ -91,52 +128,21 @@ public:
         }
     }
 
-    
+    exec_status put_data(uint8_t data) {
+        if (!tx_empty()) {
+            return exec_status::busy;
+        }
+        _reg->DATA_B.DATA = data;
+        return exec_status::ok;
+    }
 
-    // bool busy() const { return _reg->STS_B.BSYFLG == 1; }
-    // bool rx_empty() const { return _reg->STS_B.RXBNEFLG == 0; }
-    // bool tx_empty() const { return _reg->STS_B.TXBEFLG == 1; }
-
-    // DrvStatus put_data(uint16_t data) {
-    //     if (_reg->STS_B.TXBEFLG == 0) {
-    //         return DrvStatus::busy;
-    //     }
-    //     _reg->DATA_B.DATA = data;
-    //     return DrvStatus::ok;
-    // }
-
-    // std::optional<uint16_t> get_data() {
-    //     if (_reg->STS_B.RXBNEFLG == 0) {
-    //         return {};
-    //     }
-    //     uint16_t data = _reg->DATA_B.DATA;
-    //     return {data};
-    // }
-
-    // void set_bidirectional_mode(Direction dir) {
-    //     switch (dir) {
-    //         case Direction::rx:
-    //             _reg->CTRL1_B.BMOEN = 0;
-    //             break;
-    //         case Direction::tx:
-    //             _reg->CTRL1_B.BMOEN = 1;
-    //             break;
-    //     }
-    // }
-
-    // void set_cs(size_t cs_idx = 0) {
-    //     if (cs_idx >= _cs_pins.size()) {
-    //         return;
-    //     }
-    //     _cs_pins[cs_idx].set();
-    // }
-
-    // void reset_cs(size_t cs_idx = 0) {
-    //     if (cs_idx >= _cs_pins.size()) {
-    //         return;
-    //     }
-    //     _cs_pins[cs_idx].reset();
-    // }
+    std::optional<uint8_t> get_data() const {
+        if (rx_empty()) {
+            return {};
+        }
+        uint8_t data = _reg->DATA_B.DATA;
+        return {data};
+    }
 protected:
     static void _enable_clk(Peripheral peripheral);
 };

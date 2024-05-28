@@ -149,7 +149,7 @@ public:
         return 0;
     }
 
-    DrvStatus put_frame(const can_frame& frame);
+    exec_status put_frame(const can_frame& frame);
     std::optional<RxMessageAttribute> get_frame(can_frame& frame, RxFifo fifo) const;
 
 public:

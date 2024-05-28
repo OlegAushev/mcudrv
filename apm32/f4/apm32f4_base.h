@@ -12,7 +12,7 @@
 namespace mcu {
 
 
-enum class DrvStatus {
+enum class exec_status {
     ok,
     error,
     busy,

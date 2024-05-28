@@ -86,18 +86,18 @@ void Module::stop() {
 }
 
 
-DrvStatus Module::put_frame(const can_frame& frame) {
+exec_status Module::put_frame(const can_frame& frame) {
     if (mailbox_full()) {
         if (_txqueue.full()) {
-            return DrvStatus::overflow;
+            return exec_status::overflow;
         }
         _txqueue.push(frame);
-        return DrvStatus::busy;
+        return exec_status::busy;
     }
     
     uint32_t mailboxid = _reg->TXSTS_B.EMNUM;
     if (mailboxid > 2) {
-        return DrvStatus::error;
+        return exec_status::error;
     }
 
     // set up id
@@ -107,7 +107,7 @@ DrvStatus Module::put_frame(const can_frame& frame) {
         write_reg(_reg->sTxMailBox[mailboxid].TXMID, (frame.id << 3));
         _reg->sTxMailBox[mailboxid].TXMID_B.IDTYPESEL = 1;
     } else {
-        return DrvStatus::invalid_argument;
+        return exec_status::invalid_argument;
     }
 
     // set up dlc
@@ -128,7 +128,7 @@ DrvStatus Module::put_frame(const can_frame& frame) {
     // request transmission
     _reg->sTxMailBox[mailboxid].TXMID_B.TXMREQ = 1;
 
-    return DrvStatus::ok;
+    return exec_status::ok;
 }
 
 
