@@ -80,6 +80,10 @@ inline std::array<void(*)(void), peripheral_count> clk_enable_funcs = {
 };
 
 
+inline constexpr std::array<IRQn_Type, peripheral_count> event_irqn = {I2C1_EV_IRQn, I2C2_EV_IRQn, I2C3_EV_IRQn};
+inline constexpr std::array<IRQn_Type, peripheral_count> error_irqn = {I2C1_ER_IRQn, I2C2_ER_IRQn, I2C3_ER_IRQn};
+
+
 } // namespace impl
 
 
@@ -143,6 +147,24 @@ public:
         uint8_t data = _reg->DATA_B.DATA;
         return {data};
     }
+public:
+    void init_event_interrupts(bool enable_buf_it, IrqPriority priority) {
+        if (enable_buf_it) {
+            _reg->CTRL2_B.BUFIEN = 1;
+        }
+        _reg->CTRL2_B.EVIEN = 1;
+        set_irq_priority(impl::event_irqn[std::to_underlying(_peripheral)], priority);
+    }
+
+    void init_error_interrupts(IrqPriority priority) {
+        _reg->CTRL2_B.ERRIEN = 1;
+        set_irq_priority(impl::error_irqn[std::to_underlying(_peripheral)], priority);
+    }
+
+    void enable_event_interrupts() { enable_irq(impl::event_irqn[std::to_underlying(_peripheral)]); }
+    void enable_error_interrupts() { enable_irq(impl::error_irqn[std::to_underlying(_peripheral)]); }
+    void disable_event_interrupts() { disable_irq(impl::event_irqn[std::to_underlying(_peripheral)]); }
+    void disable_error_interrupts() { disable_irq(impl::event_irqn[std::to_underlying(_peripheral)]); }
 protected:
     static void _enable_clk(Peripheral peripheral);
 };
