@@ -117,10 +117,14 @@ public:
     bool rx_empty() const { return _reg->STS1_B.RXBNEFLG == 0; }
     bool tx_empty() const { return _reg->STS1_B.TXBEFLG == 1; }
 
-    uint32_t read_event() const {
+    uint32_t read_status_regs() const {
         uint32_t sts1 = _reg->STS1 & 0x0000FFFF;
         uint32_t sts2 = _reg->STS2 & 0x000000FF;
         return sts1 | (sts2 << 16);
+    }
+
+    static bool is_event(uint32_t sts_regs, Event event) {
+        return (sts_regs & std::to_underlying(event)) == std::to_underlying(event);
     }
 
     void put_addr(uint8_t addr, Direction dir) {

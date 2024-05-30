@@ -96,12 +96,6 @@ struct RxMessageAttribute {
 
 
 class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
-    friend void ::CAN1_RX0_IRQHandler();
-    friend void ::CAN1_RX1_IRQHandler();
-    friend void ::CAN1_TX_IRQHandler();
-    friend void ::CAN2_RX0_IRQHandler();
-    friend void ::CAN2_RX1_IRQHandler();
-    friend void ::CAN2_TX_IRQHandler();
 private:
     const Peripheral _peripheral;
     CAN_T* _reg;
@@ -151,15 +145,13 @@ public:
 
     exec_status put_frame(const can_frame& frame);
     std::optional<RxMessageAttribute> get_frame(can_frame& frame, RxFifo fifo) const;
-
 public:
     void init_interrupts(uint32_t interrupt_bitset);
     void set_interrupt_priority(IrqPriority rx0_priority, IrqPriority rx1_priority, IrqPriority tx_priority);
     void enable_interrupts();
     void disable_interrupts();
 
-private:
-    void _on_mailbox_empty() {
+    void on_mailbox_empty() {
         while (!mailbox_full()) {
             if (_txqueue.empty()) {
                 return;
@@ -168,7 +160,6 @@ private:
             _txqueue.pop();
         }
     }
-
 private:
     static void _enable_clk(Peripheral peripheral);
 };
