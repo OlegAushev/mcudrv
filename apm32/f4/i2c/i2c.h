@@ -112,6 +112,8 @@ public:
 
     void toggle_start(bool v = true) { _reg->CTRL1_B.START = v; }
     void toggle_stop(bool v = true) { _reg->CTRL1_B.STOP = v; }
+    void toggle_ack(bool v = true) { _reg->CTRL1_B.ACKEN = v; }
+    void toggle_ackpos(bool v = true) { _reg->CTRL1_B.ACKPOS = v; }
 
     bool busy() const { return _reg->STS2_B.BUSBSYFLG == 1; }
     bool rx_empty() const { return _reg->STS1_B.RXBNEFLG == 0; }
