@@ -153,6 +153,16 @@ public:
         uint8_t data = _reg->DATA_B.DATA;
         return {data};
     }
+
+    void clear_errors() {
+        _reg->STS1_B.SMBALTFLG = 0;
+        _reg->STS1_B.TTEFLG = 0;
+        _reg->STS1_B.PECEFLG = 0;
+        _reg->STS1_B.OVRURFLG = 0;
+        _reg->STS1_B.AEFLG = 0;
+        _reg->STS1_B.ALFLG = 0;
+        _reg->STS1_B.BERRFLG = 0;
+    }
 public:
     void init_event_interrupts(bool enable_buf_it, IrqPriority priority) {
         if (enable_buf_it) {
