@@ -23,7 +23,7 @@ void steady_clock::init() {
 
     uint32_t ticks_msec = core_clk_freq() / 1000;
     SysTick->LOAD = ticks_msec - 1;
-    NVIC_SetPriority(SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL);
+    NVIC_SetPriority(SysTick_IRQn, 0); // set to highest priority instead of (1UL << __NVIC_PRIO_BITS) - 1UL
     SysTick->VAL = 0UL;
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 

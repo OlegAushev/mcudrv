@@ -66,9 +66,9 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
 
 void Module::start() {
     _reg->MCTRL_B.INITREQ = 0;
-    emb::chrono::timeout start_timeout(std::chrono::milliseconds(2));
+    emb::chrono::watchdog start_wd(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 1) {
-        if (start_timeout.expired()) {
+        if (!start_wd.good()) {
             fatal_error("CAN module start failed");
         }
     }
@@ -77,9 +77,9 @@ void Module::start() {
 
 void Module::stop() {
     _reg->MCTRL_B.INITREQ = 1;
-    emb::chrono::timeout stop_timeout(std::chrono::milliseconds(2));
+    emb::chrono::watchdog stop_wd(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 0) {
-        if (stop_timeout.expired()) {
+        if (!stop_wd.good()) {
              fatal_error("CAN module start failed");
         }
     }
