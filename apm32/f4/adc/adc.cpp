@@ -81,8 +81,10 @@ void Module::init_injected(const PinConfig& pin_config, const InjectedChannelCon
                            .actstate{}};
     mcu::gpio::AnalogPin input(cfg);
 
-    ADC_ConfigInjectedChannel(_reg, channel_config.channel, static_cast<ADC_INJEC_CHANNEL_T>(channel_config.rank), channel_config.sampletime);
-    ADC_ConfigInjectedOffset(_reg, static_cast<ADC_INJEC_CHANNEL_T>(channel_config.rank), channel_config.offset);
+    for (auto rank : channel_config.ranks) {
+        ADC_ConfigInjectedChannel(_reg, channel_config.channel, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.sampletime);
+        ADC_ConfigInjectedOffset(_reg, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.offset);
+    }
 }
 
 

@@ -79,7 +79,7 @@ enum class InjectedChannelRank {
 struct InjectedChannelConfig {
     ADC_CHANNEL_T channel;
     ADC_SAMPLETIME_T sampletime;
-    InjectedChannelRank rank;
+    std::initializer_list<InjectedChannelRank> ranks;
     uint16_t offset;
 };
 
