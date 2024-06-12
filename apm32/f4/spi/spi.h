@@ -41,6 +41,13 @@ struct Config {
 };
 
 
+enum class InterruptEvent {
+    txe,
+    rxne,
+    err
+};
+
+
 namespace impl {
 
 
@@ -58,6 +65,9 @@ inline std::array<void(*)(void), peripheral_count> clk_enable_funcs = {
     [](){ RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_SPI2); },
     [](){ RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_SPI3); },
 };
+
+
+inline constexpr std::array<IRQn_Type, peripheral_count> irqn = {SPI1_IRQn, SPI2_IRQn, SPI3_IRQn};
 
 
 } // namespace impl
@@ -139,6 +149,10 @@ public:
         }
         _cs_pins[cs_idx].reset();
     }
+public:
+    void init_interrupts(std::initializer_list<InterruptEvent> events, IrqPriority priority);
+    void enable_interrupts() { enable_irq(impl::irqn[std::to_underlying(_peripheral)]); }
+    void disable_interrupts() { disable_irq(impl::irqn[std::to_underlying(_peripheral)]); }
 protected:
     static void _enable_clk(Peripheral peripheral);
     void _init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,

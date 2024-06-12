@@ -69,6 +69,24 @@ Module::Module(Peripheral peripheral,
 }
 
 
+void Module::init_interrupts(std::initializer_list<InterruptEvent> events, IrqPriority priority) {
+    for (auto event : events) {
+        switch (event) {
+        case InterruptEvent::txe:
+            _reg->CTRL2_B.TXBEIEN = 1;
+            break;
+        case InterruptEvent::rxne:
+            _reg->CTRL2_B.RXBNEIEN = 1;
+            break;
+        case InterruptEvent::err:
+            _reg->CTRL2_B.ERRIEN = 1;
+            break;
+        }
+    }
+    set_irq_priority(impl::irqn[std::to_underlying(_peripheral)], priority);
+}
+
+
 void Module::_enable_clk(Peripheral peripheral) {
     size_t spi_idx = std::to_underlying(peripheral);
     if (_clk_enabled[spi_idx]) {
