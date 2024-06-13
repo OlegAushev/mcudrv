@@ -127,6 +127,8 @@ public:
     void init_injected(const PinConfig& pin_config, const InjectedChannelConfig& channel_config);
     void init_regular(const PinConfig& pin_config, const RegularChannelConfig& channel_config);
 
+    void init_internal_injected(const InjectedChannelConfig& channel_config);
+
     void start_injected() {
         if (_reg->STS_B.INJCSFLG == 1) {
             return; // there is ongoing injected channel conversion

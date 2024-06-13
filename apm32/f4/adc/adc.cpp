@@ -82,7 +82,9 @@ void Module::init_injected(const PinConfig& pin_config, const InjectedChannelCon
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {
-        ADC_ConfigInjectedChannel(_reg, channel_config.channel, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.sampletime);
+        ADC_ConfigInjectedChannel(_reg, channel_config.channel,
+                                  static_cast<ADC_INJEC_CHANNEL_T>(rank),
+                                  channel_config.sampletime);
         ADC_ConfigInjectedOffset(_reg, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.offset);
     }
 }
@@ -102,6 +104,17 @@ void Module::init_regular(const PinConfig& pin_config, const RegularChannelConfi
     for (auto rank : channel_config.ranks) {
         ADC_ConfigRegularChannel(_reg, channel_config.channel, rank, channel_config.sampletime);
     }
+}
+
+
+void Module::init_internal_injected(const InjectedChannelConfig& channel_config) {
+    for (auto rank : channel_config.ranks) {
+        ADC_ConfigInjectedChannel(_reg, channel_config.channel,
+                                  static_cast<ADC_INJEC_CHANNEL_T>(rank),
+                                  channel_config.sampletime);
+        ADC_ConfigInjectedOffset(_reg, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.offset);
+    }
+    ADC_EnableTempSensorVrefint();
 }
 
 
