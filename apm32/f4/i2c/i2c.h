@@ -110,6 +110,8 @@ public:
     void enable() { _reg->CTRL1_B.I2CEN = 1; }
     void disable() { _reg->CTRL1_B.I2CEN = 0; }
 
+    void toggle_reset(bool v = true) { _reg->CTRL1_B.SWRST = v; }
+
     void toggle_start(bool v = true) { _reg->CTRL1_B.START = v; }
     void toggle_stop(bool v = true) { _reg->CTRL1_B.STOP = v; }
     void toggle_ack(bool v = true) { _reg->CTRL1_B.ACKEN = v; }
