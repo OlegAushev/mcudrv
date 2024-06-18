@@ -44,7 +44,7 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
     RxMessageAttribute attr = {};
     
     if (_filter_count >= max_fitler_count) {
-        fatal_error("too many CAN Rx filters");
+        fatal_error();
     }
 
     if (_peripheral == Peripheral::can1) {
@@ -69,7 +69,7 @@ void Module::start() {
     emb::chrono::watchdog start_wd(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 1) {
         if (!start_wd.good()) {
-            fatal_error("CAN module start failed");
+            fatal_error();
         }
     }
 }
@@ -80,7 +80,7 @@ void Module::stop() {
     emb::chrono::watchdog stop_wd(std::chrono::milliseconds(2));
     while (_reg->MSTS_B.INITFLG == 0) {
         if (!stop_wd.good()) {
-             fatal_error("CAN module start failed");
+            fatal_error();
         }
     }
 }

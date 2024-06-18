@@ -54,13 +54,17 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
 
     if (config.discontinuous_mode) {
         _reg->CTRL1_B.REGDISCEN = 1;
-        assert(config.discontinuous_conv_num > 0 && config.discontinuous_conv_num <= 8);
+        if (config.discontinuous_conv_num == 0 || config.discontinuous_conv_num > 8) {
+            fatal_error();
+        }
         _reg->CTRL1_B.DISCNUMCFG = (config.discontinuous_conv_num - 1) & 0x7;
     }
 
     // configure injected channels
     if (config.injected.has_value()) {
-        assert(config.injected.value().conv_num <= 4);
+        if (config.injected.value().conv_num > 4) {
+            fatal_error();
+        }
         _reg->INJSEQ_B.INJSEQLEN = (config.injected.value().conv_num - 1) & 0x3;
         _reg->CTRL1_B.INJGACEN = config.injected.value().auto_conv;
         _reg->CTRL1_B.INJDISCEN = config.injected.value().discontinuous_mode;

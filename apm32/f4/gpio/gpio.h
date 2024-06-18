@@ -105,7 +105,9 @@ class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
 public:
     InputPin() = default;
     InputPin(const Config& config) {
-        assert(config.pin.mode == GPIO_MODE_IN);
+        if (config.pin.mode != GPIO_MODE_IN) {
+            fatal_error();
+        }
         init(config);
     }
 
@@ -183,7 +185,9 @@ class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
     OutputPin(const Config& config) {
-        assert(config.pin.mode == GPIO_MODE_OUT);
+        if (config.pin.mode != GPIO_MODE_OUT) {
+            fatal_error();
+        }
         init(config);
     }
 
@@ -239,7 +243,9 @@ class AlternatePin : public impl::GpioPin {
 public:
     AlternatePin() = default;
     AlternatePin(const Config& config) {
-        assert(config.pin.mode == GPIO_MODE_AF);
+        if (config.pin.mode != GPIO_MODE_AF) {
+            fatal_error();
+        }
         init(config);
     }
 };
@@ -249,7 +255,9 @@ class AnalogPin : public impl::GpioPin {
 public:
     AnalogPin() = default;
     AnalogPin(const Config& config) {
-        assert(config.pin.mode == GPIO_MODE_AN);
+        if (config.pin.mode != GPIO_MODE_AN) {
+            fatal_error();
+        }
         init(config);
     }
 };
