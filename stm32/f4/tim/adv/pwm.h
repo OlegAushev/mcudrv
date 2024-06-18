@@ -42,7 +42,7 @@ public:
 
     void init_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, PwmChannelConfig config);
 
-    bool pwm_enabled() const {
+    bool active() const {
         return bit_is_set<uint32_t>(_reg->BDTR, TIM_BDTR_MOE);
     }
 
