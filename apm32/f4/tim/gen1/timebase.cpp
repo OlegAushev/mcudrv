@@ -48,6 +48,10 @@ TimebaseTimer::TimebaseTimer(Peripheral peripheral, const TimebaseConfig& config
         fatal_error();
     }
 
+    if (cfg.hal_base_config.period > UINT16_MAX) {
+        fatal_error();
+    }
+
     if (config.arr_preload) {
         _reg->CTRL1_B.ARPEN = 1;
     }

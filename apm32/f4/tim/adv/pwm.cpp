@@ -48,6 +48,10 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_
         fatal_error();
     }
 
+    if (cfg.hal_base_config.period > UINT16_MAX) {
+        fatal_error();
+    }
+
     switch (config.hal_base_config.clockDivision) {
     case TMR_CLOCK_DIV_1:
         _t_dts_ns = float(config.hal_base_config.division+1) * 1000000000.f / float(core_clk_freq());
