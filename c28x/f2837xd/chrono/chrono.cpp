@@ -10,21 +10,13 @@ namespace mcu {
 namespace chrono {
 
 
-volatile int64_t steady_clock::_time;
+bool steady_clock::_initialized = false;
+volatile int64_t steady_clock::_time = 0;
 const emb::chrono::milliseconds steady_clock::time_step(1);
-
-emb::static_vector<steady_clock::Task, steady_clock::task_count_max> steady_clock::_tasks;
-
-emb::chrono::milliseconds steady_clock::_delayed_task_start;
-emb::chrono::milliseconds steady_clock::_delayed_task_delay;
-void (*steady_clock::_delayed_task)();
 
 
 void steady_clock::init() {
     _time = 0;
-
-    _delayed_task_start = emb::chrono::milliseconds(0);
-    _delayed_task_delay = emb::chrono::milliseconds(-1);
 
     Interrupt_register(INT_TIMER0, steady_clock::on_interrupt);
 
@@ -37,36 +29,9 @@ void steady_clock::init() {
     CPUTimer_setPeriod(CPUTIMER0_BASE, tmp - 1);
     CPUTimer_setEmulationMode(CPUTIMER0_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 
-    _delayed_task = empty_delayed_task;
-
     CPUTimer_enableInterrupt(CPUTIMER0_BASE);
     Interrupt_enable(INT_TIMER0);
     CPUTimer_startTimer(CPUTIMER0_BASE);
-}
-
-
-void steady_clock::run_tasks() {
-    for (size_t i = 0; i < _tasks.size(); ++i) {
-        if (now() >= (_tasks[i].timepoint + _tasks[i].period)) {
-            if (_tasks[i].func(i) == TaskStatus::success) {
-                _tasks[i].timepoint = now();
-            }
-        }
-
-    }
-
-    if (_delayed_task_delay.count() >= 0) {
-        if (now() >= (_delayed_task_start + _delayed_task_delay)) {
-            _delayed_task_delay = emb::chrono::milliseconds(-1);
-            _delayed_task();
-        }
-    }
-}
-
-
-interrupt void steady_clock::on_interrupt() {
-    _time += time_step.count();
-    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 
 

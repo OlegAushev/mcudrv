@@ -2,6 +2,7 @@
 
 
 #include <mcudrv/c28x/f2837xd/tests/tests.h>
+#include <emblib/scheduler.h>
 
 
 void mcu::tests::gpio_test() {
@@ -167,12 +168,12 @@ void mcu::tests::chrono_test() {
 #ifdef MCU_TESTS_ENABLED
     GPIO_writePin(34, 1);
 
-    mcu::chrono::steady_clock::register_delayed_task(TestingDelayedTask, emb::chrono::milliseconds(200));
+    emb::scheduler::basic_scheduler::add_delayed_task(TestingDelayedTask, emb::chrono::milliseconds(200));
     DEVICE_DELAY_US(150000);
-    mcu::chrono::steady_clock::run_tasks();
+    emb::scheduler::basic_scheduler::run();
     EMB_ASSERT_EQUAL(GPIO_readPin(34), 1);
     DEVICE_DELAY_US(100000);
-    mcu::chrono::steady_clock::run_tasks();
+    emb::scheduler::basic_scheduler::run();
     EMB_ASSERT_EQUAL(GPIO_readPin(34), 0);
 
     GPIO_writePin(34, 1);
