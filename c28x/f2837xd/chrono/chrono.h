@@ -47,10 +47,16 @@ protected:
 
 class high_resolution_clock {
 private:
+    static bool _initialized;
     static uint32_t _period;
     static const int64_t sysclk_period_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
+private:
+    high_resolution_clock();                                                // no constructor
+    high_resolution_clock(const high_resolution_clock& other);              // no copy constructor
+    high_resolution_clock& operator=(const high_resolution_clock& other);   // no copy assignment operator
 public:
     static void init(emb::chrono::microseconds period);
+    static bool initialized() { return _initialized; }
     static uint32_t counter() { return CPUTimer_getTimerCount(CPUTIMER1_BASE); }
     static emb::chrono::nanoseconds now() {	return emb::chrono::nanoseconds((_period - counter()) * sysclk_period_ns); }
     static void start() { CPUTimer_startTimer(CPUTIMER1_BASE); }

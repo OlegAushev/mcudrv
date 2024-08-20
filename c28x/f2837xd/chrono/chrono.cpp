@@ -32,9 +32,12 @@ void steady_clock::init() {
     CPUTimer_enableInterrupt(CPUTIMER0_BASE);
     Interrupt_enable(INT_TIMER0);
     CPUTimer_startTimer(CPUTIMER0_BASE);
+
+    _initialized = true;
 }
 
 
+bool high_resolution_clock::_initialized = false;
 uint32_t high_resolution_clock::_period;
 
 
@@ -47,6 +50,8 @@ void high_resolution_clock::init(emb::chrono::microseconds period) {
     _period = (uint32_t)(mcu::sysclk_freq() / 1000000) * period.count() - 1;
     CPUTimer_setPeriod(CPUTIMER1_BASE, _period);
     CPUTimer_setEmulationMode(CPUTIMER1_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
+
+    _initialized = true;
 }
 
 
