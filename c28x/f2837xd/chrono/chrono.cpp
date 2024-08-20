@@ -20,7 +20,7 @@ emb::chrono::milliseconds steady_clock::_delayed_task_delay;
 void (*steady_clock::_delayed_task)();
 
 
-void steady_clock::initialize() {
+void steady_clock::init() {
     _time = 0;
 
     _delayed_task_start = emb::chrono::milliseconds(0);
@@ -73,7 +73,7 @@ interrupt void steady_clock::on_interrupt() {
 uint32_t high_resolution_clock::_period;
 
 
-void high_resolution_clock::initialize(emb::chrono::microseconds period) {
+void high_resolution_clock::init(emb::chrono::microseconds period) {
     CPUTimer_stopTimer(CPUTIMER1_BASE);             // Make sure timer is stopped
     CPUTimer_setPeriod(CPUTIMER1_BASE, 0xFFFFFFFF); // Initialize timer period to maximum
     CPUTimer_setPreScaler(CPUTIMER1_BASE, 0);       // Initialize pre-scale counter to divide by 1 (SYSCLKOUT)

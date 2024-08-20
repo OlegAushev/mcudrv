@@ -45,7 +45,7 @@ public:
         assert(flagNo < 32);
     }
 
-    void initialize(uint32_t flagNo) {
+    void init(uint32_t flagNo) {
         assert(flagNo < 32);
         _mask = 1UL << flagNo;
     }
@@ -66,7 +66,7 @@ public:
         assert(flagNo < 32);
     }
 
-    void initialize(uint32_t flagNo) {
+    void init(uint32_t flagNo) {
         assert(flagNo < 32);
         _mask = 1UL << flagNo;
     }
@@ -93,10 +93,10 @@ public:
             , local(flagNo)
             , remote(flagNo) {}
 
-    void initialize(uint32_t flagNo, Mode mode) {
+    void init(uint32_t flagNo, Mode mode) {
         _mode = mode;
-        local.initialize(flagNo);
-        remote.initialize(flagNo);
+        local.init(flagNo);
+        remote.init(flagNo);
     }
 
     bool is_set() const {
