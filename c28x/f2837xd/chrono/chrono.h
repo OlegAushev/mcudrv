@@ -16,10 +16,27 @@ namespace mcu {
 namespace chrono {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(TaskStatus) {
-    success = 0,
-    fail = 1
-} SCOPED_ENUM_DECLARE_END(TaskStatus)
+inline void delay(emb::chrono::nanoseconds ns) {
+    const uint32_t sysclkCycle_ns = 1000000000 / DEVICE_SYSCLK_FREQ;
+    const uint32_t delayLoop_ns = 5 * sysclkCycle_ns;
+    const uint32_t delayOverhead_ns = 9 * sysclkCycle_ns;
+
+    if (ns.count() < delayLoop_ns + delayOverhead_ns) {
+        SysCtl_delay(1);
+    } else {
+        SysCtl_delay((ns.count() - delayOverhead_ns) / delayLoop_ns);
+    }
+}
+
+
+inline void delay(emb::chrono::microseconds us) {
+    DEVICE_DELAY_US(us.count());
+}
+
+
+inline void delay(emb::chrono::milliseconds ms) {
+    delay(emb::chrono::duration_cast<emb::chrono::microseconds>(ms));
+}
 
 
 class steady_clock {

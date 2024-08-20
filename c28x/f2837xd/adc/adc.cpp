@@ -2,6 +2,7 @@
 
 
 #include <mcudrv/c28x/f2837xd/adc/adc.h>
+#include <mcudrv/c28x/f2837xd/chrono/chrono.h>
 
 
 namespace mcu {
@@ -39,7 +40,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
     ADC_setInterruptPulseMode(_module.base, ADC_PULSE_END_OF_CONV);
     ADC_enableConverter(_module.base);
     ADC_setSOCPriority(_module.base, ADC_PRI_ALL_HIPRI);    // SOCs at high priority - easier to control order
-    mcu::delay(emb::chrono::microseconds(1000));            // delay for power-up
+    mcu::chrono::delay(emb::chrono::microseconds(1000));    // delay for power-up
 
     // Configure SOCs
     // For 12-bit resolution, a sampling window of (5 x sample_window_cycles)ns
