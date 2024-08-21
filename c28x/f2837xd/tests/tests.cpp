@@ -178,23 +178,23 @@ void mcu::tests::chrono_test() {
 
     GPIO_writePin(34, 1);
 
-    mcu::chrono::Timeout timeout(emb::chrono::milliseconds(20));
-    EMB_ASSERT_TRUE(!timeout.expired());
+    emb::chrono::watchdog wd(emb::chrono::milliseconds(20));
+    EMB_ASSERT_TRUE(!wd.bad());
     for (int i = 0; i < 15; ++i) {
         mcu::chrono::delay(emb::chrono::milliseconds(1));
-        EMB_ASSERT_TRUE(!timeout.expired());
+        EMB_ASSERT_TRUE(!wd.bad());
     }
     mcu::chrono::delay(emb::chrono::milliseconds(6));
-    EMB_ASSERT_TRUE(timeout.expired());
+    EMB_ASSERT_TRUE(wd.bad());
 
-    timeout.reset();
-    EMB_ASSERT_TRUE(!timeout.expired());
+    wd.reset();
+    EMB_ASSERT_TRUE(wd.good());
     for (int i = 0; i < 15; ++i) {
         mcu::chrono::delay(emb::chrono::milliseconds(1));
-        EMB_ASSERT_TRUE(!timeout.expired());
+        EMB_ASSERT_TRUE(wd.good());
     }
     mcu::chrono::delay(emb::chrono::milliseconds(6));
-    EMB_ASSERT_TRUE(timeout.expired());
+    EMB_ASSERT_TRUE(!wd.good());
 #endif
 }
 

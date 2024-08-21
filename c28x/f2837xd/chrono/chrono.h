@@ -89,29 +89,6 @@ private:
 };
 
 
-class Timeout {
-private:
-    const emb::chrono::milliseconds _timeout;
-    emb::chrono::milliseconds _start;
-public:
-    Timeout(emb::chrono::milliseconds timeout = emb::chrono::milliseconds(-1))
-            : _timeout(timeout)
-            , _start(steady_clock::now()) {}
-
-    bool expired() {
-        if (_timeout.count() < 0) {
-            return false;
-        }
-        if ((steady_clock::now() - _start) > _timeout) {
-            return true;
-        }
-        return false;
-    }
-
-    void reset() { _start = steady_clock::now(); }
-};
-
-
 } // namespace chrono
 
 

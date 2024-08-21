@@ -81,7 +81,7 @@ public:
     void disable() { I2C_disableModule(_module.base); }
 
     bool has_stop_condition() const { return I2C_getStopConditionStatus(_module.base); }
-    bool is_bus_busy() const { return I2C_isBusBusy(_module.base); }
+    bool busy() const { return I2C_isBusBusy(_module.base); }
     uint16_t status() const { return I2C_getStatus(_module.base); }
     void clear_status(uint16_t status_flags) { I2C_clearStatus(_module.base, status_flags); }
 
