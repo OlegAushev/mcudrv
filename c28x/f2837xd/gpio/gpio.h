@@ -6,7 +6,9 @@
 
 #include "../system/system.h"
 #include <emblib/interfaces/gpio.h>
+#include <emblib/array.h>
 #include <emblib/chrono.h>
+#include <emblib/optional.h>
 #include <assert.h>
 
 
@@ -287,23 +289,56 @@ SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerMode) {
 } SCOPED_ENUM_DECLARE_END(DurationLoggerMode)
 
 
-template <DurationLoggerMode::enum_type Mode = DurationLoggerMode::set_reset>
+SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerChannel) {
+    channel0,
+    channel1,
+    channel2,
+    channel3,
+    channel4,
+    channel5,
+    channel6,
+    channel7,
+    channel8,
+    channel9,
+    channel10,
+    channel11,
+    channel12,
+    channel13,
+    channel14,
+    channel15,
+} SCOPED_ENUM_DECLARE_END(DurationLoggerChannel)
+
+
+//template <DurationLoggerMode::enum_type Mode = DurationLoggerMode::set_reset>
 class DurationLogger {
 private:
-    const uint32_t _pin;
+    static bool _initialized;
+    static emb::array<emb::optional<uint32_t>, 16> _pins;
+    const bool _valid;
+    uint32_t _pin;
+    const DurationLoggerMode _mode;
 public:
-    explicit DurationLogger(const mcu::gpio::OutputPin& pin) : _pin(pin.no()) {
-        if (Mode == DurationLoggerMode::set_reset) {
-            GPIO_writePin(_pin, 1);
-        } else {
-            GPIO_togglePin(_pin);
-            NOP; NOP; NOP; NOP; NOP; NOP; NOP; NOP;
-            GPIO_togglePin(_pin);
+    static OutputPin init_channel(DurationLoggerChannel ch, const Config& config) {
+        if (!_initialized) {
+            for (size_t i = 0; i < _pins.size(); ++i) {
+                _pins[i].reset();
+                _initialized = true;
+            }
         }
+        OutputPin pin(config);
+        _pins[ch.underlying_value()] = pin.no();
+        return pin;
     }
 
-    explicit DurationLogger(uint32_t pin_num) : _pin(pin_num) {
-        if (Mode == DurationLoggerMode::set_reset) {
+    explicit DurationLogger(DurationLoggerChannel ch, DurationLoggerMode mode)
+            : _valid(_pins[ch.underlying_value()].has_value())
+            , _mode(mode) {
+        if (!_valid) {
+            return;
+        }
+        _pin = _pins[ch.underlying_value()].value();
+
+        if (_mode == DurationLoggerMode::set_reset) {
             GPIO_writePin(_pin, 1);
         } else {
             GPIO_togglePin(_pin);
@@ -313,7 +348,11 @@ public:
     }
 
     ~DurationLogger() {
-        if (Mode == DurationLoggerMode::set_reset) {
+        if (!_valid) {
+            return;
+        }
+
+        if (_mode == DurationLoggerMode::set_reset) {
             GPIO_writePin(_pin, 0);
         } else {
             GPIO_togglePin(_pin);

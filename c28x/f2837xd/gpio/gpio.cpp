@@ -16,6 +16,10 @@ const uint16_t impl::pie_xint_groups[5] = {
 };
 
 
+bool DurationLogger::_initialized = false;
+emb::array<emb::optional<uint32_t>, 16> DurationLogger::_pins;
+
+
 } // namespace gpio
 
 
