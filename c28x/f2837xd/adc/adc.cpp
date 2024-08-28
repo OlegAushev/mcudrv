@@ -39,7 +39,12 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
     ADC_setMode(_module.base, ADC_RESOLUTION_12BIT, ADC_MODE_SINGLE_ENDED);
     ADC_setInterruptPulseMode(_module.base, ADC_PULSE_END_OF_CONV);
     ADC_enableConverter(_module.base);
-    ADC_setSOCPriority(_module.base, ADC_PRI_ALL_HIPRI);    // SOCs at high priority - easier to control order
+    ADC_setSOCPriority(_module.base, config.pri_mode);
+    if (config.burst_mode) {
+        ADC_setBurstModeConfig(_module.base, config.burst_trigger, config.burst_size);
+        ADC_enableBurstMode(_module.base);
+    }
+
     mcu::chrono::delay(emb::chrono::microseconds(1000));    // delay for power-up
 
     // Configure SOCs
@@ -54,6 +59,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
     }
 
     // Interrupt config
+
     for (size_t i = 0; i < _irqs.size(); ++i) {
         if (_irqs[i].peripheral == _peripheral) {
             ADC_setInterruptSource(_module.base, _irqs[i].int_num, _irqs[i].soc);

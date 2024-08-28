@@ -29,6 +29,10 @@ const size_t peripheral_count = 4;
 
 struct Config {
     uint32_t sample_window_ns;
+    ADC_PriorityMode pri_mode;
+    bool burst_mode;
+    ADC_Trigger burst_trigger;
+    uint16_t burst_size;
 };
 
 
