@@ -8,7 +8,7 @@
 #include "../gpio/gpio.h"
 #include <emblib/array.h>
 #include <emblib/core.h>
-#include <math.h>
+#include <emblib/math.h>
 
 
 namespace mcu {
@@ -510,19 +510,19 @@ public:
         }
     }
 
-    void set_duty_cycle(const emb::array<float, Phases>& duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_duty_cycle(const emb::array<emb::unsigned_perunit, Phases>& duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                                        static_cast<uint16_t>(duty_cycle[i] * _period));
+                                        static_cast<uint16_t>(duty_cycle[i].get() * _period));
         }
     }
 
-    void set_duty_cycle(float duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
+    void set_duty_cycle(emb::unsigned_perunit duty_cycle, CounterCompareModule cmp_module = CounterCompareModule::a) {
         for (size_t i = 0; i < Phases; ++i) {
             EPWM_setCounterCompareValue(_module.base[i],
                                         static_cast<EPWM_CounterCompareModule>(cmp_module.underlying_value()),
-                                        static_cast<uint16_t>(duty_cycle * _period));
+                                        static_cast<uint16_t>(duty_cycle.get() * _period));
         }
     }
 
