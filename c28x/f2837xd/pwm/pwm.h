@@ -23,6 +23,12 @@ SCOPED_ENUM_DECLARE_BEGIN(State) {
 } SCOPED_ENUM_DECLARE_END(State)
 
 
+SCOPED_ENUM_DECLARE_BEGIN(CountDirection) {
+    up = EPWM_TIME_BASE_STATUS_COUNT_UP,
+    down = EPWM_TIME_BASE_STATUS_COUNT_DOWN
+} SCOPED_ENUM_DECLARE_END(CountDirection)
+
+
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     pwm1,
     pwm2,
@@ -541,6 +547,8 @@ public:
     }
 
     State state() const { return _state; }
+    CountDirection count_direction() const { return CountDirection(EPWM_getTimeBaseCounterDirection(_module.base[0])); }
+
     void enable_event_interrupts() { EPWM_enableInterrupt(_module.base[0]); }
     void enable_trip_interrupts() { EPWM_enableTripZoneInterrupt(_module.base[0], EPWM_TZ_INTERRUPT_OST); }
     void disable_event_interrupts() { EPWM_disableInterrupt(_module.base[0]); }
