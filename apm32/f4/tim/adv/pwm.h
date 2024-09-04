@@ -6,6 +6,7 @@
 
 
 #include <mcudrv/apm32/f4/tim/adv/base.h>
+#include <emblib/math.h>
 
 
 namespace mcu {
@@ -64,8 +65,8 @@ public:
         }
     }
 
-    void set_duty_cycle(Channel channel, float duty_cycle) {
-        uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(_reg->AUTORLD));
+    void set_duty_cycle(Channel channel, emb::unsigned_perunit duty_cycle) {
+        uint32_t compare_value = static_cast<uint32_t>(duty_cycle.get() * float(_reg->AUTORLD));
         switch (channel) {
         case Channel::channel1:
             write_reg(_reg->CC1, compare_value); 
