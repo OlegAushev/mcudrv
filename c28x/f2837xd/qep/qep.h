@@ -7,6 +7,7 @@
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
+#include <emblib/optional.h>
 
 
 namespace mcu {
@@ -53,6 +54,11 @@ SCOPED_ENUM_DECLARE_BEGIN(PositionResetMode) {
 } SCOPED_ENUM_DECLARE_END(PositionResetMode)
 
 
+struct QepaPinConfig { uint32_t pin; uint32_t mux; };
+struct QepbPinConfig { uint32_t pin; uint32_t mux; };
+struct QepiPinConfig { uint32_t pin; uint32_t mux; };
+
+
 struct Config {
     InputMode input_mode;
     Resolution resolution;
@@ -91,8 +97,9 @@ private:
     const Peripheral _peripheral;
     impl::Module _module;
 public:
-    Module(Peripheral peripheral, const gpio::Config& qepa_pin, const gpio::Config& qepb_pin,
-            const gpio::Config& qepi_pin, const Config& config);
+    Module(Peripheral peripheral,
+           const QepaPinConfig& qepa_pin, emb::optional<QepbPinConfig> qepb_pin, emb::optional<QepiPinConfig> qepi_pin,
+           const Config& config);
 
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
@@ -104,7 +111,7 @@ public:
     void disable_interrupts() { Interrupt_disable(_module.pie_int_num); }
 protected:
 #ifdef CPU1
-    static void _init_pins(const gpio::Config& qepaPin, const gpio::Config& qepbPin, const gpio::Config& qepiPin);
+    static void _init_pins(const QepaPinConfig& qepa_pin, emb::optional<QepbPinConfig> qepb_pin, emb::optional<QepiPinConfig> qepi_pin);
 #endif
 };
 

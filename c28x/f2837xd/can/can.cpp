@@ -17,7 +17,7 @@ const SysCtl_CPUSelPeriphInstance impl::can_cpusel_instances[2] = {SYSCTL_CPUSEL
 void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint32_t, uint16_t);
 
 
-Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config)
+Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin, const TxPinConfig& tx_pin, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::can_bases[peripheral.underlying_value()], impl::can_pie_int_nums[peripheral.underlying_value()]) {
@@ -50,10 +50,10 @@ Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Co
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin) {
+void Module::transfer_control_to_cpu2(Peripheral peripheral, const RxPinConfig& rx_pin, const TxPinConfig& tx_pin) {
     _init_pins(rx_pin, tx_pin);
-    GPIO_setMasterCore(rx_pin.no, GPIO_CORE_CPU2);
-    GPIO_setMasterCore(tx_pin.no, GPIO_CORE_CPU2);
+    GPIO_setMasterCore(rx_pin.pin, GPIO_CORE_CPU2);
+    GPIO_setMasterCore(tx_pin.pin, GPIO_CORE_CPU2);
     SysCtl_selectCPUForPeripheralInstance(impl::can_cpusel_instances[peripheral.underlying_value()], SYSCTL_CPUSEL_CPU2);
 }
 #endif
@@ -80,9 +80,9 @@ void Module::register_interrupt_callback(void (*callback)(Module*, uint32_t, uin
 
 
 #ifdef CPU1
-void Module::_init_pins(const gpio::Config& rxPin, const gpio::Config& txPin) {
-    GPIO_setPinConfig(rxPin.mux);
-    GPIO_setPinConfig(txPin.mux);
+void Module::_init_pins(const RxPinConfig& rx_pin, const TxPinConfig& tx_pin) {
+    GPIO_setPinConfig(rx_pin.mux);
+    GPIO_setPinConfig(tx_pin.mux);
 }
 #endif
 

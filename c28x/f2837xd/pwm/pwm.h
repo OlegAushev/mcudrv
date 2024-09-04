@@ -104,6 +104,9 @@ SCOPED_ENUM_DECLARE_BEGIN(CounterCompareModule) {
 } SCOPED_ENUM_DECLARE_END(CounterCompareModule)
 
 
+struct PinConfig { uint32_t pin; uint32_t mux; };
+
+
 struct Config {
     float switching_freq;
     float deadtime_ns;
@@ -168,7 +171,7 @@ private:
     State _state;
 public:
     Module(const emb::array<Peripheral, Phases>& peripherals,
-            const emb::array<mcu::gpio::Config, 2*Phases>& pins,
+            const emb::array<PinConfig, 2*Phases>& pins,
             const pwm::Config& config, const pwm::SyncConfig<Phases> sync_config)
             : _timebase_clk_freq(pwm_clk_freq / config.clock_prescaler)
             , _timebase_cycle_ns(pwm_clk_cycle_ns * config.clock_prescaler)
@@ -419,18 +422,18 @@ public:
 
         switch (pin.config().actstate.native_value()) {
         case emb::gpio::active_pin_state::low:
-            GPIO_setPadConfig(pin.config().no, GPIO_PIN_TYPE_PULLUP);
+            GPIO_setPadConfig(pin.config().pin, GPIO_PIN_TYPE_PULLUP);
             break;
         case emb::gpio::active_pin_state::high:
-            GPIO_setPadConfig(pin.config().no, GPIO_PIN_TYPE_INVERT);
+            GPIO_setPadConfig(pin.config().pin, GPIO_PIN_TYPE_INVERT);
             break;
         }
 
         GPIO_setPinConfig(pin.config().mux);
-        GPIO_setDirectionMode(pin.config().no, GPIO_DIR_MODE_IN);
-        GPIO_setQualificationMode(pin.config().no, GPIO_QUAL_ASYNC);
+        GPIO_setDirectionMode(pin.config().pin, GPIO_DIR_MODE_IN);
+        GPIO_setQualificationMode(pin.config().pin, GPIO_QUAL_ASYNC);
 
-        XBAR_setInputPin(xbar_input, pin.config().no);
+        XBAR_setInputPin(xbar_input, pin.config().pin);
         uint16_t tripzone_signal;
         switch (xbar_input) {
         case XBAR_INPUT1:
@@ -457,11 +460,11 @@ public:
 
 #ifdef CPU1
     static void transfer_control_to_cpu2(const emb::array<Peripheral, Phases>& peripherals,
-                                         const emb::array<mcu::gpio::Config, 2*Phases> pins) {
+                                         const emb::array<PinConfig, 2*Phases> pins) {
         SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);  // Disable sync(Freeze clock to PWM as well)
         _init_pins(pins);
         for (size_t i = 0; i < pins.size(); ++i) {
-            GPIO_setMasterCore(pins[i].no, GPIO_CORE_CPU2);
+            GPIO_setMasterCore(pins[i].pin, GPIO_CORE_CPU2);
         }
 
         for (size_t i = 0; i < peripherals.size(); ++i) {
@@ -572,9 +575,9 @@ public:
     void acknowledge_trip_interrupt() { Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP2); }
 protected:
 #ifdef CPU1
-    static void _init_pins(const emb::array<mcu::gpio::Config, 2*Phases> pins) {
+    static void _init_pins(const emb::array<PinConfig, 2*Phases> pins) {
         for (size_t i = 0; i < pins.size(); ++i) {
-            GPIO_setPadConfig(pins[i].no, GPIO_PIN_TYPE_STD);
+            GPIO_setPadConfig(pins[i].pin, GPIO_PIN_TYPE_STD);
             GPIO_setPinConfig(pins[i].mux);
         }
     }
@@ -583,9 +586,10 @@ protected:
 
 public:
 #ifdef CPU1
-    static void preset_pins(const emb::array<mcu::gpio::Config, 2*Phases>& pins, emb::gpio::active_pin_state actstate) {
+    static void preset_pins(const emb::array<PinConfig, 2*Phases>& pins, emb::gpio::active_pin_state actstate) {
         for (size_t i = 0; i < pins.size(); ++i) {
-            mcu::gpio::Config cfg = mcu::gpio::Config(pins[i].no, pins[i].mux, mcu::gpio::Direction::output, actstate, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
+            mcu::gpio::PinConfig cfg = {pins[i].pin, pins[i].mux, mcu::gpio::Direction::output, actstate,
+                                     mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
             mcu::gpio::OutputPin pin(cfg);
             pin.reset();
         }

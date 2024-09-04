@@ -7,6 +7,7 @@
 #include "../system/system.h"
 #include "../gpio/gpio.h"
 #include <emblib/core.h>
+#include <emblib/optional.h>
 
 
 namespace mcu {
@@ -53,6 +54,12 @@ SCOPED_ENUM_DECLARE_BEGIN(WordLen) {
 } SCOPED_ENUM_DECLARE_END(WordLen)
 
 
+struct MosiPinConfig { uint32_t pin; uint32_t mux; };
+struct MisoPinConfig { uint32_t pin; uint32_t mux; };
+struct ClkPinConfig { uint32_t pin; uint32_t mux; };
+struct CsPinConfig { uint32_t pin; uint32_t mux; };
+
+
 struct Config {
     Protocol protocol;
     Mode mode;
@@ -87,13 +94,13 @@ private:
     WordLen _word_len;
 public:
     Module(Peripheral peripheral,
-            const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
-            const gpio::Config& clk_pin, const gpio::Config& cs_pin,
+            const MosiPinConfig& mosi_pin, const MisoPinConfig& miso_pin,
+            const ClkPinConfig& clk_pin, emb::optional<CsPinConfig> cs_pin,
             const Config& config);
 #ifdef CPU1
     static void transfer_control_to_cpu2(Peripheral peripheral,
-                                         const gpio::Config& mosi_pin, const gpio::Config& miso_pin,
-                                         const gpio::Config& clk_pin, const gpio::Config& cs_pin);
+                                         const MosiPinConfig& mosi_pin, const MisoPinConfig& miso_pin,
+                                         const ClkPinConfig& clk_pin, emb::optional<CsPinConfig> cs_pin);
 #endif
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
@@ -161,8 +168,8 @@ public:
     void reset_tx_fifo() { SPI_resetTxFIFO(_module.base); }
 protected:
 #ifdef CPU1
-    static void _init_pins(const gpio::Config& mosiPin, const gpio::Config& misoPin,
-                            const gpio::Config& clkPin, const gpio::Config& csPin);
+    static void _init_pins(const MosiPinConfig& mosi_pin, const MisoPinConfig& miso_pin,
+                           const ClkPinConfig& clk_pin, emb::optional<CsPinConfig> cs_pin);
 #endif
 };
 

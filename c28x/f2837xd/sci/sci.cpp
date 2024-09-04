@@ -16,7 +16,7 @@ const uint16_t impl::sci_pie_int_groups[4] = {
 };
 
 
-Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config)
+Module::Module(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin, const Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::sci_bases[peripheral.underlying_value()],
@@ -54,10 +54,10 @@ Module::Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Co
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin) {
+void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin) {
     _init_pins(rx_pin, tx_pin);
-    GPIO_setMasterCore(rx_pin.no, GPIO_CORE_CPU2);
-    GPIO_setMasterCore(tx_pin.no, GPIO_CORE_CPU2);
+    GPIO_setMasterCore(rx_pin.pin, GPIO_CORE_CPU2);
+    GPIO_setMasterCore(tx_pin.pin, GPIO_CORE_CPU2);
     SysCtl_selectCPUForPeripheral(SYSCTL_CPUSEL5_SCI,
             peripheral.underlying_value()+1, SYSCTL_CPUSEL_CPU2);
 }
@@ -65,16 +65,16 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config&
 
 
 #ifdef CPU1
-void Module::_init_pins(const gpio::Config& rx_pin, const gpio::Config& tx_pin) {
+void Module::_init_pins(const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin) {
     GPIO_setPinConfig(rx_pin.mux);
-    GPIO_setDirectionMode(rx_pin.no, GPIO_DIR_MODE_IN);
-    GPIO_setPadConfig(rx_pin.no, GPIO_PIN_TYPE_STD);
-    GPIO_setQualificationMode(rx_pin.no, GPIO_QUAL_ASYNC);
+    GPIO_setDirectionMode(rx_pin.pin, GPIO_DIR_MODE_IN);
+    GPIO_setPadConfig(rx_pin.pin, GPIO_PIN_TYPE_STD);
+    GPIO_setQualificationMode(rx_pin.pin, GPIO_QUAL_ASYNC);
 
     GPIO_setPinConfig(tx_pin.mux);
-    GPIO_setDirectionMode(tx_pin.no, GPIO_DIR_MODE_OUT);
-    GPIO_setPadConfig(tx_pin.no, GPIO_PIN_TYPE_STD);
-    GPIO_setQualificationMode(tx_pin.no, GPIO_QUAL_ASYNC);
+    GPIO_setDirectionMode(tx_pin.pin, GPIO_DIR_MODE_OUT);
+    GPIO_setPadConfig(tx_pin.pin, GPIO_PIN_TYPE_STD);
+    GPIO_setQualificationMode(tx_pin.pin, GPIO_QUAL_ASYNC);
 }
 #endif
 

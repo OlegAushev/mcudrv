@@ -53,7 +53,7 @@ private:
     impl::Module _module;
     gpio::InputPin _pin;
 public:
-    Module(Peripheral peripheral, const gpio::Config& pin_config);
+    Module(Peripheral peripheral, const gpio::PinConfig& pin_config);
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
     const gpio::InputPin& pin() const { return _pin; }

@@ -96,9 +96,9 @@ private:
     const Peripheral _peripheral;
     impl::Module _module;
 public:
-    Module(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin, const Config& config);
+    Module(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin, const Config& config);
 #ifdef CPU1
-    static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& rx_pin, const gpio::Config& tx_pin);
+    static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin);
 #endif
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
@@ -157,7 +157,7 @@ public:
     }
 protected:
 #ifdef CPU1
-    static void _init_pins(const gpio::Config& rx_pin, const gpio::Config& tx_pin);
+    static void _init_pins(const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin);
 #endif
 };
 

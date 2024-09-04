@@ -8,10 +8,10 @@
 void mcu::tests::gpio_test() {
 #ifdef MCU_TESTS_ENABLED
 #ifdef _LAUNCHXL_F28379D
-    mcu::gpio::Config out1cfg(125, GPIO_125_GPIO125, mcu::gpio::Direction::output, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
-    mcu::gpio::Config out2cfg(29, GPIO_29_GPIO29, mcu::gpio::Direction::output, emb::gpio::active_pin_state::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
-    mcu::gpio::Config in1cfg(59, GPIO_59_GPIO59, mcu::gpio::Direction::input, emb::gpio::active_pin_state::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
-    mcu::gpio::Config in2cfg(124, GPIO_124_GPIO124, mcu::gpio::Direction::input, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
+    mcu::gpio::PinConfig out1cfg = {125, GPIO_125_GPIO125, mcu::gpio::Direction::output, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
+    mcu::gpio::PinConfig out2cfg = {29, GPIO_29_GPIO29, mcu::gpio::Direction::output, emb::gpio::active_pin_state::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
+    mcu::gpio::PinConfig in1cfg = {59, GPIO_59_GPIO59, mcu::gpio::Direction::input, emb::gpio::active_pin_state::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
+    mcu::gpio::PinConfig in2cfg = {124, GPIO_124_GPIO124, mcu::gpio::Direction::input, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
 
     mcu::gpio::OutputPin out1(out1cfg);
     mcu::gpio::OutputPin out2(out2cfg);
@@ -62,9 +62,9 @@ void mcu::tests::gpio_test() {
 #endif
 
 #ifdef _LAUNCHXL_F28379D
-    mcu::gpio::Config out3Cfg(27, GPIO_27_GPIO27, mcu::gpio::Direction::output, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
-    mcu::gpio::Config in3Cfg(25, GPIO_25_GPIO25, mcu::gpio::Direction::input, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
-    mcu::gpio::Config in4Cfg(25, GPIO_25_GPIO25, mcu::gpio::Direction::input, emb::gpio::active_pin_state::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1);
+    mcu::gpio::PinConfig out3Cfg = {27, GPIO_27_GPIO27, mcu::gpio::Direction::output, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
+    mcu::gpio::PinConfig in3Cfg = {25, GPIO_25_GPIO25, mcu::gpio::Direction::input, emb::gpio::active_pin_state::high, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
+    mcu::gpio::PinConfig in4Cfg = {25, GPIO_25_GPIO25, mcu::gpio::Direction::input, emb::gpio::active_pin_state::low, mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
 
     mcu::gpio::OutputPin out3(out3Cfg);
     mcu::gpio::InputPin in3(in3Cfg);

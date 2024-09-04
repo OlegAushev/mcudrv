@@ -13,7 +13,7 @@ namespace i2c {
 const uint32_t impl::i2c_bases[2] = {I2CA_BASE, I2CB_BASE};
 
 
-Module::Module(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin, const i2c::Config& config)
+Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin, const SclPinConfig& scl_pin, const i2c::Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::i2c_bases[peripheral.underlying_value()]) {
@@ -34,10 +34,10 @@ Module::Module(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::C
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin) {
+void Module::transfer_control_to_cpu2(Peripheral peripheral, const SdaPinConfig& sda_pin, const SclPinConfig& scl_pin) {
     _init_pins(sda_pin, scl_pin);
-    GPIO_setMasterCore(sda_pin.no, GPIO_CORE_CPU2);
-    GPIO_setMasterCore(scl_pin.no, GPIO_CORE_CPU2);
+    GPIO_setMasterCore(sda_pin.pin, GPIO_CORE_CPU2);
+    GPIO_setMasterCore(scl_pin.pin, GPIO_CORE_CPU2);
 
     SysCtl_selectCPUForPeripheral(SYSCTL_CPUSEL7_I2C, peripheral.underlying_value()+1, SYSCTL_CPUSEL_CPU2);
 }
@@ -45,13 +45,13 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config&
 
 
 #ifdef CPU1
-void Module::_init_pins(const gpio::Config& sda_pin, const gpio::Config& scl_pin) {
-    GPIO_setPadConfig(sda_pin.no, GPIO_PIN_TYPE_PULLUP);
-    GPIO_setQualificationMode(sda_pin.no, GPIO_QUAL_ASYNC);
+void Module::_init_pins(const SdaPinConfig& sda_pin, const SclPinConfig& scl_pin) {
+    GPIO_setPadConfig(sda_pin.pin, GPIO_PIN_TYPE_PULLUP);
+    GPIO_setQualificationMode(sda_pin.pin, GPIO_QUAL_ASYNC);
     GPIO_setPinConfig(sda_pin.mux);
 
-    GPIO_setPadConfig(scl_pin.no, GPIO_PIN_TYPE_PULLUP);
-    GPIO_setQualificationMode(scl_pin.no, GPIO_QUAL_ASYNC);
+    GPIO_setPadConfig(scl_pin.pin, GPIO_PIN_TYPE_PULLUP);
+    GPIO_setQualificationMode(scl_pin.pin, GPIO_QUAL_ASYNC);
     GPIO_setPinConfig(scl_pin.mux);
 }
 #endif

@@ -17,14 +17,14 @@ const uint32_t impl::cap_pie_int_nums[6] = {INT_ECAP1, INT_ECAP2, INT_ECAP3, INT
 void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint16_t);
 
 
-Module::Module(Peripheral peripheral, const gpio::Config& pin_config)
+Module::Module(Peripheral peripheral, const gpio::PinConfig& pin_config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::cap_bases[peripheral.underlying_value()],
                   impl::cap_xbar_inputs[peripheral.underlying_value()],
                   impl::cap_pie_int_nums[peripheral.underlying_value()])
         , _pin(pin_config) {
-    XBAR_setInputPin(_module.xbar_input, _pin.no());
+    XBAR_setInputPin(_module.xbar_input, _pin.pin_no());
 
     ECAP_disableInterrupt(_module.base,
                          (ECAP_ISR_SOURCE_CAPTURE_EVENT_1

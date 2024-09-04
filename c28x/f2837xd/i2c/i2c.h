@@ -42,6 +42,10 @@ SCOPED_ENUM_DECLARE_BEGIN(DutyCycle) {
 } SCOPED_ENUM_DECLARE_END(DutyCycle)
 
 
+struct SdaPinConfig { uint32_t pin; uint32_t mux; };
+struct SclPinConfig { uint32_t pin; uint32_t mux; };
+
+
 struct Config {
     uint32_t bitrate;
     BitCount bitcount;
@@ -70,9 +74,9 @@ private:
     const Peripheral _peripheral;
     impl::Module _module;
 public:
-    Module(Peripheral peripheral, const gpio::Config& sda_pin, const gpio::Config& scl_pin, const i2c::Config& config);
+    Module(Peripheral peripheral, const SdaPinConfig& sda_pin, const SclPinConfig& scl_pin, const i2c::Config& config);
 #ifdef CPU1
-    static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::Config& sdaPin, const gpio::Config& sclPin);
+    static void transfer_control_to_cpu2(Peripheral peripheral, const SdaPinConfig& sdaPin, const SclPinConfig& sclPin);
 #endif
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
@@ -94,7 +98,7 @@ public:
 
 protected:
 #ifdef CPU1
-    static void _init_pins(const gpio::Config& sda_pin, const gpio::Config& scl_pin);
+    static void _init_pins(const SdaPinConfig& sda_pin, const SclPinConfig& scl_pin);
 #endif
 };
 

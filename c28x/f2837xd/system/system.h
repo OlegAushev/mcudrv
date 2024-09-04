@@ -15,11 +15,6 @@
 namespace mcu {
 
 
-namespace traits {
-struct unused{};
-}
-
-
 inline void initialize_device() {
 #ifdef CPU1
     Device_init();                  // Initialize device clock and peripherals

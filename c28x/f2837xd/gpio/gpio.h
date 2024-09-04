@@ -58,9 +58,8 @@ extern const uint16_t pie_xint_groups[5];
 } // namespace impl
 
 
-struct Config {
-    bool valid;
-    uint32_t no;
+struct PinConfig {
+    uint32_t pin;
     uint32_t mux;
     Direction direction;
     emb::gpio::active_pin_state actstate;
@@ -68,30 +67,6 @@ struct Config {
     QualMode qual_mode;
     uint32_t qual_period;
     MasterCore master_core;
-
-    Config() : valid(false) {}
-
-    Config(uint32_t no_, uint32_t mux_, Direction direction_, emb::gpio::active_pin_state actstate_,
-            Type type_, QualMode qual_mode_, uint32_t qual_period_,
-            MasterCore master_core_ = MasterCore::cpu1)
-            : valid(true)
-            , no(no_)
-            , mux(mux_)
-            , direction(direction_)
-            , actstate(actstate_)
-            , type(type_)
-            , qual_mode(qual_mode_)
-            , qual_period(qual_period_)
-            , master_core(master_core_) {
-    }
-
-    Config(uint32_t no_, uint32_t mux_)
-            : valid(false)
-            , no(no_)
-            , mux(mux_) {
-    }
-
-    Config(traits::unused) : valid(false) {}
 };
 
 
@@ -100,20 +75,18 @@ namespace impl {
 
 class GpioPin {
 protected:
-    Config _cfg;
     bool _initialized;
+    uint32_t _pin;
+    emb::gpio::active_pin_state _actstate;
     GpioPin() : _initialized(false) {}
 public:
     void set_master_core(MasterCore master_core) {
         assert(_initialized);
-        _cfg.master_core = master_core;
 #ifdef CPU1
-        GPIO_setMasterCore(_cfg.no, static_cast<GPIO_CoreSelect>(master_core.underlying_value()));
+        GPIO_setMasterCore(_pin, static_cast<GPIO_CoreSelect>(master_core.underlying_value()));
 #endif
     }
-
-    const Config& config() const { return _cfg; }
-    uint32_t no() const { return _cfg.no; }
+    uint32_t pin_no() const { return _pin; }
 };
 
 
@@ -125,32 +98,31 @@ private:
     GPIO_ExternalIntNum _int_num;
 public:
     InputPin() {}
-    InputPin(const Config& config) { init(config); }
+    InputPin(const PinConfig& config) { init(config); }
 
-    void init(const Config& config)	{
-        _cfg = config;
-        if (_cfg.valid) {
-            assert(config.direction == Direction::input);
+    void init(const PinConfig& config)	{
+        assert(config.direction == Direction::input);
+        _pin = config.pin;
+        _actstate = config.actstate;
 #ifdef CPU1
-            GPIO_setQualificationPeriod(_cfg.no, _cfg.qual_period);
-            GPIO_setQualificationMode(_cfg.no, static_cast<GPIO_QualificationMode>(_cfg.qual_mode.underlying_value()));
-            GPIO_setPadConfig(_cfg.no, _cfg.type.underlying_value());
-            GPIO_setPinConfig(_cfg.mux);
-            GPIO_setDirectionMode(_cfg.no, GPIO_DIR_MODE_IN);
-            GPIO_setMasterCore(_cfg.no, static_cast<GPIO_CoreSelect>(_cfg.master_core.underlying_value()));
+        GPIO_setQualificationPeriod(config.pin, config.qual_period);
+        GPIO_setQualificationMode(config.pin, static_cast<GPIO_QualificationMode>(config.qual_mode.underlying_value()));
+        GPIO_setPadConfig(config.pin, config.type.underlying_value());
+        GPIO_setPinConfig(config.mux);
+        GPIO_setDirectionMode(config.pin, GPIO_DIR_MODE_IN);
+        GPIO_setMasterCore(config.pin, static_cast<GPIO_CoreSelect>(config.master_core.underlying_value()));
 #endif
-            _initialized = true;
-        }
+        _initialized = true;
     }
 
     virtual unsigned int read_level() const {
         assert(_initialized);
-        return GPIO_readPin(_cfg.no);
+        return GPIO_readPin(_pin);
     }
 
     virtual emb::gpio::pin_state read() const {
         assert(_initialized);
-        if (read_level() == _cfg.actstate.underlying_value()) {
+        if (read_level() == _actstate.underlying_value()) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive;
@@ -158,8 +130,8 @@ public:
 
 public:
 #ifdef CPU1
-    void set_interrupt(GPIO_ExternalIntNum intNum) {
-        GPIO_setInterruptPin(_cfg.no, intNum);   // X-Bar may be configured on CPU1 only
+    void set_interrupt(GPIO_ExternalIntNum int_num) {
+        GPIO_setInterruptPin(_pin, int_num);    // X-Bar may be configured on CPU1 only
     }
 #endif
     void register_interrupt_handler(GPIO_ExternalIntNum int_num, GPIO_IntType int_type, void (*handler)(void)) {
@@ -178,38 +150,37 @@ public:
 class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() {}
-    OutputPin(const Config& config) { init(config); }
+    OutputPin(const PinConfig& config) { init(config); }
 
-    void init(const Config& config) {
-        _cfg = config;
-        if (_cfg.valid) {
-            assert(config.direction == Direction::output);
+    void init(const PinConfig& config) {
+        assert(config.direction == Direction::output);
+        _pin = config.pin;
+        _actstate = config.actstate;
 #ifdef CPU1
-            GPIO_setPadConfig(_cfg.no, _cfg.type.underlying_value());
-            //set() - is virtual, shouldn't be called in ctor
-            GPIO_writePin(_cfg.no,
-                    1 - (static_cast<uint32_t>(emb::gpio::pin_state::inactive) ^ static_cast<uint32_t>(_cfg.actstate.underlying_value())));
-            GPIO_setPinConfig(_cfg.mux);
-            GPIO_setDirectionMode(_cfg.no, GPIO_DIR_MODE_OUT);
-            GPIO_setMasterCore(_cfg.no, static_cast<GPIO_CoreSelect>(_cfg.master_core.underlying_value()));
+        GPIO_setPadConfig(config.pin, config.type.underlying_value());
+        //set() - is virtual, shouldn't be called in ctor
+        GPIO_writePin(config.pin,
+                1 - (static_cast<uint32_t>(emb::gpio::pin_state::inactive) ^ static_cast<uint32_t>(config.actstate.underlying_value())));
+        GPIO_setPinConfig(config.mux);
+        GPIO_setDirectionMode(config.pin, GPIO_DIR_MODE_OUT);
+        GPIO_setMasterCore(config.pin, static_cast<GPIO_CoreSelect>(config.master_core.underlying_value()));
 #endif
-            _initialized = true;
-        }
+        _initialized = true;
     }
 
     virtual unsigned int read_level() const {
         assert(_initialized);
-        return GPIO_readPin(_cfg.no);
+        return GPIO_readPin(_pin);
     }
 
     virtual void set_level(unsigned int level) {
         assert(_initialized);
-        GPIO_writePin(_cfg.no, level);
+        GPIO_writePin(_pin, level);
     }
 
     virtual emb::gpio::pin_state read() const {
         assert(_initialized);
-        if (read_level() == _cfg.actstate.underlying_value()) {
+        if (read_level() == _actstate.underlying_value()) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive;
@@ -218,9 +189,9 @@ public:
     virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) {
         assert(_initialized);
         if (s == emb::gpio::pin_state::active) {
-            set_level(_cfg.actstate.underlying_value());
+            set_level(_actstate.underlying_value());
         } else {
-            set_level(1 - _cfg.actstate.underlying_value());
+            set_level(1 - _actstate.underlying_value());
         }
     }
 
@@ -231,7 +202,7 @@ public:
 
     virtual void toggle() {
         assert(_initialized);
-        GPIO_togglePin(_cfg.no);
+        GPIO_togglePin(_pin);
     }
 };
 
@@ -309,17 +280,20 @@ SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerChannel) {
 } SCOPED_ENUM_DECLARE_END(DurationLoggerChannel)
 
 
-//template <DurationLoggerMode::enum_type Mode = DurationLoggerMode::set_reset>
+struct DurationLoggerPinConfig { uint32_t pin; uint32_t mux; mcu::gpio::MasterCore core; };
+
+
 class DurationLogger {
 private:
     static emb::array<emb::optional<uint32_t>, 16> _pins;
     const emb::optional<uint32_t> _pin;
     const DurationLoggerMode _mode;
 public:
-    static OutputPin init_channel(DurationLoggerChannel ch, const Config& config) {
-        OutputPin pin(config);
-        _pins[ch.underlying_value()] = pin.no();
-        return pin;
+    static void init_channel(DurationLoggerChannel ch, const DurationLoggerPinConfig config) {
+        PinConfig out_config = {config.pin, config.mux, mcu::gpio::Direction::output, emb::gpio::active_pin_state::high,
+                             mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, config.core};
+        OutputPin out(out_config);
+        _pins[ch.underlying_value()] = config.pin;
     }
 
     explicit DurationLogger(DurationLoggerChannel ch, DurationLoggerMode mode)
