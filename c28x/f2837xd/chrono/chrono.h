@@ -49,16 +49,18 @@ private:
     steady_clock(const steady_clock& other);            // no copy constructor
     steady_clock& operator=(const steady_clock& other); // no copy assignment operator
 public:
-    static void init();
     static bool initialized() { return _initialized; }
     static emb::chrono::milliseconds now() { return emb::chrono::milliseconds(_time); }
     static emb::chrono::milliseconds step() { return time_step; }
+#ifdef CPU1
+    static void init();
     static void reset() { _time = 0; }
 protected:
     static interrupt void on_interrupt() {
         _time += time_step.count();
         Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
     }
+#endif
 };
 
 
