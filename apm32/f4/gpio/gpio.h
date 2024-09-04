@@ -271,47 +271,81 @@ enum class DurationLoggerMode {
 };
 
 
-template <DurationLoggerMode Mode = DurationLoggerMode::set_reset>
+enum class DurationLoggerChannel : unsigned int {
+    channel0,
+    channel1,
+    channel2,
+    channel3,
+    channel4,
+    channel5,
+    channel6,
+    channel7,
+    channel8,
+    channel9,
+    channel10,
+    channel11,
+    channel12,
+    channel13,
+    channel14,
+    channel15,
+};
+
+
 class DurationLogger {
 private:
-    GPIO_T* _port;
-    uint16_t _pin;
+    struct LoggerPin {
+        GPIO_T* port;
+        uint16_t pin;
+    };
+    static inline std::array<std::optional<LoggerPin>, 16> _pins; 
+    const std::optional<LoggerPin> _pin;
+    const DurationLoggerMode _mode;
 public:
-    DurationLogger(GPIO_T* port, uint16_t pin)
-            : _port(port)
-            , _pin(pin) {
-        if constexpr (Mode == DurationLoggerMode::set_reset) {
-            write_reg(_port->BSCL, _pin);
-        } else {
-            uint16_t odr_reg = static_cast<uint16_t>( read_reg(_port->ODATA));
-            write_reg<uint16_t>(_port->BSCL, ~odr_reg & _pin);
-            write_reg<uint16_t>(_port->BSCH, odr_reg & _pin);
+    static OutputPin init_channel(DurationLoggerChannel channel, GPIO_T* port, uint16_t pin) {
+        OutputPin logger_pin({.port = port,
+                              .pin = {.pin = pin,
+                                      .mode = GPIO_MODE_OUT,
+                                      .speed = GPIO_SPEED_100MHz,
+                                      .otype = GPIO_OTYPE_PP,
+                                      .pupd = GPIO_PUPD_NOPULL},
+                              .altfunc{},
+                              .actstate = emb::gpio::active_pin_state::high});
+        _pins[std::to_underlying(channel)] = {port, pin};
+        return logger_pin;
+    }
 
-            odr_reg = static_cast<uint16_t>( read_reg(_port->ODATA));
-            write_reg<uint16_t>(_port->BSCL, ~odr_reg & _pin);
-            write_reg<uint16_t>(_port->BSCH, odr_reg & _pin);
+    DurationLogger(DurationLoggerChannel channel, DurationLoggerMode mode)
+            : _pin(_pins[std::to_underlying(channel)])
+            , _mode(mode) {
+        if (!_pin.has_value()) {
+            return;
+        }
+
+        if (_mode == DurationLoggerMode::set_reset) {
+            write_reg<uint16_t>(_pin->port->BSCL, _pin->pin);
+        } else {
+            uint16_t odr_reg = static_cast<uint16_t>( read_reg(_pin->port->ODATA));
+            write_reg<uint16_t>(_pin->port->BSCL, ~odr_reg & _pin->pin);
+            write_reg<uint16_t>(_pin->port->BSCH, odr_reg & _pin->pin);
+
+            odr_reg = static_cast<uint16_t>( read_reg(_pin->port->ODATA));
+            write_reg<uint16_t>(_pin->port->BSCL, ~odr_reg & _pin->pin);
+            write_reg<uint16_t>(_pin->port->BSCH, odr_reg & _pin->pin);
         }
     }
 
     ~DurationLogger() {
-        if constexpr (Mode == DurationLoggerMode::set_reset) {
-            write_reg(_port->BSCH, _pin);
-        } else {
-            uint16_t odr_reg = static_cast<uint16_t>( read_reg(_port->ODATA));
-            write_reg<uint16_t>(_port->BSCL, ~odr_reg & _pin);
-            write_reg<uint16_t>(_port->BSCH, odr_reg & _pin);
+        if (!_pin.has_value()) {
+            return;
         }
-    }
 
-    static OutputPin init(GPIO_T* port, uint16_t pin) {
-        return OutputPin({.port = port,
-                       .pin = {.pin = pin,
-                               .mode = GPIO_MODE_OUT,
-                               .speed = GPIO_SPEED_100MHz,
-                               .otype = GPIO_OTYPE_PP,
-                               .pupd = GPIO_PUPD_NOPULL},
-                       .altfunc{},
-                       .actstate = emb::gpio::active_pin_state::high});
+        if (_mode == DurationLoggerMode::set_reset) {
+            write_reg<uint16_t>(_pin->port->BSCH, _pin->pin);
+        } else {
+            uint16_t odr_reg = static_cast<uint16_t>( read_reg(_pin->port->ODATA));
+            write_reg<uint16_t>(_pin->port->BSCL, ~odr_reg & _pin->pin);
+            write_reg<uint16_t>(_pin->port->BSCH, odr_reg & _pin->pin);
+        }
     }
 };
 
