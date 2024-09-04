@@ -312,50 +312,41 @@ SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerChannel) {
 //template <DurationLoggerMode::enum_type Mode = DurationLoggerMode::set_reset>
 class DurationLogger {
 private:
-    static bool _initialized;
     static emb::array<emb::optional<uint32_t>, 16> _pins;
-    const bool _valid;
-    uint32_t _pin;
+    const emb::optional<uint32_t> _pin;
     const DurationLoggerMode _mode;
 public:
     static OutputPin init_channel(DurationLoggerChannel ch, const Config& config) {
-        if (!_initialized) {
-            for (size_t i = 0; i < _pins.size(); ++i) {
-                _pins[i].reset();
-                _initialized = true;
-            }
-        }
         OutputPin pin(config);
         _pins[ch.underlying_value()] = pin.no();
         return pin;
     }
 
     explicit DurationLogger(DurationLoggerChannel ch, DurationLoggerMode mode)
-            : _valid(_pins[ch.underlying_value()].has_value())
+            : _pin(_pins[ch.underlying_value()])
             , _mode(mode) {
-        if (!_valid) {
+        if (!_pin.has_value()) {
             return;
         }
-        _pin = _pins[ch.underlying_value()].value();
 
         if (_mode == DurationLoggerMode::set_reset) {
-            GPIO_writePin(_pin, 1);
+            GPIO_writePin(*_pin, 1);
         } else {
-            GPIO_togglePin(_pin);
+            GPIO_togglePin(*_pin);
             NOP; NOP; NOP; NOP; NOP; NOP; NOP; NOP;
-            GPIO_togglePin(_pin);
+            GPIO_togglePin(*_pin);
         }
     }
 
     ~DurationLogger() {
-        if (!_valid) {
+        if (!_pin.has_value()) {
             return;
         }
 
         if (_mode == DurationLoggerMode::set_reset) {
-            GPIO_writePin(_pin, 0);
+            GPIO_writePin(*_pin, 0);
         } else {
-            GPIO_togglePin(_pin);
+            GPIO_togglePin(*_pin);
         }
     }
 };
