@@ -36,6 +36,7 @@ Module::Module(Peripheral peripheral,
 
     _enable_clk(peripheral);
 
+    _cfg = config;
     auto i2c_config = config.hal_config;
     I2C_Config(_reg, &i2c_config);
 }

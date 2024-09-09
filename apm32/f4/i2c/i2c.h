@@ -93,6 +93,7 @@ private:
     I2C_T* const _reg;
     mcu::gpio::AlternatePin _sda_pin;
     mcu::gpio::AlternatePin _scl_pin;
+    Config _cfg;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
@@ -109,6 +110,11 @@ public:
 
     void enable() { _reg->CTRL1_B.I2CEN = 1; }
     void disable() { _reg->CTRL1_B.I2CEN = 0; }
+
+    void reset() {
+        I2C_Reset(_reg);
+        I2C_Config(_reg, &_cfg.hal_config);    
+    }
 
     void toggle_reset(bool v = true) { _reg->CTRL1_B.SWRST = v; }
 
