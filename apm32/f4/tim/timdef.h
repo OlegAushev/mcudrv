@@ -25,6 +25,12 @@ enum class OpMode {
 };
 
 
+enum class CountDir {
+    up,
+    down
+};
+
+
 struct ChPinConfig {
     GPIO_T* port;
     uint16_t pin;

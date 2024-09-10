@@ -71,6 +71,12 @@ public:
     Peripheral peripheral() const { return _peripheral; }
     TMR_T* reg() { return _reg; }
     OpMode mode() const { return _mode; }
+    CountDir dir() const {
+        if (_reg->CTRL1_B.CNTDIR == 1) {
+            return CountDir::down;
+        }
+        return CountDir::up;
+    }
 
     void enable() {
         _reg->CTRL1_B.CNTEN = 1;
