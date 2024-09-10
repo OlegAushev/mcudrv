@@ -76,6 +76,7 @@ public:
         case Channel::channel4:
             return emb::unsigned_perunit{float(_reg->CC4) / float(_reg->AUTORLD)};
         }
+        return {};
     } 
 
     void set_duty_cycle(Channel channel, emb::unsigned_perunit duty_cycle) {
