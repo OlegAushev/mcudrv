@@ -26,6 +26,7 @@ const size_t peripheral_count = 2;
 
 SCOPED_ENUM_UT_DECLARE_BEGIN(Bitrate, uint32_t) {
     bitrate_125k = 125000,
+    bitrate_250k = 250000,
     bitrate_500k = 500000,
     bitrate_1000k = 1000000,
 } SCOPED_ENUM_DECLARE_END(Bitrate)

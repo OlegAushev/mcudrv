@@ -30,9 +30,10 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin, const TxPinConf
 
     switch (config.bitrate.native_value()) {
     case Bitrate::bitrate_125k:
-    case Bitrate::bitrate_500k:
+    case Bitrate::bitrate_250k:
         CAN_setBitRate(_module.base, mcu::sysclk_freq(), static_cast<uint32_t>(config.bitrate.underlying_value()), 16);
         break;
+    case Bitrate::bitrate_500k:
     case Bitrate::bitrate_1000k:
         CAN_setBitRate(_module.base, mcu::sysclk_freq(), static_cast<uint32_t>(config.bitrate.underlying_value()), 10);
         break;
