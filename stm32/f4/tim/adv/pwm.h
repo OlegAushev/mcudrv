@@ -6,6 +6,7 @@
 
 
 #include <mcudrv/stm32/f4/tim/adv/base.h>
+#include <emblib/math.h>
 
 
 namespace mcu {
@@ -62,8 +63,22 @@ public:
         }
     }
 
-    void set_duty_cycle(Channel channel, float duty_cycle) {
-        uint32_t compare_value = static_cast<uint32_t>(duty_cycle * float(_reg->ARR));
+    emb::unsigned_perunit duty_cycle(Channel channel) const {
+        switch (channel) {
+        case Channel::channel1:
+            return emb::unsigned_perunit(float(_reg->CCR1) / float(_reg->ARR)); 
+        case Channel::channel2:
+            return emb::unsigned_perunit(float(_reg->CCR2) / float(_reg->ARR)); 
+        case Channel::channel3:
+            return emb::unsigned_perunit(float(_reg->CCR3) / float(_reg->ARR)); 
+        case Channel::channel4:
+            return emb::unsigned_perunit(float(_reg->CCR4) / float(_reg->ARR)); 
+        }
+        return {};
+    }
+
+    void set_duty_cycle(Channel channel, emb::unsigned_perunit duty_cycle) {
+        uint32_t compare_value = uint32_t(duty_cycle.get() * float(_reg->ARR));
         switch (channel) {
         case Channel::channel1:
             write_reg(_reg->CCR1, compare_value); 
@@ -95,7 +110,7 @@ public:
         disable_irq(impl::up_irq_nums[std::to_underlying(_peripheral)]);
     }
 
-    void acknowledge_update_interrupt() {
+    void ack_update_interrupt() {
         clear_bit<uint32_t>(_reg->SR, TIM_SR_UIF);
     }
 
@@ -111,7 +126,7 @@ public:
         disable_irq(impl::brk_irq_nums[std::to_underlying(_peripheral)]);
     }
 
-    void acknowledge_break_interrupt() {
+    void ack_break_interrupt() {
         clear_bit<uint32_t>(_reg->SR, TIM_SR_BIF);
     }
 private:

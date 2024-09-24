@@ -63,16 +63,22 @@ public:
             : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
             , _peripheral(peripheral)
             , _reg(impl::instances[std::to_underlying(peripheral)])
-            , _mode(mode)
-    {
+            , _mode(mode) {
         _enable_clk(peripheral);
         _handle.Instance = _reg;
     }
 
-    OpMode mode() const { return _mode; }
     Peripheral peripheral() const { return _peripheral; }
-    TIM_HandleTypeDef* handle() { return &_handle; }
     TIM_TypeDef* reg() { return _reg; }
+    OpMode mode() const { return _mode; }
+    TIM_HandleTypeDef* handle() { return &_handle; }
+    
+    CountDir dir() const {
+        if (bit_is_set<uint32_t>(_reg->CR1, TIM_CR1_DIR)) {
+            return CountDir::down;
+        }
+        return CountDir::up;
+    }
 
     void enable() {
         set_bit<uint32_t>(_reg->CR1, TIM_CR1_CEN);

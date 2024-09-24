@@ -48,6 +48,10 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_
         fatal_error();
     }
 
+    if (_handle.Init.Period > UINT16_MAX) {
+        fatal_error();
+    }
+
     switch (config.hal_base_config.ClockDivision) {
     case TIM_CLOCKDIVISION_DIV1:
         _t_dts_ns = float(config.hal_base_config.Prescaler+1) * 1000000000.f / float(core_clk_freq());
@@ -72,10 +76,8 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_
 
 
 void PwmTimer::_init_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
-    if (config.hal_bdt_config.BreakState == TIM_BREAK_ENABLE) {
-        if (pin_bkin == nullptr) {
-            fatal_error();
-        }
+    if (config.hal_bdt_config.BreakState == TIM_BREAK_ENABLE && pin_bkin == nullptr) {
+        fatal_error();
     }
     
     auto bdt_config = config.hal_bdt_config;
