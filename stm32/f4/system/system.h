@@ -32,11 +32,6 @@ void fatal_error();
 void fatal_error(const char* hint, int code = 0);
 
 
-inline void delay(std::chrono::milliseconds delay) {
-    HAL_Delay(static_cast<uint32_t>(delay.count()));
-}
-
-
 inline void enable_interrupts() { __enable_irq(); }
 
 

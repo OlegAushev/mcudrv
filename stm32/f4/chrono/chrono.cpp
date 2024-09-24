@@ -18,28 +18,17 @@ namespace chrono {
 
 
 void steady_clock::init() {
-
+    _initialized = true;
 }
 
 
-void steady_clock::run_tasks() {
-    for (size_t i = 0; i < _tasks.size(); ++i) {
-        if (now() >= (_tasks[i].timepoint + _tasks[i].period)) {
-            if (_tasks[i].func(i) == TaskStatus::success) {
-                _tasks[i].timepoint = now();
-            }
-        }
+void high_resolution_clock::init() {
+    if (!steady_clock::initialized()) {
+        fatal_error();
     }
+    _ticks_usec = core_clk_freq() / 1000000;
 
-
-    if (_delayed_task_delay.count() != 0)
-    {
-        if (now() >= (_delayed_task_start + _delayed_task_delay))
-        {
-            _delayed_task();
-            _delayed_task_delay = std::chrono::milliseconds(0);
-        }
-    }
+    _initialized = true;
 }
 
 

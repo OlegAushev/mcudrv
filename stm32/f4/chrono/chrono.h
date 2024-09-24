@@ -19,94 +19,45 @@ namespace mcu {
 namespace chrono {
 
 
-enum class TaskStatus {
-    success,
-    fail
-};
-
-
 class steady_clock {
     friend void ::SysTick_Handler();
+private:
+    static inline bool _initialized{false};
+    static inline volatile int64_t _time{0};
+    static constexpr std::chrono::milliseconds time_step{1};
 public:
     steady_clock() = delete;
     static void init();
-private:
-    static inline volatile int64_t _time{0};
-    static constexpr std::chrono::milliseconds time_step{1};
-    static constexpr size_t task_count_max{4};
-
-/* periodic tasks */
-private:
-    struct Task
-    {
-        std::chrono::milliseconds period;
-        std::chrono::milliseconds timepoint;
-        TaskStatus (*func)(size_t);
-    };
-    static TaskStatus empty_task(size_t) { return TaskStatus::success; }
-    static inline emb::static_vector<Task, task_count_max> _tasks;
-public:
-    static void add_task(TaskStatus (*func)(size_t), std::chrono::milliseconds period)
-    {
-        Task task = {period, now(), func};
-        _tasks.push_back(task);
-    }
-
-    static void set_task_period(size_t index, std::chrono::milliseconds period)
-    {
-        if (index < _tasks.size()) {
-            _tasks[index].period = period;
-        }
-    }
-private:
-    static inline std::chrono::milliseconds _delayed_task_start{0};
-    static inline std::chrono::milliseconds _delayed_task_delay{0};
-    static void empty_delayed_task() {}
-    static inline void (*_delayed_task)() = empty_delayed_task;
-public:
-    static void register_delayed_task(void (*task)(), std::chrono::milliseconds delay)
-    {
-        _delayed_task = task;
-        _delayed_task_delay = delay;
-        _delayed_task_start = now();
-    }
-
-public:
+    static bool initialized() { return _initialized; }
     static std::chrono::milliseconds now() { return std::chrono::milliseconds(_time); }
     static std::chrono::milliseconds step() { return time_step; }
 
-    static void reset() {
-        _time = 0;
-        for (size_t i = 0; i < _tasks.size(); ++i) {
-            _tasks[i].timepoint = now();
-        }
+    static void delay(std::chrono::milliseconds delay) {
+        auto start = now();
+        while ((now() - start) <= delay) { /* wait */ }
     }
-
-    static void run_tasks(); 
-
 protected:
     static void on_interrupt() { _time += time_step.count(); }
 };
 
 
-class Timeout {
+class high_resolution_clock {
 private:
-    const std::chrono::milliseconds _timeout;
-    std::chrono::milliseconds _start;
+    static inline bool _initialized{false};
+    static inline uint32_t _ticks_usec{1};
 public:
-    Timeout(std::chrono::milliseconds timeout = std::chrono::milliseconds(0))
-            : _timeout(timeout)
-            , _start(mcu::chrono::steady_clock::now())
-    {}
-
-    bool expired() const {
-        if (_timeout.count() <= 0) {
-            return false;
-        }
-        if ((steady_clock::now() - _start) > _timeout) {
-            return true;
-        }
-        return false;
+    high_resolution_clock() = delete;
+    static void init();
+    static bool initialized() { return _initialized; }
+    
+    static std::chrono::microseconds now() {
+        std::chrono::microseconds usec{(SysTick->LOAD - SysTick->VAL) / _ticks_usec};
+        return steady_clock::now() + usec;
+    }
+    
+    static void delay(std::chrono::microseconds delay) {
+        auto start = now();
+        while ((now() - start) <= delay) { /* wait */ }
     }
 };
 

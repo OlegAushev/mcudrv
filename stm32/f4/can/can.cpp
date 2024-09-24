@@ -3,7 +3,7 @@
 
 
 #include <mcudrv/stm32/f4/can/can.h>
-#include <mcudrv/stm32/f4/chrono/chrono.h>
+#include <emblib/chrono.h>
 
 
 namespace mcu {
@@ -75,9 +75,9 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterTypeDef& filter) {
 
 void Module::start() {
     clear_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
-    mcu::chrono::Timeout start_timeout(std::chrono::milliseconds(2));
+    emb::chrono::watchdog start_watchdog(std::chrono::milliseconds(2));
     while (bit_is_set<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
-        if (start_timeout.expired()) {
+        if (start_watchdog.bad()) {
              fatal_error("CAN module start failed");
         }
     }
@@ -86,9 +86,9 @@ void Module::start() {
 
 void Module::stop() {
     set_bit<uint32_t>(_reg->MCR, CAN_MCR_INRQ);
-    mcu::chrono::Timeout stop_timeout(std::chrono::milliseconds(2));
+    emb::chrono::watchdog stop_watchdog(std::chrono::milliseconds(2));
     while (bit_is_clear<uint32_t>(_reg->MSR, CAN_MSR_INAK)) {
-        if (stop_timeout.expired()) {
+        if (stop_watchdog.bad()) {
              fatal_error("CAN module start failed");
         }
     }
