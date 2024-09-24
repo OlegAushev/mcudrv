@@ -11,6 +11,7 @@
 #include <emblib/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <utility>
 
 
@@ -62,11 +63,13 @@ private:
     static inline std::array<uint16_t, port_count> _assigned{};
     static inline std::array<bool, port_count> _clk_enabled{};
 protected:
-    Config _cfg;
     bool _initialized{false};
+    GPIO_TypeDef* _port;
+    uint32_t _pin;
+    std::optional<emb::gpio::active_pin_state> _actstate{std::nullopt};
     GpioPin() = default;
 public:
-    void init(const Config& config) {
+    void init(Config config) {
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(),
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (_assigned[port_idx] & config.pin.Pin) {
@@ -79,22 +82,23 @@ public:
             _clk_enabled[port_idx] = true;
         }	
 
-        _cfg = config;
-        HAL_GPIO_Init(_cfg.port, &_cfg.pin);
+        _port = config.port;
+        _pin = config.pin.Pin;
+
+        HAL_GPIO_Init(config.port, &config.pin);
         _initialized = true;
     }
 
     void deinit() {	
         if (_initialized) {
-            HAL_GPIO_DeInit(_cfg.port, _cfg.pin.Pin);
+            HAL_GPIO_DeInit(_port, _pin);
             _initialized = false;
         }
     }
 
-    const Config& config() const { return _cfg; }
-    unsigned int pin_no() const { return POSITION_VAL(_cfg.pin.Pin); }
-    uint16_t pin_bit() const { return static_cast<uint16_t>(_cfg.pin.Pin); }
-    const GPIO_TypeDef* port() const { return _cfg.port; }
+    unsigned int pin_no() const { return POSITION_VAL(_pin); }
+    uint16_t pin_bit() const { return static_cast<uint16_t>(_pin); }
+    const GPIO_TypeDef* port() const { return _port; }
 };
 
 
@@ -115,11 +119,12 @@ public:
                 || config.pin.Mode == GPIO_MODE_IT_RISING || config.pin.Mode == GPIO_MODE_IT_FALLING || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
                 || config.pin.Mode == GPIO_MODE_EVT_RISING || config.pin.Mode == GPIO_MODE_EVT_FALLING || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
         init(config);
+        _actstate = config.actstate;
     }
 
     virtual unsigned int read_level() const override {
         assert(_initialized);
-        if ((mcu::read_reg(_cfg.port->IDR) & _cfg.pin.Pin) != 0) {
+        if ((mcu::read_reg(_port->IDR) & _pin) != 0) {
             return 1;
         }
         return 0;
@@ -127,7 +132,7 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(_cfg.actstate)) {
+        if (read_level() == std::to_underlying(*_actstate)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive; 
@@ -142,7 +147,7 @@ private:
     };
 public:
     void init_interrupts(void(*handler)(void), IrqPriority priority) {
-        switch (_cfg.pin.Pin) {
+        switch (_pin) {
         case GPIO_PIN_0:
             _irqn = EXTI0_IRQn;
             break;
@@ -192,11 +197,12 @@ public:
     OutputPin(const Config& config) {
         assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
         init(config);
+        _actstate = config.actstate;
     }
 
     virtual unsigned int read_level() const override {
         assert(_initialized);
-        if ((mcu::read_reg(_cfg.port->IDR) & _cfg.pin.Pin) != 0) {
+        if ((mcu::read_reg(_port->IDR) & _pin) != 0) {
             return 1;
         }
         return 0;
@@ -205,15 +211,15 @@ public:
     virtual void set_level(unsigned int level) override {
         assert(_initialized);
         if(level != 0) {
-            mcu::write_reg(_cfg.port->BSRR, _cfg.pin.Pin);
+            mcu::write_reg(_port->BSRR, _pin);
         } else {
-            mcu::write_reg(_cfg.port->BSRR, _cfg.pin.Pin << 16);
+            mcu::write_reg(_port->BSRR, _pin << 16);
         }
     }
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(_cfg.actstate)) {
+        if (read_level() == std::to_underlying(*_actstate)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive;
@@ -222,9 +228,9 @@ public:
     virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) override {
         assert(_initialized);
         if (s == emb::gpio::pin_state::active) {
-            set_level(std::to_underlying(_cfg.actstate));
+            set_level(std::to_underlying(*_actstate));
         } else {
-            set_level(1 - std::to_underlying(_cfg.actstate));
+            set_level(1 - std::to_underlying(*_actstate));
         }
     }
 
@@ -235,8 +241,8 @@ public:
 
     virtual void toggle() override {
         assert(_initialized);
-        auto odr_reg = mcu::read_reg(_cfg.port->ODR);
-        mcu::write_reg(_cfg.port->BSRR, ((odr_reg & _cfg.pin.Pin) << 16) | (~odr_reg & _cfg.pin.Pin));
+        auto odr_reg = mcu::read_reg(_port->ODR);
+        mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
     }
 };
 
