@@ -38,7 +38,7 @@ Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
 
 
 void Module::init_injected(const PinConfig& pin_config, InjectedChannelConfig channel_config) {
-    mcu::gpio::Config cfg = {};
+    mcu::gpio::PinConfig cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;
@@ -52,7 +52,7 @@ void Module::init_injected(const PinConfig& pin_config, InjectedChannelConfig ch
 
 
 void Module::init_regular(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
-    mcu::gpio::Config cfg = {};
+    mcu::gpio::PinConfig cfg = {};
     cfg.port = pin_config.port;
     cfg.pin.Pin = pin_config.pin;
     cfg.pin.Mode = GPIO_MODE_ANALOG;

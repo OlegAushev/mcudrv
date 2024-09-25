@@ -26,7 +26,7 @@ namespace mcu {
 namespace gpio {
 
 
-struct Config {
+struct PinConfig {
     GPIO_TypeDef* port;
     GPIO_InitTypeDef pin;
     emb::gpio::active_pin_state actstate;
@@ -65,17 +65,17 @@ private:
 protected:
     bool _initialized{false};
     GPIO_TypeDef* _port;
-    uint32_t _pin;
+    uint16_t _pin;
     std::optional<emb::gpio::active_pin_state> _actstate{std::nullopt};
     GpioPin() = default;
 public:
-    void init(Config config) {
+    void init(PinConfig config) {
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(),
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (_assigned[port_idx] & config.pin.Pin) {
             fatal_error();
         }
-        _assigned[port_idx] |= uint16_t(config.pin.Pin);
+        _assigned[port_idx] |= static_cast<uint16_t>(config.pin.Pin);
 
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
@@ -83,7 +83,7 @@ public:
         }	
 
         _port = config.port;
-        _pin = config.pin.Pin;
+        _pin = static_cast<uint16_t>(config.pin.Pin);
 
         HAL_GPIO_Init(config.port, &config.pin);
         _initialized = true;
@@ -97,7 +97,7 @@ public:
     }
 
     unsigned int pin_no() const { return POSITION_VAL(_pin); }
-    uint16_t pin_bit() const { return static_cast<uint16_t>(_pin); }
+    uint16_t pin_bit() const { return _pin; }
     const GPIO_TypeDef* port() const { return _port; }
 };
 
@@ -114,10 +114,14 @@ class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
     friend void ::HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 public:
     InputPin() = default;
-    InputPin(const Config& config) {
+    InputPin(const PinConfig& config) {
         assert(config.pin.Mode == GPIO_MODE_INPUT
-                || config.pin.Mode == GPIO_MODE_IT_RISING || config.pin.Mode == GPIO_MODE_IT_FALLING || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
-                || config.pin.Mode == GPIO_MODE_EVT_RISING || config.pin.Mode == GPIO_MODE_EVT_FALLING || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
+            || config.pin.Mode == GPIO_MODE_IT_RISING
+            || config.pin.Mode == GPIO_MODE_IT_FALLING
+            || config.pin.Mode == GPIO_MODE_IT_RISING_FALLING
+            || config.pin.Mode == GPIO_MODE_EVT_RISING
+            || config.pin.Mode == GPIO_MODE_EVT_FALLING
+            || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
         init(config);
         _actstate = config.actstate;
     }
@@ -194,8 +198,9 @@ public:
 class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
-    OutputPin(const Config& config) {
-        assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
+    OutputPin(const PinConfig& config) {
+        assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP
+            || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
         init(config);
         _actstate = config.actstate;
     }
@@ -211,9 +216,9 @@ public:
     virtual void set_level(unsigned int level) override {
         assert(_initialized);
         if(level != 0) {
-            mcu::write_reg(_port->BSRR, _pin);
+            mcu::write_reg(_port->BSRR, static_cast<uint32_t>(_pin));
         } else {
-            mcu::write_reg(_port->BSRR, _pin << 16);
+            mcu::write_reg(_port->BSRR, static_cast<uint32_t>(_pin) << 16u);
         }
     }
 
@@ -230,7 +235,7 @@ public:
         if (s == emb::gpio::pin_state::active) {
             set_level(std::to_underlying(*_actstate));
         } else {
-            set_level(1 - std::to_underlying(*_actstate));
+            set_level(1u - std::to_underlying(*_actstate));
         }
     }
 
@@ -241,8 +246,8 @@ public:
 
     virtual void toggle() override {
         assert(_initialized);
-        auto odr_reg = mcu::read_reg(_port->ODR);
-        mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
+        uint32_t odr_reg = mcu::read_reg(_port->ODR);
+        mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16u) | (~odr_reg & _pin));
     }
 };
 
@@ -250,7 +255,7 @@ public:
 class AlternatePin : public impl::GpioPin {
 public:
     AlternatePin() = default;
-    AlternatePin(const Config& config) {
+    AlternatePin(const PinConfig& config) {
         assert(config.pin.Mode == GPIO_MODE_AF_PP || config.pin.Mode == GPIO_MODE_AF_OD);
         init(config);
     }
@@ -260,7 +265,7 @@ public:
 class AnalogPin : public impl::GpioPin {
 public:
     AnalogPin() = default;
-    AnalogPin(const Config& config) {
+    AnalogPin(const PinConfig& config) {
         assert(config.pin.Mode == GPIO_MODE_ANALOG);
         init(config);
     }
@@ -275,60 +280,77 @@ enum class DurationLoggerMode {
 };
 
 
-template <DurationLoggerMode Mode = DurationLoggerMode::set_reset>
+enum class DurationLoggerChannel : unsigned int {
+    channel0,
+    channel1,
+    channel2,
+    channel3,
+    channel4,
+    channel5,
+    channel6,
+    channel7,
+    channel8,
+    channel9,
+    channel10,
+    channel11,
+    channel12,
+    channel13,
+    channel14,
+    channel15,
+};
+
+
 class DurationLogger {
 private:
-    GPIO_TypeDef* _port;
-    uint16_t _pin;
+    struct LoggerPin {
+        GPIO_TypeDef* port;
+        uint16_t pin;
+    };
+    static inline std::array<std::optional<LoggerPin>, 16> _pins; 
+    const std::optional<LoggerPin> _pin;
+    const DurationLoggerMode _mode;
 public:
-    DurationLogger(OutputPin& gpio_output)
-            : _port(gpio_output.port())
-            , _pin(gpio_output.pin_bit()) {
-        if constexpr (Mode == DurationLoggerMode::set_reset) {
-            _port->BSRR = _pin;
-        } else {
-            auto odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
-            odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
-        }
+    static OutputPin init_channel(DurationLoggerChannel channel, GPIO_TypeDef* port, uint16_t pin) {
+        OutputPin logger_pin({.port = port,
+                              .pin = {
+                                    .Pin = pin,
+                                    .Mode = GPIO_MODE_OUTPUT_PP,
+                                    .Pull = GPIO_NOPULL,
+                                    .Speed = GPIO_SPEED_FREQ_HIGH,
+                                    .Alternate = 0},
+                              .actstate = emb::gpio::active_pin_state::high});
+        _pins[std::to_underlying(channel)] = {port, pin};
+        return logger_pin;
     }
 
-    DurationLogger(GPIO_TypeDef* port, uint16_t pin_bit)
-            : _port(port)
-            , _pin(pin_bit) {
-        if constexpr (Mode == DurationLoggerMode::set_reset)
-        {
-            _port->BSRR = _pin;
+    DurationLogger(DurationLoggerChannel channel, DurationLoggerMode mode)
+            : _pin(_pins[std::to_underlying(channel)])
+            , _mode(mode) {
+        if (!_pin.has_value()) {
+            return;
+        }
+
+        if (_mode == DurationLoggerMode::set_reset) {
+            _pin->port->BSRR = _pin->pin;
         } else {
-            auto odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
-            odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
+            uint32_t odr_reg = mcu::read_reg(_pin->port->ODR);
+            mcu::write_reg(_pin->port->BSRR, ((odr_reg & _pin->pin) << 16u) | (~odr_reg & _pin->pin));
+            odr_reg = mcu::read_reg(_pin->port->ODR);
+            mcu::write_reg(_pin->port->BSRR, ((odr_reg & _pin->pin) << 16u) | (~odr_reg & _pin->pin));
         }
     }
 
     ~DurationLogger() {
-        if constexpr (Mode == DurationLoggerMode::set_reset) {
-            _port->BSRR = static_cast<uint32_t>(_pin) << 16;
-        } else {
-            auto odr_reg = mcu::read_reg(_port->ODR);
-            mcu::write_reg(_port->BSRR, ((odr_reg & _pin) << 16) | (~odr_reg & _pin));
+        if (!_pin.has_value()) {
+            return;
         }
-    }
 
-    static OutputPin init(GPIO_TypeDef* port, uint32_t pin) {
-        return OutputPin({	
-            .port = port,
-            .pin = {
-                .Pin = pin,
-                .Mode = GPIO_MODE_OUTPUT_PP,
-                .Pull = GPIO_NOPULL,
-                .Speed = GPIO_SPEED_FREQ_HIGH,
-                .Alternate = 0
-            },
-            .actstate = emb::gpio::active_pin_state::high
-        });
+        if (_mode == DurationLoggerMode::set_reset) {
+            _pin->port->BSRR = static_cast<uint32_t>(_pin->pin) << 16;
+        } else {
+            uint32_t odr_reg = mcu::read_reg(_pin->port->ODR);
+            mcu::write_reg(_pin->port->BSRR, ((odr_reg & _pin->pin) << 16u) | (~odr_reg & _pin->pin));
+        }
     }
 };
 
