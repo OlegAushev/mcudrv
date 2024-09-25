@@ -51,7 +51,8 @@ Module::Module(Peripheral peripheral,
     _init_mosi_miso_clk(mosi_pin_config, miso_pin_config, clk_pin_config);
 
     for (auto pincfg : cs_pin_configs) {
-        _cs_pins.emplace_back(mcu::gpio::OutputPin(mcu::gpio::Config{.port = pincfg.port,
+        _cs_pins.emplace_back(mcu::gpio::OutputPin(mcu::gpio::PinConfig{
+                .port = pincfg.port,
                 .pin = {.pin = pincfg.pin,
                         .mode = GPIO_MODE_OUT,
                         .speed = GPIO_SPEED_25MHz,

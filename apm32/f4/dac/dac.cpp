@@ -19,7 +19,7 @@ Module::Module(Peripheral peripheral)
 
 
 void Module::initialize_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config) {
-    mcu::gpio::Config cfg{.port = pin_config.port,
+    mcu::gpio::PinConfig cfg{.port = pin_config.port,
                           .pin = {.pin = pin_config.pin,
                                   .mode = GPIO_MODE_AN,
                                   .speed{},

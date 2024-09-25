@@ -19,7 +19,7 @@ namespace mcu {
 namespace gpio {
 
 
-struct Config {
+struct PinConfig {
     GPIO_T* port;
     GPIO_Config_T pin;
     GPIO_AF_T altfunc;
@@ -66,7 +66,7 @@ protected:
     std::optional<emb::gpio::active_pin_state> _actstate{std::nullopt};
     GpioPin() = default;
 public:
-    void init(Config config) {
+    void init(PinConfig config) {
         size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (_assigned[port_idx] & config.pin.pin) {
@@ -109,7 +109,7 @@ class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
     // friend void ::HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 public:
     InputPin() = default;
-    InputPin(const Config& config) {
+    InputPin(const PinConfig& config) {
         if (config.pin.mode != GPIO_MODE_IN) {
             fatal_error();
         }
@@ -190,7 +190,7 @@ public:
 class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
-    OutputPin(const Config& config) {
+    OutputPin(const PinConfig& config) {
         if (config.pin.mode != GPIO_MODE_OUT) {
             fatal_error();
         }
@@ -249,7 +249,7 @@ public:
 class AlternatePin : public impl::GpioPin {
 public:
     AlternatePin() = default;
-    AlternatePin(const Config& config) {
+    AlternatePin(const PinConfig& config) {
         if (config.pin.mode != GPIO_MODE_AF) {
             fatal_error();
         }
@@ -261,7 +261,7 @@ public:
 class AnalogPin : public impl::GpioPin {
 public:
     AnalogPin() = default;
-    AnalogPin(const Config& config) {
+    AnalogPin(const PinConfig& config) {
         if (config.pin.mode != GPIO_MODE_AN) {
             fatal_error();
         }
