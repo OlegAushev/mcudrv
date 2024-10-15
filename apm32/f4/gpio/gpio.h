@@ -94,6 +94,7 @@ public:
     unsigned int pin_no() const { return __CLZ(__RBIT(_pin)); }
     uint16_t pin_bit() const { return static_cast<uint16_t>(_pin); }
     const GPIO_T* port() const { return _port; }
+    bool initialized() const { return _initialized; }
 };
 
 
