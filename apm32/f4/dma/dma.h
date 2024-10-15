@@ -117,10 +117,10 @@ public:
         _stream.stream_reg()->M0ADDR = uint32_t(_data.data());
     }
 
-    constexpr const T* data() const { return _data.data(); }
+    const T* data() const { return _data.data(); }
     constexpr uint32_t size() const { return _data.size(); }
     T& operator[](size_t pos) { return _data[pos]; }
-    constexpr T& operator[](size_t pos) const { return _data[pos]; }
+    const T& operator[](size_t pos) const { return _data[pos]; }
 };
 
 
