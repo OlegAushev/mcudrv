@@ -122,6 +122,14 @@ void Module::init_internal_injected(const InjectedChannelConfig& channel_config)
 }
 
 
+void Module::init_internal_regular(const RegularChannelConfig& channel_config) {
+    for (auto rank : channel_config.ranks) {
+        ADC_ConfigRegularChannel(_reg, channel_config.channel, rank, channel_config.sampletime);
+    }
+    ADC_EnableTempSensorVrefint();
+}
+
+
 void Module::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority) {
     _reg->STS_B.AWDFLG = 0;
     _reg->STS_B.EOCFLG = 0;
