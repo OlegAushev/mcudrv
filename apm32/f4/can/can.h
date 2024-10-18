@@ -37,15 +37,15 @@ constexpr size_t peripheral_count = 2;
 
 
 struct RxPinConfig {
-    GPIO_T* port;
-    uint16_t pin;
+    gpio::Port port;
+    gpio::Pin pin;
     GPIO_AF_T altfunc;
 };
 
 
 struct TxPinConfig {
-    GPIO_T* port;
-    uint16_t pin;
+    gpio::Port port;
+    gpio::Pin pin;
     GPIO_AF_T altfunc;
 };
 

@@ -15,8 +15,9 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 {
     _rx_pin.init({
         .port = rx_pin_config.port,
-        .pin = {
-            .pin = rx_pin_config.pin,
+        .pin = rx_pin_config.pin,
+        .config = {
+            .pin{},
             .mode = GPIO_MODE_AF,
             .speed = GPIO_SPEED_50MHz,
             .otype = GPIO_OTYPE_PP,
@@ -28,8 +29,9 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 
     _tx_pin.init({
         .port = tx_pin_config.port,
-        .pin = {
-            .pin = tx_pin_config.pin,
+        .pin = tx_pin_config.pin,
+        .config = {
+            .pin{},
             .mode = GPIO_MODE_AF,
             .speed = GPIO_SPEED_50MHz,
             .otype = GPIO_OTYPE_PP,

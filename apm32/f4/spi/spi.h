@@ -29,11 +29,11 @@ enum class Peripheral : unsigned int {
 enum class Direction { rx, tx };
 
 
-struct MosiPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
-struct MisoPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
-struct ClkPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
-struct HwCsPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
-struct SwCsPinConfig { GPIO_T* port; uint16_t pin; };
+struct MosiPinConfig { gpio::Port port; gpio::Pin pin; GPIO_AF_T altfunc; };
+struct MisoPinConfig { gpio::Port port; gpio::Pin pin; GPIO_AF_T altfunc; };
+struct ClkPinConfig { gpio::Port port; gpio::Pin pin; GPIO_AF_T altfunc; };
+struct HwCsPinConfig { gpio::Port port; gpio::Pin pin; GPIO_AF_T altfunc; };
+struct SwCsPinConfig { gpio::Port port; gpio::Pin pin; };
 
 
 struct Config {

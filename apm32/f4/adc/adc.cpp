@@ -75,14 +75,18 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
 
 
 void Module::init_injected(const PinConfig& pin_config, const InjectedChannelConfig& channel_config) {
-    mcu::gpio::PinConfig cfg{.port = pin_config.port,
-                          .pin = {.pin = pin_config.pin,
-                                  .mode = GPIO_MODE_AN,
-                                  .speed{},
-                                  .otype{},
-                                  .pupd = GPIO_PUPD_NOPULL},
-                           .altfunc{},
-                           .actstate{}};
+    mcu::gpio::PinConfig cfg{
+        .port = pin_config.port,
+        .pin = pin_config.pin,
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AN,
+            .speed{},
+            .otype{},
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc{},
+        .actstate{}};
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {
@@ -95,14 +99,18 @@ void Module::init_injected(const PinConfig& pin_config, const InjectedChannelCon
 
 
 void Module::init_regular(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
-    mcu::gpio::PinConfig cfg{.port = pin_config.port,
-                          .pin = {.pin = pin_config.pin,
-                                  .mode = GPIO_MODE_AN,
-                                  .speed{},
-                                  .otype{},
-                                  .pupd = GPIO_PUPD_NOPULL},
-                           .altfunc{},
-                           .actstate{}};
+    mcu::gpio::PinConfig cfg{
+        .port = pin_config.port,
+        .pin = pin_config.pin,
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AN,
+            .speed{},
+            .otype{},
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc{},
+        .actstate{}};
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {

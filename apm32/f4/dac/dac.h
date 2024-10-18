@@ -37,8 +37,8 @@ enum class DataAlignment : unsigned int {
 
 
 struct PinConfig {
-    GPIO_T* port;
-    uint16_t pin;
+    gpio::Port port;
+    gpio::Pin pin;
 };
 
 

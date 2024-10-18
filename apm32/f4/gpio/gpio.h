@@ -19,9 +19,38 @@ namespace mcu {
 namespace gpio {
 
 
+constexpr size_t port_count = 9;
+
+
+enum class Port : unsigned int {
+    gpioa, gpiob, gpioc, gpiod, gpioe, gpiof, gpiog, gpioh, gpioi
+};
+
+
+enum class Pin : uint16_t {
+    pin0 = GPIO_PIN_0,
+    pin1 = GPIO_PIN_1,
+    pin2 = GPIO_PIN_2,
+    pin3 = GPIO_PIN_3,
+    pin4 = GPIO_PIN_4,
+    pin5 = GPIO_PIN_5,
+    pin6 = GPIO_PIN_6,
+    pin7 = GPIO_PIN_7,
+    pin8 = GPIO_PIN_8,
+    pin9 = GPIO_PIN_9,
+    pin10 = GPIO_PIN_10,
+    pin11 = GPIO_PIN_11,
+    pin12 = GPIO_PIN_12,
+    pin13 = GPIO_PIN_13,
+    pin14 = GPIO_PIN_14,
+    pin15 = GPIO_PIN_15,
+};
+
+
 struct PinConfig {
-    GPIO_T* port;
-    GPIO_Config_T pin;
+    Port port;
+    Pin pin;
+    GPIO_Config_T config;
     GPIO_AF_T altfunc;
     emb::gpio::active_pin_state actstate;
 };
@@ -30,13 +59,8 @@ struct PinConfig {
 namespace impl {
 
 
-constexpr size_t port_count = 9;
-
-
-inline const std::array<GPIO_T*, port_count> gpio_ports = {
-    GPIOA, GPIOB, GPIOC, GPIOD,
-    GPIOE, GPIOF, GPIOG, GPIOH,
-    GPIOI
+inline const std::array<GPIO_T*, port_count> gpio_instances = {
+    GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI
 };
 
 
@@ -67,27 +91,29 @@ protected:
     GpioPin() = default;
 public:
     void init(PinConfig config) {
-        size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
-                                                            std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
-        if (_assigned[port_idx] & config.pin.pin) {
+        const size_t port_idx = std::to_underlying(config.port);
+        
+        _port = impl::gpio_instances[port_idx];
+        _pin = std::to_underlying(config.pin);
+        config.config.pin = _pin;
+        
+        if (_assigned[port_idx] & _pin) {
             fatal_error();
         }
-        _assigned[port_idx] |= uint16_t(config.pin.pin);
+        _assigned[port_idx] |= uint16_t(_pin);
 
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
             _clk_enabled[port_idx] = true;
         }
 
-        _port = config.port;
-        _pin = config.pin.pin;
-
-        if (config.pin.mode == GPIO_MODE_AF) {
-            GPIO_ConfigPinAF(config.port,
-                             static_cast<GPIO_PIN_SOURCE_T>(bit_position(config.pin.pin)), config.altfunc);
+        if (config.config.mode == GPIO_MODE_AF) {
+            GPIO_ConfigPinAF(_port,
+                             static_cast<GPIO_PIN_SOURCE_T>(bit_position(_pin)),
+                             config.altfunc);
         }
 
-        GPIO_Config(config.port, &config.pin);
+        GPIO_Config(_port, &config.config);
         _initialized = true;
     }
 
@@ -111,7 +137,7 @@ class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
 public:
     InputPin() = default;
     InputPin(const PinConfig& config) {
-        if (config.pin.mode != GPIO_MODE_IN) {
+        if (config.config.mode != GPIO_MODE_IN) {
             fatal_error();
         }
         init(config);
@@ -192,7 +218,7 @@ class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
     OutputPin(const PinConfig& config) {
-        if (config.pin.mode != GPIO_MODE_OUT) {
+        if (config.config.mode != GPIO_MODE_OUT) {
             fatal_error();
         }
         init(config);
@@ -251,7 +277,7 @@ class AlternatePin : public impl::GpioPin {
 public:
     AlternatePin() = default;
     AlternatePin(const PinConfig& config) {
-        if (config.pin.mode != GPIO_MODE_AF) {
+        if (config.config.mode != GPIO_MODE_AF) {
             fatal_error();
         }
         init(config);
@@ -263,7 +289,7 @@ class AnalogPin : public impl::GpioPin {
 public:
     AnalogPin() = default;
     AnalogPin(const PinConfig& config) {
-        if (config.pin.mode != GPIO_MODE_AN) {
+        if (config.config.mode != GPIO_MODE_AN) {
             fatal_error();
         }
         init(config);
@@ -309,16 +335,19 @@ private:
     const std::optional<LoggerPin> _pin;
     const DurationLoggerMode _mode;
 public:
-    static OutputPin init_channel(DurationLoggerChannel channel, GPIO_T* port, uint16_t pin) {
+    static OutputPin init_channel(DurationLoggerChannel channel, Port port, Pin pin) {
         OutputPin logger_pin({.port = port,
-                              .pin = {.pin = pin,
-                                      .mode = GPIO_MODE_OUT,
-                                      .speed = GPIO_SPEED_100MHz,
-                                      .otype = GPIO_OTYPE_PP,
-                                      .pupd = GPIO_PUPD_NOPULL},
+                              .pin = pin,
+                              .config = {.pin{},
+                                         .mode = GPIO_MODE_OUT,
+                                         .speed = GPIO_SPEED_100MHz,
+                                         .otype = GPIO_OTYPE_PP,
+                                         .pupd = GPIO_PUPD_NOPULL},
                               .altfunc{},
                               .actstate = emb::gpio::active_pin_state::high});
-        _pins[std::to_underlying(channel)] = {port, pin};
+        _pins[std::to_underlying(channel)] = {
+                impl::gpio_instances[std::to_underlying(port)],
+                std::to_underlying(pin)};
         return logger_pin;
     }
 

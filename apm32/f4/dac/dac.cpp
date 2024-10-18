@@ -19,14 +19,18 @@ Module::Module(Peripheral peripheral)
 
 
 void Module::initialize_channel(Channel channel, const PinConfig& pin_config, ChannelConfig config) {
-    mcu::gpio::PinConfig cfg{.port = pin_config.port,
-                          .pin = {.pin = pin_config.pin,
-                                  .mode = GPIO_MODE_AN,
-                                  .speed{},
-                                  .otype{},
-                                  .pupd = GPIO_PUPD_NOPULL},
-                           .altfunc{},
-                           .actstate{}};
+    mcu::gpio::PinConfig cfg{
+        .port = pin_config.port,
+        .pin = pin_config.pin,
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AN,
+            .speed{},
+            .otype{},
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc{},
+        .actstate{}};
     mcu::gpio::AnalogPin output(cfg);
 
     DAC_Config(std::to_underlying(channel), &config.hal_config);

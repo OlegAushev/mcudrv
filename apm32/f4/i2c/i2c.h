@@ -52,8 +52,8 @@ enum class Event : uint32_t {
 };
 
 
-struct SdaPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
-struct SclPinConfig { GPIO_T* port; uint16_t pin; GPIO_AF_T altfunc; };
+struct SdaPinConfig { gpio::Port port; gpio::Pin pin; GPIO_AF_T altfunc; };
+struct SclPinConfig { gpio::Port port; gpio::Pin pin; GPIO_AF_T altfunc; };
 
 
 struct Config {

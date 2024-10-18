@@ -32,8 +32,8 @@ enum class CountDir {
 
 
 struct ChPinConfig {
-    GPIO_T* port;
-    uint16_t pin;
+    gpio::Port port;
+    gpio::Pin pin;
     GPIO_AF_T altfunc;
 };
 
@@ -41,21 +41,25 @@ struct ChPinConfig {
 class ChPin {
 public:
     ChPin(const ChPinConfig& config) {
-        mcu::gpio::AlternatePin({.port = config.port, 
-                                 .pin = {.pin = config.pin,
-                                         .mode = GPIO_MODE_AF,
-                                         .speed = GPIO_SPEED_50MHz,
-                                         .otype = GPIO_OTYPE_PP,
-                                         .pupd = GPIO_PUPD_NOPULL},
-                                 .altfunc = config.altfunc,
-                                 .actstate = emb::gpio::active_pin_state::high});
+        mcu::gpio::AlternatePin({
+            .port = config.port,
+            .pin = config.pin, 
+            .config = {
+                .pin{},
+                .mode = GPIO_MODE_AF,
+                .speed = GPIO_SPEED_50MHz,
+                .otype = GPIO_OTYPE_PP,
+                .pupd = GPIO_PUPD_NOPULL
+            },
+            .altfunc = config.altfunc,
+            .actstate = emb::gpio::active_pin_state::high});
     }
 };
 
 
 struct BkinPinConfig {
-    GPIO_T* port;
-    uint16_t pin;
+    gpio::Port port;
+    gpio::Pin pin;
     GPIO_PUPD_T pull;
     GPIO_AF_T altfunc;
 };
@@ -64,14 +68,18 @@ struct BkinPinConfig {
 class BkinPin {
 public:
     BkinPin(const BkinPinConfig& config) {
-        mcu::gpio::AlternatePin({.port = config.port, 
-                                 .pin = {.pin = config.pin,
-                                         .mode = GPIO_MODE_AF,
-                                         .speed = GPIO_SPEED_50MHz,
-                                         .otype = GPIO_OTYPE_PP,
-                                         .pupd = config.pull},
-                                 .altfunc = config.altfunc,
-                                 .actstate = emb::gpio::active_pin_state::high});
+        mcu::gpio::AlternatePin({
+            .port = config.port, 
+            .pin = config.pin,
+            .config = {
+                .pin{},
+                .mode = GPIO_MODE_AF,
+                .speed = GPIO_SPEED_50MHz,
+                .otype = GPIO_OTYPE_PP,
+                .pupd = config.pull
+            },
+            .altfunc = config.altfunc,
+            .actstate = emb::gpio::active_pin_state::high});
     }
 };
 

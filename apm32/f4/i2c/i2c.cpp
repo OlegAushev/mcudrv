@@ -16,23 +16,31 @@ Module::Module(Peripheral peripheral,
         , _peripheral(peripheral)
         , _reg(impl::instances[std::to_underlying(peripheral)])
 {
-    _sda_pin.init({.port = sda_pin_config.port,
-                   .pin = {.pin = sda_pin_config.pin,
-                           .mode = GPIO_MODE_AF,
-                           .speed = GPIO_SPEED_50MHz,
-                           .otype = GPIO_OTYPE_OD,
-                           .pupd = GPIO_PUPD_NOPULL},
-                   .altfunc = sda_pin_config.altfunc,
-                   .actstate{}});
+    _sda_pin.init({
+        .port = sda_pin_config.port,
+        .pin = sda_pin_config.pin,
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AF,
+            .speed = GPIO_SPEED_50MHz,
+            .otype = GPIO_OTYPE_OD,
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc = sda_pin_config.altfunc,
+        .actstate{}});
 
-    _scl_pin.init({.port = scl_pin_config.port,
-                   .pin = {.pin = scl_pin_config.pin,
-                           .mode = GPIO_MODE_AF,
-                           .speed = GPIO_SPEED_50MHz,
-                           .otype = GPIO_OTYPE_OD,
-                           .pupd = GPIO_PUPD_NOPULL},
-                   .altfunc = scl_pin_config.altfunc,
-                   .actstate{}});
+    _scl_pin.init({
+        .port = scl_pin_config.port,
+        .pin = scl_pin_config.pin,
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AF,
+            .speed = GPIO_SPEED_50MHz,
+            .otype = GPIO_OTYPE_OD,
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc = scl_pin_config.altfunc,
+        .actstate{}});
 
     _enable_clk(peripheral);
 

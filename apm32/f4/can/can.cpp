@@ -15,23 +15,31 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
 {
-    _rx_pin.init({.port = rx_pin_config.port,
-                  .pin = {.pin = rx_pin_config.pin,
-                          .mode = GPIO_MODE_AF,
-                          .speed = GPIO_SPEED_50MHz,
-                          .otype = GPIO_OTYPE_PP,
-                          .pupd = GPIO_PUPD_NOPULL},
-                  .altfunc = rx_pin_config.altfunc,
-                  .actstate{}});
+    _rx_pin.init({
+        .port = rx_pin_config.port,
+        .pin = rx_pin_config.pin,          
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AF,
+            .speed = GPIO_SPEED_50MHz,
+            .otype = GPIO_OTYPE_PP,
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc = rx_pin_config.altfunc,
+        .actstate{}});
 
-    _tx_pin.init({.port = tx_pin_config.port,
-                  .pin = {.pin = tx_pin_config.pin,
-                          .mode = GPIO_MODE_AF,
-                          .speed = GPIO_SPEED_50MHz,
-                          .otype = GPIO_OTYPE_PP,
-                          .pupd = GPIO_PUPD_NOPULL},
-                  .altfunc = tx_pin_config.altfunc,
-                  .actstate{}});
+    _tx_pin.init({
+        .port = tx_pin_config.port,
+        .pin = tx_pin_config.pin,
+        .config = {
+            .pin{},
+            .mode = GPIO_MODE_AF,
+            .speed = GPIO_SPEED_50MHz,
+            .otype = GPIO_OTYPE_PP,
+            .pupd = GPIO_PUPD_NOPULL
+        },
+        .altfunc = tx_pin_config.altfunc,
+        .actstate{}});
 
     _enable_clk(peripheral);
     _reg = impl::can_instances[static_cast<size_t>(_peripheral)];
