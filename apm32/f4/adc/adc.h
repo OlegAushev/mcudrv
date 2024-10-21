@@ -44,12 +44,8 @@ struct InjectedConfig {
 };
 
 
-struct CommonConfig {
-    ADC_CommonConfig_T hal_common_config;
-};
-
-
 struct Config {
+    ADC_CommonConfig_T  hal_common_config;
     ADC_RESOLUTION_T    resolution;
     bool                scan_mode;
     bool                continuous_mode;
@@ -119,7 +115,6 @@ private:
     static inline std::array<bool, peripheral_count> _clk_enabled{};
     static inline bool _common_initialized{false};
 public:
-    static void init(CommonConfig common_config);
     Module(Peripheral peripheral, Config config, dma::Stream* dma = nullptr);
 
     Peripheral peripheral() const { return _peripheral; }

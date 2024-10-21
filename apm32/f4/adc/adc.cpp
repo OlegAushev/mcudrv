@@ -11,21 +11,16 @@ namespace mcu {
 namespace adc {
 
 
-void Module::init(CommonConfig common_config) {
-    ADC_CommonConfig(&common_config.hal_common_config);
-    _common_initialized = true;
-}
-
-
 Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
-    if (!_common_initialized) {
-        fatal_error();
-    }
-
     _enable_clk(peripheral);
     _reg = impl::adc_instances[std::to_underlying(_peripheral)];
+
+    if (!_common_initialized) {
+        ADC_CommonConfig(&config.hal_common_config);
+        _common_initialized = true;
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
