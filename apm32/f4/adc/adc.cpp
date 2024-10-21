@@ -11,13 +11,21 @@ namespace mcu {
 namespace adc {
 
 
+void Module::init(CommonConfig common_config) {
+    ADC_CommonConfig(&common_config.hal_common_config);
+    _common_initialized = true;
+}
+
+
 Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
+    if (!_common_initialized) {
+        fatal_error();
+    }
+
     _enable_clk(peripheral);
     _reg = impl::adc_instances[std::to_underlying(_peripheral)];
-
-    ADC_CommonConfig(&config.hal_common_config);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
@@ -138,7 +146,7 @@ void Module::init_internal_regular(const RegularChannelConfig& channel_config) {
 }
 
 
-void Module::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority) {
+void Module::init_interrupts(uint32_t interrupt_bitset) {
     _reg->STS_B.AWDFLG = 0;
     _reg->STS_B.EOCFLG = 0;
     _reg->STS_B.INJEOCFLG = 0;
@@ -147,7 +155,6 @@ void Module::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priorit
     _reg->STS_B.OVREFLG = 0;
 
     set_bit(_reg->CTRL1, interrupt_bitset);
-    mcu::set_irq_priority(ADC_IRQn, priority);
 }
 
 

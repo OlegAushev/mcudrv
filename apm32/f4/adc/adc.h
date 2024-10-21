@@ -44,8 +44,12 @@ struct InjectedConfig {
 };
 
 
+struct CommonConfig {
+    ADC_CommonConfig_T hal_common_config;
+};
+
+
 struct Config {
-    ADC_CommonConfig_T  hal_common_config;
     ADC_RESOLUTION_T    resolution;
     bool                scan_mode;
     bool                continuous_mode;
@@ -113,7 +117,9 @@ private:
     ADC_T* _reg;
     static inline ADC_Common_T* _reg_common{ADC};
     static inline std::array<bool, peripheral_count> _clk_enabled{};
+    static inline bool _common_initialized{false};
 public:
+    static void init(CommonConfig common_config);
     Module(Peripheral peripheral, Config config, dma::Stream* dma = nullptr);
 
     Peripheral peripheral() const { return _peripheral; }
@@ -177,9 +183,10 @@ public:
     }
 
 public:
-    void init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority);
-    void enable_interrupts() { enable_irq(ADC_IRQn); }
-    void disable_interrupts() { disable_irq(ADC_IRQn); }
+    void init_interrupts(uint32_t interrupt_bitset);
+    static void set_interrupt_priority(mcu::IrqPriority priority) { mcu::set_irq_priority(ADC_IRQn, priority); }
+    static void enable_interrupts() { enable_irq(ADC_IRQn); }
+    static void disable_interrupts() { disable_irq(ADC_IRQn); }
     bool check_interrupt(ADC_INT_T interrupt) const {
         auto sts = _reg->STS_B;
         auto cr1 = _reg->CTRL1_B;
