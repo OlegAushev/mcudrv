@@ -420,20 +420,20 @@ public:
 #else
         assert(static_cast<uint32_t>(xbar_input) <= static_cast<uint32_t>(XBAR_INPUT3));
 
-        switch (pin.config().actstate.native_value()) {
-        case emb::gpio::active_pin_state::low:
-            GPIO_setPadConfig(pin.config().pin, GPIO_PIN_TYPE_PULLUP);
+        switch (pin.active_state().native_value()) {
+        case emb::gpio::active_state::low:
+            GPIO_setPadConfig(pin.pin_no(), GPIO_PIN_TYPE_PULLUP);
             break;
-        case emb::gpio::active_pin_state::high:
-            GPIO_setPadConfig(pin.config().pin, GPIO_PIN_TYPE_INVERT);
+        case emb::gpio::active_state::high:
+            GPIO_setPadConfig(pin.pin_no(), GPIO_PIN_TYPE_INVERT);
             break;
         }
 
-        GPIO_setPinConfig(pin.config().mux);
-        GPIO_setDirectionMode(pin.config().pin, GPIO_DIR_MODE_IN);
-        GPIO_setQualificationMode(pin.config().pin, GPIO_QUAL_ASYNC);
+        GPIO_setPinConfig(pin.mux());
+        GPIO_setDirectionMode(pin.pin_no(), GPIO_DIR_MODE_IN);
+        GPIO_setQualificationMode(pin.pin_no(), GPIO_QUAL_ASYNC);
 
-        XBAR_setInputPin(xbar_input, pin.config().pin);
+        XBAR_setInputPin(xbar_input, pin.pin_no());
         uint16_t tripzone_signal;
         switch (xbar_input) {
         case XBAR_INPUT1:
@@ -586,9 +586,9 @@ protected:
 
 public:
 #ifdef CPU1
-    static void preset_pins(const emb::array<PinConfig, 2*Phases>& pins, emb::gpio::active_pin_state actstate) {
+    static void preset_pins(const emb::array<PinConfig, 2*Phases>& pins, emb::gpio::active_state active_state) {
         for (size_t i = 0; i < pins.size(); ++i) {
-            mcu::gpio::PinConfig cfg = {pins[i].pin, pins[i].mux, mcu::gpio::Direction::output, actstate,
+            mcu::gpio::PinConfig cfg = {pins[i].pin, pins[i].mux, mcu::gpio::Direction::output, active_state,
                                      mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
             mcu::gpio::OutputPin pin(cfg);
             pin.reset();
