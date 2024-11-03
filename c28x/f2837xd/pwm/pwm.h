@@ -17,12 +17,6 @@ namespace mcu {
 namespace pwm {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(State) {
-    off,
-    on
-} SCOPED_ENUM_DECLARE_END(State)
-
-
 SCOPED_ENUM_DECLARE_BEGIN(CountDirection) {
     up = EPWM_TIME_BASE_STATUS_COUNT_UP,
     down = EPWM_TIME_BASE_STATUS_COUNT_DOWN
@@ -168,7 +162,7 @@ private:
     uint16_t _phase_shift[Phases];	// TBPHS registers values
     uint16_t _sync_delay[Phases];   // delay from internal master module to slave modules, p.1876
 
-    State _state;
+    bool _active;
 public:
     Module(const emb::array<Peripheral, Phases>& peripherals,
             const emb::array<PinConfig, 2*Phases>& pins,
@@ -178,7 +172,7 @@ public:
             , _counter_mode(config.counter_mode)
             , _switching_freq(config.switching_freq)
             , _deadtime_cycles(config.deadtime_ns / _timebase_cycle_ns)
-            , _state(State::off) {
+            , _active(false) {
         for (size_t i = 0; i < Phases; ++i) {
             _peripheral[i] = peripherals[i];
             _module.base[i] = impl::pwm_bases[peripherals[i].underlying_value()];
@@ -536,7 +530,7 @@ public:
     }
 
     void start() {
-        _state = State::on;
+        _active = true;
         for (size_t i = 0; i < Phases; ++i) {
             EPWM_clearTripZoneFlag(_module.base[i], EPWM_TZ_INTERRUPT | EPWM_TZ_FLAG_OST);
         }
@@ -546,10 +540,10 @@ public:
         for (size_t i = 0; i < Phases; ++i) {
             EPWM_forceTripZoneEvent(_module.base[i], EPWM_TZ_FORCE_EVENT_OST);
         }
-        _state = State::off;
+        _active = false;
     }
 
-    State state() const { return _state; }
+    bool active() const { return _active; }
     CountDirection count_direction() const { return CountDirection(EPWM_getTimeBaseCounterDirection(_module.base[0])); }
 
     void enable_event_interrupts() { EPWM_enableInterrupt(_module.base[0]); }
