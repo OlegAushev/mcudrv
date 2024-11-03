@@ -16,6 +16,13 @@ namespace mcu {
 namespace adc {
 
 
+inline float vref() { return 3.0f; }
+
+
+template<typename T>
+inline T nmax() { return static_cast<T>(4095); }
+
+
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     adca,
     adcb,
