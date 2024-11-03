@@ -10,9 +10,9 @@ namespace mcu {
 namespace chrono {
 
 
-bool steady_clock::_initialized __attribute__((section("shared_mcu_clock"), retain)) = false;
-volatile int64_t steady_clock::_time __attribute__((section("shared_mcu_clock"), retain)) = 0;
-const emb::chrono::milliseconds steady_clock::time_step __attribute__((section("shared_mcu_clock"), retain)) = emb::chrono::milliseconds(1);
+bool steady_clock::_initialized __attribute__((section("shared_mcu_chrono"), retain)) = false;
+volatile int64_t steady_clock::_time __attribute__((section("shared_mcu_chrono"), retain)) = 0;
+const emb::chrono::milliseconds steady_clock::time_step __attribute__((section("shared_mcu_chrono"), retain)) = emb::chrono::milliseconds(1);
 
 
 #ifdef CPU1
