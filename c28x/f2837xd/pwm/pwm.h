@@ -104,7 +104,6 @@ struct PinConfig { uint32_t pin; uint32_t mux; };
 struct Config {
     float switching_freq;
     float deadtime_ns;
-    uint32_t clock_prescaler;   // must be the product of clkDivider and hsclkDivider
     ClockDivider clk_divider;
     HsClockDivider hsclk_divider;
     OperatingMode operating_mode;
@@ -126,6 +125,11 @@ struct SyncConfig {
 
 
 namespace impl {
+
+
+extern const uint32_t clk_dividers[8];
+extern const uint32_t hsclk_dividers[8];
+
 
 template <PhaseCount::enum_type Phases>
 struct Module {
@@ -149,6 +153,7 @@ private:
     // which defaults to EPWMCLK = SYSCLKOUT/2, fclk(epwm)max = 100 MHz
     static const float pwm_clk_freq = DEVICE_SYSCLK_FREQ / 2;
     static const float pwm_clk_cycle_ns = 1000000000.f / pwm_clk_freq;
+    const uint32_t _clock_prescaler;
     const float _timebase_clk_freq;
     const float _timebase_cycle_ns;
 
@@ -167,8 +172,9 @@ public:
     Module(const emb::array<Peripheral, Phases>& peripherals,
             const emb::array<PinConfig, 2*Phases>& pins,
             const pwm::Config& config, const pwm::SyncConfig<Phases> sync_config)
-            : _timebase_clk_freq(pwm_clk_freq / config.clock_prescaler)
-            , _timebase_cycle_ns(pwm_clk_cycle_ns * config.clock_prescaler)
+            : _clock_prescaler(impl::clk_dividers[config.clk_divider.underlying_value()] * impl::hsclk_dividers[config.hsclk_divider.underlying_value()])
+            , _timebase_clk_freq(pwm_clk_freq / _clock_prescaler)
+            , _timebase_cycle_ns(pwm_clk_cycle_ns * _clock_prescaler)
             , _counter_mode(config.counter_mode)
             , _switching_freq(config.switching_freq)
             , _deadtime_cycles(config.deadtime_ns / _timebase_cycle_ns)
