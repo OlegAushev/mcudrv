@@ -154,23 +154,26 @@ public:
 class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() {}
-    OutputPin(const PinConfig& config) { init(config); }
+    OutputPin(const PinConfig& config,
+              emb::gpio::pin_state init_state =
+                  emb::gpio::pin_state::inactive) { init(config, init_state); }
 
-    void init(const PinConfig& config) {
+    void init(const PinConfig& config,
+              emb::gpio::pin_state init_state =
+                  emb::gpio::pin_state::inactive) {
         assert(config.direction == Direction::output);
         _pin = config.pin;
         _mux = config.mux;
         _active_state = config.active_state;
+        _initialized = true;
 #ifdef CPU1
         GPIO_setPadConfig(config.pin, config.type.underlying_value());
         //set() - is virtual, shouldn't be called in ctor
-        GPIO_writePin(config.pin,
-                1 - (static_cast<uint32_t>(emb::gpio::pin_state::inactive) ^ static_cast<uint32_t>(config.active_state.underlying_value())));
+        set(init_state);
         GPIO_setPinConfig(config.mux);
         GPIO_setDirectionMode(config.pin, GPIO_DIR_MODE_OUT);
         GPIO_setMasterCore(config.pin, static_cast<GPIO_CoreSelect>(config.master_core.underlying_value()));
 #endif
-        _initialized = true;
     }
 
     virtual unsigned int read_level() const {
