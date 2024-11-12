@@ -168,8 +168,7 @@ public:
         _initialized = true;
 #ifdef CPU1
         GPIO_setPadConfig(config.pin, config.type.underlying_value());
-        //set() - is virtual, shouldn't be called in ctor
-        set(init_state);
+        OutputPin::set(init_state);
         GPIO_setPinConfig(config.mux);
         GPIO_setDirectionMode(config.pin, GPIO_DIR_MODE_OUT);
         GPIO_setMasterCore(config.pin, static_cast<GPIO_CoreSelect>(config.master_core.underlying_value()));
