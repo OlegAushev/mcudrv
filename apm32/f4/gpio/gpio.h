@@ -52,7 +52,7 @@ struct PinConfig {
     Pin pin;
     GPIO_Config_T config;
     GPIO_AF_T altfunc;
-    emb::gpio::active_pin_state actstate;
+    emb::gpio::active_state active_state;
 };
 
 
@@ -87,16 +87,16 @@ protected:
     bool _initialized{false};
     GPIO_T* _port;
     uint16_t _pin;
-    std::optional<emb::gpio::active_pin_state> _actstate{std::nullopt};
+    std::optional<emb::gpio::active_state> _active_state{std::nullopt};
     GpioPin() = default;
 public:
     void init(PinConfig config) {
         const size_t port_idx = std::to_underlying(config.port);
-        
+
         _port = impl::gpio_instances[port_idx];
         _pin = std::to_underlying(config.pin);
         config.config.pin = _pin;
-        
+
         if (_assigned[port_idx] & _pin) {
             fatal_error();
         }
@@ -141,7 +141,7 @@ public:
             fatal_error();
         }
         init(config);
-        _actstate = config.actstate;
+        _active_state = config.active_state;
     }
 
     virtual unsigned int read_level() const override {
@@ -154,10 +154,10 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(*_actstate)) {
+        if (read_level() == std::to_underlying(*_active_state)) {
             return emb::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive; 
+        return emb::gpio::pin_state::inactive;
     }
 // TODO
 // private:
@@ -217,12 +217,14 @@ public:
 class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
-    OutputPin(const PinConfig& config) {
+    OutputPin(const PinConfig& config, emb::gpio::pin_state init_state =
+        emb::gpio::pin_state::inactive) {
         if (config.config.mode != GPIO_MODE_OUT) {
             fatal_error();
         }
         init(config);
-        _actstate = config.actstate;
+        OutputPin::set(init_state);
+        _active_state = config.active_state;
     }
 
     virtual unsigned int read_level() const override {
@@ -244,7 +246,7 @@ public:
 
     virtual emb::gpio::pin_state read() const override {
         assert(_initialized);
-        if (read_level() == std::to_underlying(*_actstate)) {
+        if (read_level() == std::to_underlying(*_active_state)) {
             return emb::gpio::pin_state::active;
         }
         return emb::gpio::pin_state::inactive;
@@ -253,9 +255,9 @@ public:
     virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) override {
         assert(_initialized);
         if (st == emb::gpio::pin_state::active) {
-            set_level(std::to_underlying(*_actstate));
+            set_level(std::to_underlying(*_active_state));
         } else {
-            set_level(1 - std::to_underlying(*_actstate));
+            set_level(1 - std::to_underlying(*_active_state));
         }
     }
 
@@ -331,7 +333,7 @@ private:
         GPIO_T* port;
         uint16_t pin;
     };
-    static inline std::array<std::optional<LoggerPin>, 16> _pins; 
+    static inline std::array<std::optional<LoggerPin>, 16> _pins;
     const std::optional<LoggerPin> _pin;
     const DurationLoggerMode _mode;
 public:
@@ -344,7 +346,7 @@ public:
                                          .otype = GPIO_OTYPE_PP,
                                          .pupd = GPIO_PUPD_NOPULL},
                               .altfunc{},
-                              .actstate = emb::gpio::active_pin_state::high});
+                              .active_state = emb::gpio::active_state::high});
         _pins[std::to_underlying(channel)] = {
                 impl::gpio_instances[std::to_underlying(port)],
                 std::to_underlying(pin)};

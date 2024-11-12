@@ -27,7 +27,7 @@ Module::Module(Peripheral peripheral,
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = sda_pin_config.altfunc,
-        .actstate{}});
+        .active_state{}});
 
     _scl_pin.init({
         .port = scl_pin_config.port,
@@ -40,7 +40,7 @@ Module::Module(Peripheral peripheral,
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = scl_pin_config.altfunc,
-        .actstate{}});
+        .active_state{}});
 
     _enable_clk(peripheral);
 

@@ -89,7 +89,7 @@ void Module::init_injected(const PinConfig& pin_config, const InjectedChannelCon
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc{},
-        .actstate{}};
+        .active_state{}};
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {
@@ -113,7 +113,7 @@ void Module::init_regular(const PinConfig& pin_config, const RegularChannelConfi
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc{},
-        .actstate{}};
+        .active_state{}};
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {

@@ -24,7 +24,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = rx_pin_config.altfunc,
-        .actstate = emb::gpio::active_pin_state::high
+        .active_state = emb::gpio::active_state::high
     });
 
     _tx_pin.init({
@@ -38,7 +38,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = tx_pin_config.altfunc,
-        .actstate = emb::gpio::active_pin_state::high
+        .active_state = emb::gpio::active_state::high
     });
 
     _enable_clk(peripheral);

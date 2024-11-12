@@ -43,7 +43,7 @@ public:
     ChPin(const ChPinConfig& config) {
         mcu::gpio::AlternatePin({
             .port = config.port,
-            .pin = config.pin, 
+            .pin = config.pin,
             .config = {
                 .pin{},
                 .mode = GPIO_MODE_AF,
@@ -52,7 +52,7 @@ public:
                 .pupd = GPIO_PUPD_NOPULL
             },
             .altfunc = config.altfunc,
-            .actstate = emb::gpio::active_pin_state::high});
+            .active_state = emb::gpio::active_state::high});
     }
 };
 
@@ -69,7 +69,7 @@ class BkinPin {
 public:
     BkinPin(const BkinPinConfig& config) {
         mcu::gpio::AlternatePin({
-            .port = config.port, 
+            .port = config.port,
             .pin = config.pin,
             .config = {
                 .pin{},
@@ -79,7 +79,7 @@ public:
                 .pupd = config.pull
             },
             .altfunc = config.altfunc,
-            .actstate = emb::gpio::active_pin_state::high});
+            .active_state = emb::gpio::active_state::high});
     }
 };
 

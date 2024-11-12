@@ -17,7 +17,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 {
     _rx_pin.init({
         .port = rx_pin_config.port,
-        .pin = rx_pin_config.pin,          
+        .pin = rx_pin_config.pin,
         .config = {
             .pin{},
             .mode = GPIO_MODE_AF,
@@ -26,7 +26,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = rx_pin_config.altfunc,
-        .actstate{}});
+        .active_state{}});
 
     _tx_pin.init({
         .port = tx_pin_config.port,
@@ -39,7 +39,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = tx_pin_config.altfunc,
-        .actstate{}});
+        .active_state{}});
 
     _enable_clk(peripheral);
     _reg = impl::can_instances[static_cast<size_t>(_peripheral)];
@@ -50,7 +50,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const Tx
 
 RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
     RxMessageAttribute attr = {};
-    
+
     if (_filter_count >= max_fitler_count) {
         fatal_error();
     }
@@ -102,7 +102,7 @@ exec_status Module::put_frame(const can_frame& frame) {
         _txqueue.push(frame);
         return exec_status::busy;
     }
-    
+
     uint32_t mailboxid = _reg->TXSTS_B.EMNUM;
     if (mailboxid > 2) {
         return exec_status::error;
@@ -132,7 +132,7 @@ exec_status Module::put_frame(const can_frame& frame) {
         (uint32_t(frame.payload[5]) << 8) |
         (uint32_t(frame.payload[6]) << 16) |
         (uint32_t(frame.payload[7]) << 24));
-    
+
     // request transmission
     _reg->sTxMailBox[mailboxid].TXMID_B.TXMREQ = 1;
 
@@ -178,7 +178,7 @@ std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fif
     case RxFifo::fifo1:
         _reg->RXF1_B.RFOM1 = 1;;
         break;
-    }    
+    }
 
     return {attr};
 }
@@ -213,7 +213,7 @@ void Module::_enable_clk(Peripheral peripheral) {
     if (_clk_enabled[can_idx]) {
         return;
     }
-        
+
     impl::can_clk_enable_funcs[can_idx]();
     _clk_enabled[can_idx] = true;
 }
