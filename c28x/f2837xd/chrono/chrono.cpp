@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace chrono {
 
@@ -26,7 +27,7 @@ void steady_clock::init() {
     CPUTimer_setPreScaler(CPUTIMER0_BASE, 0);       // Initialize pre-scale counter to divide by 1 (SYSCLKOUT)
     CPUTimer_reloadTimerCounter(CPUTIMER0_BASE);    // Reload counter register with period value
 
-    uint32_t tmp = (uint32_t)((mcu::sysclk_freq() / 1000) * time_step.count());
+    uint32_t tmp = (uint32_t)((mcu::c28x::sysclk_freq() / 1000) * time_step.count());
     CPUTimer_setPeriod(CPUTIMER0_BASE, tmp - 1);
     CPUTimer_setEmulationMode(CPUTIMER0_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 
@@ -49,7 +50,7 @@ void high_resolution_clock::init(emb::chrono::microseconds period) {
     CPUTimer_setPreScaler(CPUTIMER1_BASE, 0);       // Initialize pre-scale counter to divide by 1 (SYSCLKOUT)
     CPUTimer_reloadTimerCounter(CPUTIMER1_BASE);    // Reload counter register with period value
 
-    _period = (uint32_t)(mcu::sysclk_freq() / 1000000) * period.count() - 1;
+    _period = (uint32_t)(mcu::c28x::sysclk_freq() / 1000000) * period.count() - 1;
     CPUTimer_setPeriod(CPUTIMER1_BASE, _period);
     CPUTimer_setEmulationMode(CPUTIMER1_BASE, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
 
@@ -59,6 +60,7 @@ void high_resolution_clock::init(emb::chrono::microseconds period) {
 
 } // namespace chrono
 
+} // namespace c28x
 
 } // namespace mcu
 

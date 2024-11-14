@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace ipc {
 
@@ -14,14 +15,14 @@ namespace flags {
 
 
 #ifdef DUALCORE
-const mcu::ipc::Mode mode = mcu::ipc::Mode::singlecore;
+const mcu::c28x::ipc::Mode mode = mcu::c28x::ipc::Mode::singlecore;
 #else
-const mcu::ipc::Mode mode = mcu::ipc::Mode::dualcore;
+const mcu::c28x::ipc::Mode mode = mcu::c28x::ipc::Mode::dualcore;
 #endif
 
-mcu::ipc::Flag cpu1_periphery_configured(31, mode);
-mcu::ipc::Flag cpu2_booted(30, mode);
-mcu::ipc::Flag cpu2_periphery_configured(29, mode);
+mcu::c28x::ipc::Flag cpu1_periphery_configured(31, mode);
+mcu::c28x::ipc::Flag cpu2_booted(30, mode);
+mcu::c28x::ipc::Flag cpu2_periphery_configured(29, mode);
 
 
 } // namespace flags
@@ -29,6 +30,7 @@ mcu::ipc::Flag cpu2_periphery_configured(29, mode);
 
 } // namespace ipc
 
+} // namespace c28x
 
 } // namespace mcu
 

@@ -12,6 +12,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace qep {
 
@@ -118,6 +119,7 @@ protected:
 
 } // namespace qep
 
+} // namespace c28x
 
 } // namespace mcu
 

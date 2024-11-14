@@ -1,13 +1,10 @@
 #ifdef MCUDRV_C28X
 
-
 #include <mcudrv/c28x/f2837xd/adc/adc.h>
 #include <mcudrv/c28x/f2837xd/chrono/chrono.h>
 
-
 namespace mcu {
-
-
+namespace c28x {
 namespace adc {
 
 
@@ -28,7 +25,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
         : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::adc_bases[peripheral.underlying_value()], impl::adc_result_bases[peripheral.underlying_value()])
-        , sample_window_cycles(config.sample_window_ns / (1000000000 / mcu::sysclk_freq())) {
+        , sample_window_cycles(config.sample_window_ns / (1000000000 / mcu::c28x::sysclk_freq())) {
     if (!_channels_and_irqs_initialized) {
         impl::init_channels(_channels);
         impl::init_irqs(_irqs);
@@ -45,7 +42,7 @@ Module::Module(Peripheral peripheral, const adc::Config& config)
         ADC_enableBurstMode(_module.base);
     }
 
-    mcu::chrono::delay(emb::chrono::microseconds(1000));    // delay for power-up
+    mcu::c28x::chrono::delay(emb::chrono::microseconds(1000));    // delay for power-up
 
     // Configure SOCs
     // For 12-bit resolution, a sampling window of (5 x sample_window_cycles)ns
@@ -79,8 +76,7 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral) {
 
 
 } // namespace adc
-
-
+} // namespace c28x
 } // namespace mcu
 
 

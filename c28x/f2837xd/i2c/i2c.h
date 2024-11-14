@@ -11,6 +11,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace i2c {
 
@@ -105,6 +106,7 @@ protected:
 
 } // namespace i2c
 
+} // namespace c28x
 
 } // namespace mcu
 

@@ -1,27 +1,20 @@
 #pragma once
 
-
 #ifdef MCUDRV_C28X
-
 
 #include <emblib/array.h>
 #include <emblib/core.h>
 #include <mcu/adc_channels/adc_channels.h>
 #include <mcudrv/c28x/f2837xd/system/system.h>
 
-
 namespace mcu {
-
-
+namespace c28x {
 namespace adc {
-
 
 inline float vref() { return 3.0f; }
 
-
 template<typename T>
 inline T nmax() { return static_cast<T>(4095); }
-
 
 SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     adca,
@@ -30,9 +23,7 @@ SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
     adcd
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
-
 const size_t peripheral_count = 4;
-
 
 struct Config {
     uint32_t sample_window_ns;
@@ -42,9 +33,7 @@ struct Config {
     uint16_t burst_size;
 };
 
-
 namespace impl {
-
 
 struct Module {
     uint32_t base;
@@ -53,12 +42,10 @@ struct Module {
             : base(base_), result_base(result_base_) {}
 };
 
-
 extern const uint32_t adc_bases[4];
 extern const uint32_t adc_result_bases[4];
 extern const uint16_t adc_pie_int_groups[4];
 extern const SysCtl_CPUSelPeriphInstance adc_cpusel_instances[4];
-
 
 struct Channel {
     Peripheral peripheral;
@@ -67,15 +54,17 @@ struct Channel {
     ADC_Trigger trigger;
     bool registered;
     Channel() { registered = false; }
-    Channel(Peripheral peripheral_, ADC_Channel channel_, ADC_SOCNumber soc_, ADC_Trigger trigger_)
-            : peripheral(peripheral_)
-            , channel(channel_)
-            , soc(soc_)
-            , trigger(trigger_) {
+    Channel(Peripheral peripheral_,
+            ADC_Channel channel_,
+            ADC_SOCNumber soc_,
+            ADC_Trigger trigger_)
+            : peripheral(peripheral_),
+              channel(channel_),
+              soc(soc_),
+              trigger(trigger_) {
         registered = false;
     }
 };
-
 
 struct Irq {
     Peripheral peripheral;
@@ -84,26 +73,26 @@ struct Irq {
     uint32_t pie_int_num;
     bool registered;
     Irq() { registered = false; }
-    Irq(Peripheral peripheral_, ADC_IntNumber int_num_, ADC_SOCNumber soc_, uint32_t pie_int_num_)
-            : peripheral(peripheral_)
-            , int_num(int_num_)
-            , soc(soc_)
-            , pie_int_num(pie_int_num_) {
+    Irq(Peripheral peripheral_,
+        ADC_IntNumber int_num_,
+        ADC_SOCNumber soc_,
+        uint32_t pie_int_num_)
+            : peripheral(peripheral_),
+              int_num(int_num_),
+              soc(soc_),
+              pie_int_num(pie_int_num_) {
         registered = false;
     }
 };
 
-
 void init_channels(emb::array<impl::Channel, ChannelId::count>& channels);
-
 
 void init_irqs(emb::array<impl::Irq, IrqId::count>& irqs);
 
-
 } // namespace impl
 
-
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::interrupt_invoker_array<Module, peripheral_count>,
+               private emb::noncopyable {
     friend class Channel;
 private:
     const Peripheral _peripheral;
@@ -128,7 +117,8 @@ public:
 
     uint16_t read(ChannelId channel) const {
         assert(_channels[channel.underlying_value()].peripheral == _peripheral);
-        return ADC_readResult(_module.result_base, _channels[channel.underlying_value()].soc);
+        return ADC_readResult(_module.result_base,
+                              _channels[channel.underlying_value()].soc);
     }
 
     void enable_interrupts() {
@@ -169,7 +159,6 @@ public:
     }
 };
 
-
 class Channel {
 private:
     Module* _adc;
@@ -192,11 +181,8 @@ public:
     Module* adc() { return _adc; }
 };
 
-
 } // namespace adc
-
-
+} // namespace c28x
 } // namespace mcu
-
 
 #endif

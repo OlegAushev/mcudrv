@@ -11,6 +11,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace ipc {
 
@@ -101,9 +102,9 @@ public:
 
     bool is_set() const {
         switch (_mode.native_value()) {
-        case mcu::ipc::Mode::singlecore:
+        case mcu::c28x::ipc::Mode::singlecore:
             return local.is_set();
-        case mcu::ipc::Mode::dualcore:
+        case mcu::c28x::ipc::Mode::dualcore:
             return remote.is_set();
         }
         return false;
@@ -111,10 +112,10 @@ public:
 
     void reset() {
         switch (_mode.native_value()) {
-        case mcu::ipc::Mode::singlecore:
+        case mcu::c28x::ipc::Mode::singlecore:
             local.reset();
             return;
-        case mcu::ipc::Mode::dualcore:
+        case mcu::c28x::ipc::Mode::dualcore:
             remote.acknowledge();
             return;
         }
@@ -141,9 +142,9 @@ inline void registerIpcInterruptHandler(InterruptType ipc_interrupt, void (*hand
 namespace flags {
 
 
-extern mcu::ipc::Flag cpu1_periphery_configured;
-extern mcu::ipc::Flag cpu2_booted;
-extern mcu::ipc::Flag cpu2_periphery_configured;
+extern mcu::c28x::ipc::Flag cpu1_periphery_configured;
+extern mcu::c28x::ipc::Flag cpu2_booted;
+extern mcu::c28x::ipc::Flag cpu2_periphery_configured;
 
 
 } // namespace flags
@@ -151,6 +152,7 @@ extern mcu::ipc::Flag cpu2_periphery_configured;
 
 } // namespace ipc
 
+} // namespace c28x
 
 } // namespace mcu
 

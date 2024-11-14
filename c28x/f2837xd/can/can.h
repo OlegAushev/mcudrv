@@ -10,8 +10,7 @@
 
 
 namespace mcu {
-
-
+namespace c28x {
 namespace can {
 
 
@@ -137,8 +136,7 @@ protected:
 
 
 } // namespace can
-
-
+} // namespace c28x
 } // namespace mcu
 
 

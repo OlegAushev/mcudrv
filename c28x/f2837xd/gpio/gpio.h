@@ -14,6 +14,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace gpio {
 
@@ -287,7 +288,7 @@ SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerChannel) {
 } SCOPED_ENUM_DECLARE_END(DurationLoggerChannel)
 
 
-struct DurationLoggerPinConfig { uint32_t pin; uint32_t mux; mcu::gpio::MasterCore core; };
+struct DurationLoggerPinConfig { uint32_t pin; uint32_t mux; mcu::c28x::gpio::MasterCore core; };
 
 
 class DurationLogger {
@@ -297,8 +298,8 @@ private:
     const DurationLoggerMode _mode;
 public:
     static void init_channel(DurationLoggerChannel ch, const DurationLoggerPinConfig config) {
-        PinConfig out_config = {config.pin, config.mux, mcu::gpio::Direction::output, emb::gpio::active_state::high,
-                             mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, config.core};
+        PinConfig out_config = {config.pin, config.mux, mcu::c28x::gpio::Direction::output, emb::gpio::active_state::high,
+                             mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, config.core};
         OutputPin out(out_config);
         _pins[ch.underlying_value()] = config.pin;
     }
@@ -335,6 +336,7 @@ public:
 
 } //namespace gpio
 
+} // namespace c28x
 
 } // namespace mcu
 

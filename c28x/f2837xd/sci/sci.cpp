@@ -5,6 +5,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace sci {
 
@@ -81,6 +82,7 @@ void Module::_init_pins(const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx
 
 } // namespace sci
 
+} // namespace c28x
 
 } // namespace mcu
 

@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace spi {
 
@@ -85,6 +86,7 @@ void Module::_init_pins(const MosiPinConfig& mosi_pin, const MisoPinConfig& miso
 
 } // namespace spi
 
+} // namespace c28x
 
 } // namespace mcu
 
