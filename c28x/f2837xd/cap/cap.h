@@ -10,6 +10,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace cap {
 
@@ -90,6 +91,7 @@ protected:
 
 } // namespace cap
 
+} // namespace c28x
 
 } // namespace mcu
 

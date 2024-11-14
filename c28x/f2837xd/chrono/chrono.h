@@ -12,6 +12,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace chrono {
 
@@ -93,6 +94,7 @@ private:
 
 } // namespace chrono
 
+} // namespace c28x
 
 } // namespace mcu
 

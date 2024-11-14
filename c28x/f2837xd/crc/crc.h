@@ -10,6 +10,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace crc {
 
@@ -67,6 +68,7 @@ inline void reset() {
 
 } // namespace crc
 
+} // namespace c28x
 
 } // namespace mcu
 

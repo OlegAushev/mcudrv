@@ -13,7 +13,7 @@
 
 
 namespace mcu {
-
+namespace c28x {
 
 inline void initialize_device() {
 #ifdef CPU1
@@ -65,6 +65,7 @@ inline uint32_t sysclk_freq() { return DEVICE_SYSCLK_FREQ; }
 #define INVOKE_USER3_INTERRUPT() __asm(" TRAP #22")
 
 
+} // namespace c28x
 } // namespace mcu
 
 

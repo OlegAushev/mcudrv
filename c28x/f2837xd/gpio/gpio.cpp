@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace gpio {
 
@@ -21,6 +22,7 @@ emb::array<emb::optional<uint32_t>, 16> DurationLogger::_pins;
 
 } // namespace gpio
 
+} // namespace c28x
 
 } // namespace mcu
 

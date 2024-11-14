@@ -12,6 +12,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace sci {
 
@@ -164,6 +165,7 @@ protected:
 
 } // namespace sci
 
+} // namespace c28x
 
 } // namespace mcu
 

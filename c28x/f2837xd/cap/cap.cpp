@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace cap {
 
@@ -96,6 +97,7 @@ void Module::register_interrupt_callback(void (*callback)(Module*, uint16_t)) {
 
 } // namespace cap
 
+} // namespace c28x
 
 } // namespace mcu
 

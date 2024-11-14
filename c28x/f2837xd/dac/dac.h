@@ -10,6 +10,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace dac {
 
@@ -69,6 +70,7 @@ public:
 
 } // namespace dac
 
+} // namespace c28x
 
 } // namespace mcu
 

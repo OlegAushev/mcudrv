@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace pwm {
 
@@ -37,6 +38,7 @@ const uint32_t impl::pwm_pie_trip_int_nums[12] = {
 
 } // namespace pwm
 
+} // namespace c28x
 
 } // namespace mcu
 

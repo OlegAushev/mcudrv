@@ -17,6 +17,7 @@
 
 
 namespace mcu {
+namespace c28x {
 
 
 class tests {
@@ -27,6 +28,7 @@ public:
 };
 
 
+} // namespace c28x
 } // namespace mcu
 
 

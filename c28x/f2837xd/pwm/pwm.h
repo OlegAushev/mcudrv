@@ -13,6 +13,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace pwm {
 
@@ -588,9 +589,9 @@ public:
 #ifdef CPU1
     static void preset_pins(const emb::array<PinConfig, 2*Phases>& pins, emb::gpio::active_state active_state) {
         for (size_t i = 0; i < pins.size(); ++i) {
-            mcu::gpio::PinConfig cfg = {pins[i].pin, pins[i].mux, mcu::gpio::Direction::output, active_state,
-                                     mcu::gpio::Type::std, mcu::gpio::QualMode::sync, 1, mcu::gpio::MasterCore::cpu1};
-            mcu::gpio::OutputPin pin(cfg);
+            mcu::c28x::gpio::PinConfig cfg = {pins[i].pin, pins[i].mux, mcu::c28x::gpio::Direction::output, active_state,
+                                     mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+            mcu::c28x::gpio::OutputPin pin(cfg);
             pin.reset();
         }
     }
@@ -600,6 +601,7 @@ public:
 
 } // namespace pwm
 
+} // namespace c28x
 
 } // namespace mcu
 

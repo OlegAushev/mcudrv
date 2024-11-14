@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace qep {
 
@@ -40,7 +41,7 @@ Module::Module(Peripheral peripheral,
     EQEP_setInitialPosition(_module.base, config.init_position);
 
     // Enable the unit timer, setting the frequency
-    EQEP_enableUnitTimer(_module.base, (mcu::sysclk_freq() / config.timeout_freq));
+    EQEP_enableUnitTimer(_module.base, (mcu::c28x::sysclk_freq() / config.timeout_freq));
 
     // Configure the position counter to be latched on a unit time out
     EQEP_setLatchMode(_module.base, config.latch_mode);
@@ -74,6 +75,7 @@ void Module::_init_pins(const QepaPinConfig& qepa_pin, emb::optional<QepbPinConf
 
 } // namespace qep
 
+} // namespace c28x
 
 } // namespace mcu
 

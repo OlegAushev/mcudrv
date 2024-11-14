@@ -7,6 +7,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace dac {
 
@@ -21,12 +22,13 @@ Module::Module(Peripheral peripheral)
     DAC_setReferenceVoltage(_module.base, DAC_REF_ADC_VREFHI);
     DAC_enableOutput(_module.base);
     DAC_setShadowValue(_module.base, 0);
-    mcu::chrono::delay(emb::chrono::microseconds(10));  // Delay for buffered DAC to power up
+    chrono::delay(emb::chrono::microseconds(10));  // Delay for buffered DAC to power up
 }
 
 
 } // namespace dac
 
+} // namespace c28x
 
 } // namespace mcu
 

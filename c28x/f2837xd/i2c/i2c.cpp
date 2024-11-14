@@ -6,6 +6,7 @@
 
 namespace mcu {
 
+namespace c28x {
 
 namespace i2c {
 
@@ -22,7 +23,7 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin, const SclPinC
 #endif
     I2C_disableModule(_module.base);
 
-    I2C_initMaster(_module.base, mcu::sysclk_freq(), config.bitrate,
+    I2C_initMaster(_module.base, mcu::c28x::sysclk_freq(), config.bitrate,
             static_cast<I2C_DutyCycle>(config.duty_cycle.underlying_value()));
     I2C_setBitCount(_module.base, static_cast<I2C_BitCount>(config.bitcount.underlying_value()));
     I2C_setSlaveAddress(_module.base, config.slave_addr);
@@ -59,6 +60,7 @@ void Module::_init_pins(const SdaPinConfig& sda_pin, const SclPinConfig& scl_pin
 
 } // namespace i2c
 
+} // namespace c28x
 
 } // namespace mcu
 
