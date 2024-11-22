@@ -8,10 +8,10 @@
 void mcu::c28x::tests::gpio_test() {
 #ifdef MCU_TESTS_ENABLED
 #ifdef _LAUNCHXL_F28379D
-    mcu::c28x::gpio::PinConfig out1cfg = {125, GPIO_125_GPIO125, mcu::c28x::gpio::Direction::output, emb::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
-    mcu::c28x::gpio::PinConfig out2cfg = {29, GPIO_29_GPIO29, mcu::c28x::gpio::Direction::output, emb::gpio::active_state::low, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
-    mcu::c28x::gpio::PinConfig in1cfg = {59, GPIO_59_GPIO59, mcu::c28x::gpio::Direction::input, emb::gpio::active_state::low, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
-    mcu::c28x::gpio::PinConfig in2cfg = {124, GPIO_124_GPIO124, mcu::c28x::gpio::Direction::input, emb::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig out1cfg = {125, GPIO_125_GPIO125, mcu::c28x::gpio::Direction::output, mcu::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig out2cfg = {29, GPIO_29_GPIO29, mcu::c28x::gpio::Direction::output, mcu::gpio::active_state::low, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig in1cfg = {59, GPIO_59_GPIO59, mcu::c28x::gpio::Direction::input, mcu::gpio::active_state::low, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig in2cfg = {124, GPIO_124_GPIO124, mcu::c28x::gpio::Direction::input, mcu::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
 
     mcu::c28x::gpio::OutputPin out1(out1cfg);
     mcu::c28x::gpio::OutputPin out2(out2cfg);
@@ -21,10 +21,10 @@ void mcu::c28x::tests::gpio_test() {
     out1.reset();
     out2.reset();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out1.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in1.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out2.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in2.read(), mcu::gpio::pin_state::active);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 0);
     EMB_ASSERT_EQUAL(in1.read_level(), 0);
@@ -34,10 +34,10 @@ void mcu::c28x::tests::gpio_test() {
     out1.set();
     out2.set();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(out1.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(in1.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(out2.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(in2.read(), mcu::gpio::pin_state::inactive);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 1);
     EMB_ASSERT_EQUAL(in1.read_level(), 1);
@@ -47,10 +47,10 @@ void mcu::c28x::tests::gpio_test() {
     out1.toggle();
     out2.toggle();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out1.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in1.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out2.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in2.read(), mcu::gpio::pin_state::active);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 0);
     EMB_ASSERT_EQUAL(in1.read_level(), 0);
@@ -62,95 +62,95 @@ void mcu::c28x::tests::gpio_test() {
 #endif
 
 #ifdef _LAUNCHXL_F28379D
-    mcu::c28x::gpio::PinConfig out3Cfg = {27, GPIO_27_GPIO27, mcu::c28x::gpio::Direction::output, emb::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
-    mcu::c28x::gpio::PinConfig in3Cfg = {25, GPIO_25_GPIO25, mcu::c28x::gpio::Direction::input, emb::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
-    mcu::c28x::gpio::PinConfig in4Cfg = {25, GPIO_25_GPIO25, mcu::c28x::gpio::Direction::input, emb::gpio::active_state::low, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig out3Cfg = {27, GPIO_27_GPIO27, mcu::c28x::gpio::Direction::output, mcu::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig in3Cfg = {25, GPIO_25_GPIO25, mcu::c28x::gpio::Direction::input, mcu::gpio::active_state::high, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
+    mcu::c28x::gpio::PinConfig in4Cfg = {25, GPIO_25_GPIO25, mcu::c28x::gpio::Direction::input, mcu::gpio::active_state::low, mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
 
     mcu::c28x::gpio::OutputPin out3(out3Cfg);
     mcu::c28x::gpio::InputPin in3(in3Cfg);
     mcu::c28x::gpio::InputDebouncer db1(in3, emb::chrono::milliseconds(10), emb::chrono::milliseconds(20), emb::chrono::milliseconds(30));
 
-    EMB_ASSERT_EQUAL(in3.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in3.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(!db1.state_changed());
 
-    out3.set(emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(in3.read(), emb::gpio::pin_state::active);
+    out3.set(mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(in3.read(), mcu::gpio::pin_state::active);
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(!db1.state_changed());
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(db1.state_changed());
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db1.state_changed());
 
 
-    out3.set(emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in3.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::active);
+    out3.set(mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in3.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db1.state_changed());
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db1.state_changed());
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db1.state_changed());
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(db1.state_changed());
     db1.debounce();
-    EMB_ASSERT_EQUAL(db1.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db1.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(!db1.state_changed());
 
 
-    out3.set(emb::gpio::pin_state::inactive);
+    out3.set(mcu::gpio::pin_state::inactive);
     mcu::c28x::gpio::InputPin in4(in4Cfg);
     mcu::c28x::gpio::InputDebouncer db2(in4, emb::chrono::milliseconds(10), emb::chrono::milliseconds(40), emb::chrono::milliseconds(20));
-    EMB_ASSERT_EQUAL(in4.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in4.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(!db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     db2.debounce();
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db2.state_changed());
 
-    out3.set(emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(in4.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::active);
+    out3.set(mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(in4.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(!db2.state_changed());
 
-    out3.set(emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in4.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    out3.set(mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in4.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     EMB_ASSERT_TRUE(!db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     db2.debounce();
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::inactive);
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(db2.state_changed());
     db2.debounce();
-    EMB_ASSERT_EQUAL(db2.state(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(db2.state(), mcu::gpio::pin_state::active);
     EMB_ASSERT_TRUE(!db2.state_changed());
 #elif defined(UNIT_TESTS_ENABLED)
 #warning "LAUNCHXL is required for full testing."
