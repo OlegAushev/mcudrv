@@ -15,7 +15,7 @@
 namespace mcu {
 namespace c28x {
 
-inline void initialize_device() {
+inline void init_device() {
 #ifdef CPU1
     Device_init();                  // Initialize device clock and peripherals
     Device_initGPIO();              // Disable pin locks and enable internal pull-ups
