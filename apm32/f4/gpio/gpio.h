@@ -95,6 +95,7 @@ public:
 
         _port = impl::gpio_instances[port_idx];
         _pin = std::to_underlying(config.pin);
+        _active_state = config.active_state;
         config.config.pin = _pin;
 
         if (_assigned[port_idx] & _pin) {
@@ -141,7 +142,6 @@ public:
             fatal_error();
         }
         init(config);
-        _active_state = config.active_state;
     }
 
     virtual unsigned int read_level() const override {
@@ -224,7 +224,6 @@ public:
         }
         init(config);
         OutputPin::set(init_state);
-        _active_state = config.active_state;
     }
 
     virtual unsigned int read_level() const override {

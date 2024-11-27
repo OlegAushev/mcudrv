@@ -53,7 +53,7 @@ inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
     [](){ __HAL_RCC_GPIOE_CLK_ENABLE(); },
     [](){ __HAL_RCC_GPIOF_CLK_ENABLE(); },
     [](){ __HAL_RCC_GPIOG_CLK_ENABLE(); },
-    [](){ __HAL_RCC_GPIOH_CLK_ENABLE(); }	
+    [](){ __HAL_RCC_GPIOH_CLK_ENABLE(); }
 };
 
 
@@ -80,16 +80,17 @@ public:
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
             _clk_enabled[port_idx] = true;
-        }	
+        }
 
         _port = config.port;
         _pin = static_cast<uint16_t>(config.pin.Pin);
+        _actstate = config.actstate;
 
         HAL_GPIO_Init(config.port, &config.pin);
         _initialized = true;
     }
 
-    void deinit() {	
+    void deinit() {
         if (_initialized) {
             HAL_GPIO_DeInit(_port, _pin);
             _initialized = false;
@@ -123,7 +124,6 @@ public:
             || config.pin.Mode == GPIO_MODE_EVT_FALLING
             || config.pin.Mode == GPIO_MODE_EVT_RISING_FALLING);
         init(config);
-        _actstate = config.actstate;
     }
 
     virtual unsigned int read_level() const override {
@@ -139,7 +139,7 @@ public:
         if (read_level() == std::to_underlying(*_actstate)) {
             return emb::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive; 
+        return emb::gpio::pin_state::inactive;
     }
 private:
     IRQn_Type _irqn = NonMaskableInt_IRQn;	// use NonMaskableInt_IRQn as value for not initialized interrupt
@@ -202,7 +202,6 @@ public:
         assert(config.pin.Mode == GPIO_MODE_OUTPUT_PP
             || config.pin.Mode == GPIO_MODE_OUTPUT_OD);
         init(config);
-        _actstate = config.actstate;
     }
 
     virtual unsigned int read_level() const override {
@@ -306,7 +305,7 @@ private:
         GPIO_TypeDef* port;
         uint16_t pin;
     };
-    static inline std::array<std::optional<LoggerPin>, 16> _pins; 
+    static inline std::array<std::optional<LoggerPin>, 16> _pins;
     const std::optional<LoggerPin> _pin;
     const DurationLoggerMode _mode;
 public:
