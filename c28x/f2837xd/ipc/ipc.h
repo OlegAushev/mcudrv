@@ -1,19 +1,46 @@
 #pragma once
 
-
 #ifdef MCUDRV_C28X
-
 
 #include "../system/system.h"
 #include <emblib/core.h>
 #include "F2837xD_Ipc_drivers.h"
 
-
 namespace mcu {
-
 namespace c28x {
-
 namespace ipc {
+
+SCOPED_ENUM_DECLARE_BEGIN(Cpu) {
+    cpu1,
+    cpu2,
+} SCOPED_ENUM_DECLARE_END(Cpu)
+
+#if defined(CPU1)
+const Cpu this_cpu = Cpu::cpu1;
+#elif defined(CPU2)
+const Cpu this_cpu = Cpu::cpu2;
+#endif
+
+namespace newimpl {
+
+class Flag {
+private:
+    uint32_t bitmask_;
+    Cpu master_cpu_;
+public:
+    Flag(uint32_t flag_id, Cpu master_cpu)
+            : bitmask_(1 << flag_id), master_cpu_(master_cpu) {
+        assert(flag_id < 32);
+    }
+
+    void set() {
+        assert(this_cpu == master_cpu_);
+    }
+};
+
+
+} // namespace newimpl
+
 
 
 namespace traits {
@@ -142,9 +169,9 @@ inline void registerIpcInterruptHandler(InterruptType ipc_interrupt, void (*hand
 namespace flags {
 
 
-extern mcu::c28x::ipc::Flag cpu1_periphery_configured;
-extern mcu::c28x::ipc::Flag cpu2_booted;
-extern mcu::c28x::ipc::Flag cpu2_periphery_configured;
+//extern mcu::c28x::ipc::Flag cpu1_periphery_configured;
+//extern mcu::c28x::ipc::Flag cpu2_booted;
+//extern mcu::c28x::ipc::Flag cpu2_periphery_configured;
 
 
 } // namespace flags
