@@ -92,7 +92,7 @@ public:
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
 
-    bool recv(uint32_t obj_id, uint16_t* data_buf) {
+    bool recv(uint32_t obj_id, uint16_t* data_buf) const {
         return CAN_readMessage(_module.base, obj_id, data_buf);
     }
 
@@ -100,7 +100,7 @@ public:
         CAN_sendMessage(_module.base, obj_id, data_len, data_buf);
     }
 
-    void setup_message_object(MessageObject& msg_obj) {
+    void setup_message_object(const MessageObject& msg_obj) {
         CAN_setupMessageObject(_module.base, msg_obj.obj_id, msg_obj.frame_id, msg_obj.frame_type,
                 msg_obj.obj_type, msg_obj.frame_idmask, msg_obj.flags, msg_obj.data_len);
     }
