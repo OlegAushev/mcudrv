@@ -68,7 +68,7 @@ inline std::array<void(*)(void), peripheral_count> uart_clk_enable_funcs = {
 } // namespace impl
 
 
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     I2C_HandleTypeDef _handle = {};
@@ -86,7 +86,7 @@ public:
     I2C_TypeDef* reg() { return _reg; }
 
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void set_slave_address(uint16_t slave_addr) { modify_reg<uint32_t>(_reg->CR2, I2C_CR2_SADD, slave_addr); }

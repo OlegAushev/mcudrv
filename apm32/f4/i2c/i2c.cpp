@@ -12,7 +12,7 @@ namespace i2c {
 Module::Module(Peripheral peripheral,
                const SdaPinConfig& sda_pin_config, const SclPinConfig& scl_pin_config,
                const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
         , _reg(impl::instances[std::to_underlying(peripheral)])
 {

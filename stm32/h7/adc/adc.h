@@ -78,7 +78,7 @@ inline Peripheral to_peripheral(const ADC_TypeDef* instance) {
 } // namespace impl
 
 
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     ADC_HandleTypeDef _handle{};
@@ -94,7 +94,7 @@ public:
     ADC_Common_TypeDef* reg_common() { return _reg_common; }
 
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void enable() {

@@ -73,7 +73,7 @@ inline constexpr std::array<IRQn_Type, peripheral_count> irqn = {SPI1_IRQn, SPI2
 } // namespace impl
 
 
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     SPI_T* const _reg;
@@ -99,7 +99,7 @@ public:
     SPI_T* reg() { return _reg; }
 
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void enable() { _reg->CTRL1_B.SPIEN = 1; }

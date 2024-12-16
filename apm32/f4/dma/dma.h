@@ -74,7 +74,7 @@ inline const std::array<DMA_Stream_T*, stream_count> dma_stream_instances = {
 } // namespace impl
 
 
-class Stream : public emb::interrupt_invoker_array<Stream, stream_count>, public emb::noncopyable {
+class Stream : public emb::singleton_array<Stream, stream_count>, public emb::noncopyable {
 private:
     const StreamId _stream_id;
     DMA_Stream_T* _stream_reg;
@@ -86,7 +86,7 @@ public:
 
     DMA_Stream_T* stream_reg() { return _stream_reg; }
     static Stream* instance(StreamId stream_id) {
-        return emb::interrupt_invoker_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
+        return emb::singleton_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
     }
 
     void init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority);

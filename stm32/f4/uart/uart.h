@@ -73,7 +73,7 @@ inline std::array<void(*)(void), peripheral_count> uart_clk_enable_funcs = {
 }
 
 
-class Module : public emb::tty, public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::tty, public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     UART_HandleTypeDef _handle = {};
@@ -94,7 +94,7 @@ public:
     USART_TypeDef* reg() { return _reg; }
 
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     virtual int getchar() override {

@@ -10,7 +10,7 @@ namespace dac {
 
 
 Module::Module(Peripheral peripheral)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk(peripheral);
     _reg = impl::dac_instances[std::to_underlying(peripheral)];

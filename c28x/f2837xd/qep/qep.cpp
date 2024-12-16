@@ -18,7 +18,7 @@ const uint32_t impl::qep_pie_int_nums[3] = {INT_EQEP1, INT_EQEP2, INT_EQEP3};
 Module::Module(Peripheral peripheral,
                const QepaPinConfig& qepa_pin, emb::optional<QepbPinConfig> qepb_pin, emb::optional<QepiPinConfig> qepi_pin,
                const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::singleton_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::qep_bases[peripheral.underlying_value()], config.int_flags, impl::qep_pie_int_nums[peripheral.underlying_value()]) {
 #ifdef CPU1

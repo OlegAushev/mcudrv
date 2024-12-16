@@ -70,7 +70,7 @@ extern const uint32_t i2c_bases[2];
 } // namespace impl
 
 
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     impl::Module _module;

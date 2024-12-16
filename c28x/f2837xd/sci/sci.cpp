@@ -18,7 +18,7 @@ const uint16_t impl::sci_pie_int_groups[4] = {
 
 
 Module::Module(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin, const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::singleton_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::sci_bases[peripheral.underlying_value()],
                   impl::sci_rx_pie_int_nums[peripheral.underlying_value()],

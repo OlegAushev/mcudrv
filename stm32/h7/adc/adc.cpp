@@ -13,7 +13,7 @@ namespace adc {
 
 
 Module::Module(Peripheral peripheral, const Config& config, dma::Stream* dma)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
         , _reg(impl::adc_instances[std::to_underlying(peripheral)])
         , _reg_common(impl::adc_common_instances[std::to_underlying(peripheral)]) {

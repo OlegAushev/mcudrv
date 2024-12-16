@@ -81,7 +81,7 @@ struct DMA_Base_Registers
 } // namespace impl
 
 
-class Stream : public emb::interrupt_invoker_array<Stream, stream_count>, public emb::noncopyable {
+class Stream : public emb::singleton_array<Stream, stream_count>, public emb::noncopyable {
 private:
     const StreamId _stream_id;
     DMA_HandleTypeDef _handle{};
@@ -95,7 +95,7 @@ public:
     DMA_HandleTypeDef* handle() { return &_handle; }
     DMA_Stream_TypeDef* stream_reg() { return _stream_reg; }
     static Stream* instance(StreamId stream_id) {
-        return emb::interrupt_invoker_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
+        return emb::singleton_array<Stream, stream_count>::instance(std::to_underlying(stream_id));
     }
 
     void init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority);

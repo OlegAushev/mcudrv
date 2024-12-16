@@ -12,7 +12,7 @@ namespace adc {
 
 
 Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral) {
     _enable_clk(peripheral);
     _reg = impl::adc_instances[std::to_underlying(_peripheral)];

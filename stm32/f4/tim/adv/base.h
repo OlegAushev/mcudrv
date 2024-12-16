@@ -51,7 +51,7 @@ inline constexpr std::array<IRQn_Type, peripheral_count> up_irq_nums = {TIM1_UP_
 inline constexpr std::array<IRQn_Type, peripheral_count> brk_irq_nums = {TIM1_BRK_TIM9_IRQn, TIM8_BRK_TIM12_IRQn};
 
 
-class AbstractTimer : public emb::interrupt_invoker_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
+class AbstractTimer : public emb::singleton_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
 protected:
     const Peripheral _peripheral;
     TIM_TypeDef* const _reg;
@@ -60,7 +60,7 @@ protected:
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
     AbstractTimer(Peripheral peripheral, OpMode mode)
-            : emb::interrupt_invoker_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
+            : emb::singleton_array<AbstractTimer, peripheral_count>(this, std::to_underlying(peripheral))
             , _peripheral(peripheral)
             , _reg(impl::instances[std::to_underlying(peripheral)])
             , _mode(mode) {

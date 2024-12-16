@@ -95,7 +95,7 @@ struct RxMessageAttribute {
 };
 
 
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     CAN_T* _reg;
@@ -120,7 +120,7 @@ public:
     Peripheral peripheral() const { return _peripheral; }
     CAN_T* reg() { return _reg; }
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void start();

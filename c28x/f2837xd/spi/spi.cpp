@@ -19,7 +19,7 @@ Module::Module(Peripheral peripheral,
                const MosiPinConfig& mosi_pin, const MisoPinConfig& miso_pin,
                const ClkPinConfig& clk_pin, emb::optional<CsPinConfig> cs_pin,
                const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::singleton_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::spi_bases[peripheral.underlying_value()], impl::spi_rx_pie_int_nums[peripheral.underlying_value()]) {
     assert((config.data_size >= 1) && (config.data_size <= 16));

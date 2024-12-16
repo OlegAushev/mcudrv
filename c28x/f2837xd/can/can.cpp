@@ -18,7 +18,7 @@ void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint32_t, uin
 
 
 Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin, const TxPinConfig& tx_pin, const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, peripheral.underlying_value())
+        : emb::singleton_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::can_bases[peripheral.underlying_value()], impl::can_pie_int_nums[peripheral.underlying_value()]) {
 #ifdef CPU1

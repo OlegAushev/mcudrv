@@ -13,7 +13,7 @@ Module::Module(Peripheral peripheral,
                const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
                const ClkPinConfig& clk_pin_config, const HwCsPinConfig& cs_pin_config,
                const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
         , _reg(impl::instances[std::to_underlying(peripheral)])
 {
@@ -44,7 +44,7 @@ Module::Module(Peripheral peripheral,
                const MosiPinConfig& mosi_pin_config, const MisoPinConfig& miso_pin_config,
                const ClkPinConfig& clk_pin_config, std::initializer_list<SwCsPinConfig> cs_pin_configs,
                const Config& config)
-        : emb::interrupt_invoker_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
+        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
         , _peripheral(peripheral)
         , _reg(impl::instances[std::to_underlying(peripheral)])
 {

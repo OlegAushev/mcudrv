@@ -73,7 +73,7 @@ inline std::array<void(*)(void), peripheral_count> usart_clk_enable_funcs = {
 }
 
 
-class Module : public emb::tty, public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::tty, public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     USART_T* _reg;
@@ -85,7 +85,7 @@ public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, Config config);
     Peripheral peripheral() const { return _peripheral; }
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     virtual int getchar() override {

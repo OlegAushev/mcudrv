@@ -75,7 +75,7 @@ inline constexpr std::array<IRQn_Type, gp_timer_peripheral_count> gp_timer_irqn 
 
 
 template <OperationMode OpMode>
-class GeneralPurposeTimer : public emb::interrupt_invoker_array<GeneralPurposeTimer<OpMode>, gp_timer_peripheral_count>, public emb::noncopyable {
+class GeneralPurposeTimer : public emb::singleton_array<GeneralPurposeTimer<OpMode>, gp_timer_peripheral_count>, public emb::noncopyable {
 private:
     const GeneralPurposePeripheral _peripheral;
     TIM_HandleTypeDef _handle{};
@@ -87,7 +87,7 @@ private:
     bool _brk_enabled{false};
 public:
     GeneralPurposeTimer(GeneralPurposePeripheral peripheral, const Config& config)
-            : emb::interrupt_invoker_array<GeneralPurposeTimer<OpMode>, gp_timer_peripheral_count>(this, std::to_underlying(peripheral))
+            : emb::singleton_array<GeneralPurposeTimer<OpMode>, gp_timer_peripheral_count>(this, std::to_underlying(peripheral))
             , _peripheral(peripheral)
     {
         _enable_clk(peripheral);
@@ -161,7 +161,7 @@ public:
     TIM_TypeDef* reg() { return _reg; }
     
     static GeneralPurposeTimer* instance(GeneralPurposePeripheral peripheral) {
-        return emb::interrupt_invoker_array<GeneralPurposeTimer, gp_timer_peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<GeneralPurposeTimer, gp_timer_peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void start() {

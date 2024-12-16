@@ -10,7 +10,7 @@ namespace dma {
 
 
 Stream::Stream(Config config)
-        : emb::interrupt_invoker_array<Stream, stream_count>(this, std::to_underlying(config.stream_id))
+        : emb::singleton_array<Stream, stream_count>(this, std::to_underlying(config.stream_id))
         , _stream_id(config.stream_id)
 {
     _enable_clk(_stream_id);

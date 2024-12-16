@@ -106,7 +106,7 @@ struct RxMessageAttribute {
 };
 
 
-class Module : public emb::interrupt_invoker_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
     friend void ::HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef*, uint32_t);
     friend void ::HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef*, uint32_t);
     friend void ::HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan);
@@ -136,7 +136,7 @@ public:
     Peripheral peripheral() const { return _peripheral; }
     FDCAN_HandleTypeDef* handle() { return &_handle; }
     static Module* instance(Peripheral peripheral) {
-        return emb::interrupt_invoker_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
     }
 
     void start() {
