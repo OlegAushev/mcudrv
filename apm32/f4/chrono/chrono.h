@@ -31,13 +31,13 @@ public:
     static bool initialized() { return _initialized; }
     static std::chrono::milliseconds now() { return std::chrono::milliseconds(_time); }
     static std::chrono::milliseconds step() { return time_step; }
-    
+
     static void delay(std::chrono::milliseconds delay) {
         auto start = now();
         while ((now() - start) <= delay) { /* wait */ }
     }
 protected:
-    static void on_interrupt() { _time += time_step.count(); }
+    static void on_interrupt() { _time = _time + time_step.count(); }
 };
 
 
@@ -49,12 +49,12 @@ public:
     high_resolution_clock() = delete;
     static void init();
     static bool initialized() { return _initialized; }
-    
+
     static std::chrono::microseconds now() {
         std::chrono::microseconds usec{(SysTick->LOAD - SysTick->VAL) / _ticks_usec};
         return steady_clock::now() + usec;
     }
-    
+
     static void delay(std::chrono::microseconds delay) {
         auto start = now();
         while ((now() - start) <= delay) { /* wait */ }

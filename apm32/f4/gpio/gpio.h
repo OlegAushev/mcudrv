@@ -12,6 +12,7 @@
 #include <emblib/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <utility>
 
 

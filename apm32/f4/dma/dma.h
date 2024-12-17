@@ -9,6 +9,7 @@
 #include <apm32f4xx_dma.h>
 #include <apm32f4xx_rcm.h>
 #include <emblib/core.h>
+#include <array>
 #include <utility>
 
 
@@ -54,7 +55,7 @@ inline std::array<void(*)(void), 2> dma_clk_enable_funcs = {
 };
 
 
-inline constexpr std::array<IRQn_Type, stream_count> dma_irqn = {	
+inline constexpr std::array<IRQn_Type, stream_count> dma_irqn = {
     DMA1_STR0_IRQn, DMA1_STR1_IRQn, DMA1_STR2_IRQn, DMA1_STR3_IRQn,
     DMA1_STR4_IRQn, DMA1_STR5_IRQn, DMA1_STR6_IRQn, DMA1_STR7_IRQn,
     DMA2_STR0_IRQn, DMA2_STR1_IRQn, DMA2_STR2_IRQn, DMA2_STR3_IRQn,
