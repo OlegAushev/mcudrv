@@ -4,8 +4,8 @@
 #ifdef MCUDRV_C28X
 
 
-#include "../system/system.h"
-#include "../gpio/gpio.h"
+#include <mcudrv/c28x/f2837xd/system/system.hpp>
+#include <mcudrv/c28x/f2837xd/gpio/gpio.hpp>
 #include <emblib/core.hpp>
 #include <emblib/interfaces/uart.hpp>
 

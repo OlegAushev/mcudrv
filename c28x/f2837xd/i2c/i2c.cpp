@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mcudrv/c28x/f2837xd/i2c/i2c.h>
+#include <mcudrv/c28x/f2837xd/i2c/i2c.hpp>
 
 
 namespace mcu {

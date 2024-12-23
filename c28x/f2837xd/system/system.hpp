@@ -4,7 +4,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include "../../c28x_base.h"
+#include <mcudrv/c28x/c28x_base.hpp>
 #include <emblib/core.hpp>
 #include <emblib/chrono.hpp>
 #include <driverlib.h>

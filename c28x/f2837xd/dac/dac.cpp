@@ -1,8 +1,8 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mcudrv/c28x/f2837xd/dac/dac.h>
-#include <mcudrv/c28x/f2837xd/chrono/chrono.h>
+#include <mcudrv/c28x/f2837xd/dac/dac.hpp>
+#include <mcudrv/c28x/f2837xd/chrono/chrono.hpp>
 
 
 namespace mcu {

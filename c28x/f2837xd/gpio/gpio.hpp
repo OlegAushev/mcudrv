@@ -2,8 +2,8 @@
 
 #ifdef MCUDRV_C28X
 
-#include <mcudrv/c28x/f2837xd/system/system.h>
-#include <mcudrv/generic/gpio.h>
+#include <mcudrv/c28x/f2837xd/system/system.hpp>
+#include <mcudrv/generic/gpio.hpp>
 
 #include <emblib/array.hpp>
 #include <emblib/chrono.hpp>

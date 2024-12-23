@@ -6,13 +6,13 @@
 
 #include <tests/tests_config.hpp>
 #include <emblib/testrunner/testrunner.hpp>
-#include "../system/system.h"
-#include <mcudrv/c28x/f2837xd/gpio/gpio.h>
-#include <mcudrv/c28x/f2837xd/chrono/chrono.h>
-#include <mcudrv/c28x/f2837xd/crc/crc.h>
+#include <mcudrv/c28x/f2837xd/system/system.hpp>
+#include <mcudrv/c28x/f2837xd/gpio/gpio.hpp>
+#include <mcudrv/c28x/f2837xd/chrono/chrono.hpp>
+#include <mcudrv/c28x/f2837xd/crc/crc.hpp>
 
 #ifdef _LAUNCHXL_F28379D
-#include <mcubsp/c28x/launchpad/launchpad.h>
+#include <mcubsp/c28x/launchpad/launchpad.hpp>
 #endif
 
 

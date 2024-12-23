@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mcudrv/c28x/f2837xd/can/can.h>
+#include <mcudrv/c28x/f2837xd/can/can.hpp>
 
 
 namespace mcu {

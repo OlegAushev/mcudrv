@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mcudrv/c28x/f2837xd/spi/spi.h>
+#include <mcudrv/c28x/f2837xd/spi/spi.hpp>
 
 
 namespace mcu {

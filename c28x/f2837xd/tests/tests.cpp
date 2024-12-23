@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mcudrv/c28x/f2837xd/tests/tests.h>
+#include <mcudrv/c28x/f2837xd/tests/tests.hpp>
 #include <emblib/scheduler.hpp>
 
 

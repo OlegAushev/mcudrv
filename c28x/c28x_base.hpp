@@ -4,7 +4,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include "../config.h"
+#include <mcudrv/config.hpp>
 
 
 #endif

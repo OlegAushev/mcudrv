@@ -4,7 +4,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include "../system/system.h"
+#include <mcudrv/c28x/f2837xd/system/system.hpp>
 #include <emblib/core.hpp>
 
 

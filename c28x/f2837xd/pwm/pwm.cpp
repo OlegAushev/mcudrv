@@ -1,7 +1,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <mcudrv/c28x/f2837xd/pwm/pwm.h>
+#include <mcudrv/c28x/f2837xd/pwm/pwm.hpp>
 
 
 namespace mcu {
