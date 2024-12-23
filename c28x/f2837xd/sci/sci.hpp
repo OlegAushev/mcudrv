@@ -4,10 +4,10 @@
 #ifdef MCUDRV_C28X
 
 
+#include <mcudrv/generic/uart.hpp>
 #include <mcudrv/c28x/f2837xd/system/system.hpp>
 #include <mcudrv/c28x/f2837xd/gpio/gpio.hpp>
 #include <emblib/core.hpp>
-#include <emblib/interfaces/uart.hpp>
 
 
 namespace mcu {
@@ -92,7 +92,10 @@ extern const uint16_t sci_pie_int_groups[4];
 } // namespace impl
 
 
-class Module : public emb::singleton_array<Module, peripheral_count>, public emb::uart::Uart, private emb::noncopyable {
+class Module
+        : public emb::singleton_array<Module, peripheral_count>,
+          public mcu::uart::module,
+          private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     impl::Module _module;
