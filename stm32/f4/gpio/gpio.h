@@ -106,7 +106,7 @@ public:
 } // namespace impl
 
 
-class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
+class InputPin : public mcu::gpio::input_pin, public impl::GpioPin {
     friend void ::EXTI0_IRQHandler();
     friend void ::EXTI1_IRQHandler();
     friend void ::EXTI2_IRQHandler();
@@ -134,12 +134,12 @@ public:
         return 0;
     }
 
-    virtual emb::gpio::pin_state read() const override {
+    virtual mcu::gpio::pin_state read() const override {
         assert(_initialized);
         if (read_level() == std::to_underlying(*_actstate)) {
-            return emb::gpio::pin_state::active;
+            return mcu::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive;
+        return mcu::gpio::pin_state::inactive;
     }
 private:
     IRQn_Type _irqn = NonMaskableInt_IRQn;	// use NonMaskableInt_IRQn as value for not initialized interrupt
@@ -195,7 +195,7 @@ public:
 };
 
 
-class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
+class OutputPin : public mcu::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
     OutputPin(const PinConfig& config) {
@@ -221,17 +221,17 @@ public:
         }
     }
 
-    virtual emb::gpio::pin_state read() const override {
+    virtual mcu::gpio::pin_state read() const override {
         assert(_initialized);
         if (read_level() == std::to_underlying(*_actstate)) {
-            return emb::gpio::pin_state::active;
+            return mcu::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive;
+        return mcu::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) override {
+    virtual void set(mcu::gpio::pin_state s = mcu::gpio::pin_state::active) override {
         assert(_initialized);
-        if (s == emb::gpio::pin_state::active) {
+        if (s == mcu::gpio::pin_state::active) {
             set_level(std::to_underlying(*_actstate));
         } else {
             set_level(1u - std::to_underlying(*_actstate));
@@ -240,7 +240,7 @@ public:
 
     virtual void reset() override {
         assert(_initialized);
-        set(emb::gpio::pin_state::inactive);
+        set(mcu::gpio::pin_state::inactive);
     }
 
     virtual void toggle() override {

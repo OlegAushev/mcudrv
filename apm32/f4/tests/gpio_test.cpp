@@ -2,7 +2,7 @@
 #ifdef APM32F4xx
 
 
-#include <mcudrv/apm32/f4/tests/tests.h>
+#include <mcudrv/apm32/f4/tests/tests.hpp>
 
 
 void mcu::tests::gpio_test()
@@ -27,14 +27,14 @@ void mcu::tests::gpio_test()
     mcu::gpio::OutputPin out2(out2cfg);
     mcu::gpio::InputPin in1(in1cfg);
     mcu::gpio::InputPin in2(in2cfg);
-    
+
     out1.reset();
     out2.reset();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out1.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in1.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out2.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in2.read(), mcu::gpio::pin_state::active);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 0);
     EMB_ASSERT_EQUAL(in1.read_level(), 0);
@@ -44,10 +44,10 @@ void mcu::tests::gpio_test()
     out1.set();
     out2.set();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(out1.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(in1.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(out2.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(in2.read(), mcu::gpio::pin_state::inactive);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 1);
     EMB_ASSERT_EQUAL(in1.read_level(), 1);
@@ -57,15 +57,15 @@ void mcu::tests::gpio_test()
     out1.toggle();
     out2.toggle();
 
-    EMB_ASSERT_EQUAL(out1.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in1.read(), emb::gpio::pin_state::active);
-    EMB_ASSERT_EQUAL(out2.read(), emb::gpio::pin_state::inactive);
-    EMB_ASSERT_EQUAL(in2.read(), emb::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out1.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in1.read(), mcu::gpio::pin_state::active);
+    EMB_ASSERT_EQUAL(out2.read(), mcu::gpio::pin_state::inactive);
+    EMB_ASSERT_EQUAL(in2.read(), mcu::gpio::pin_state::active);
 
     EMB_ASSERT_EQUAL(out1.read_level(), 0);
     EMB_ASSERT_EQUAL(in1.read_level(), 0);
     EMB_ASSERT_EQUAL(out2.read_level(), 1);
-    EMB_ASSERT_EQUAL(in2.read_level(), 1);  
+    EMB_ASSERT_EQUAL(in2.read_level(), 1);
 
     out1.deinit();
     out2.deinit();

@@ -5,8 +5,6 @@
 namespace mcu {
 namespace uart {
 
-#if defined(MCUDRV_C28X)
-
 class tty {
 public:
     tty() EMB_DEFAULT
@@ -15,6 +13,8 @@ public:
     virtual int getchar() = 0;
     virtual int putchar(int ch) = 0;
 };
+
+#if defined(MCUDRV_C28X)
 
 class module : protected emb::noncopyable {
 public:
@@ -40,11 +40,8 @@ public:
 
 class module : protected emb::noncopyable {
 public:
-    Uart() = default;
-    virtual ~Uart() = default;
-
-    Uart(const Uart& other) = delete;
-    Uart& operator=(const Uart& other) = delete;
+    module() = default;
+    virtual ~module() = default;
 
     //virtual void reset() = 0;
     //virtual bool hasRxError() const = 0;

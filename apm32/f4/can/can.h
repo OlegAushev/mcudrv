@@ -5,11 +5,11 @@
 #ifdef APM32F4xx
 
 
+#include <mcudrv/generic/can.hpp>
 #include <mcudrv/apm32/f4/system/system.h>
 #include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <apm32f4xx_can.h>
 #include <emblib/core.hpp>
-#include <emblib/interfaces/can.h>
 #include <emblib/queue.hpp>
 
 
@@ -23,7 +23,7 @@ void CAN2_TX_IRQHandler();
 }
 
 
-namespace mcu { 
+namespace mcu {
 namespace can {
 
 
@@ -116,7 +116,7 @@ private:
 public:
     Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, Config config);
     RxMessageAttribute register_rxmessage(CAN_FilterConfig_T& filter);
-    
+
     Peripheral peripheral() const { return _peripheral; }
     CAN_T* reg() { return _reg; }
     static Module* instance(Peripheral peripheral) {
@@ -156,7 +156,7 @@ public:
             if (_txqueue.empty()) {
                 return;
             }
-            put_frame(_txqueue.front());   
+            put_frame(_txqueue.front());
             _txqueue.pop();
         }
     }

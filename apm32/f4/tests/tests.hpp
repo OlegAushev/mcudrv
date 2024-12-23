@@ -9,7 +9,7 @@
 #include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <mcudrv/apm32/f4/chrono/chrono.h>
 
-#include <emblib/testrunner/testrunner.h>
+#include <emblib/testrunner/testrunner.hpp>
 
 
 namespace mcu {

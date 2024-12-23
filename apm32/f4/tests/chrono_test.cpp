@@ -1,7 +1,7 @@
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-#include <mcudrv/apm32/f4/tests/tests.h>
+#include <mcudrv/apm32/f4/tests/tests.hpp>
 
 
 void mcu::tests::chrono_test() {
@@ -17,15 +17,15 @@ void mcu::tests::chrono_test() {
         mcu::delay(std::chrono::milliseconds(101));
         mcu::chrono::steady_clock::run_tasks();
         if (i % 2 != 0) {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::pin_state::active);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), mcu::gpio::pin_state::active);
         } else {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), emb::gpio::pin_state::inactive);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_green.read(), mcu::gpio::pin_state::inactive);
         }
 
         if ((i < 2) || (i == 4)) {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), emb::gpio::pin_state::inactive);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), mcu::gpio::pin_state::inactive);
         } else {
-            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), emb::gpio::pin_state::active);
+            EMB_ASSERT_EQUAL(bsp::nucleo::led_red.read(), mcu::gpio::pin_state::active);
         }
 
         if (i == 2) {

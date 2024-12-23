@@ -5,11 +5,11 @@
 #ifdef APM32F4xx
 
 
+#include <mcudrv/generic/uart.hpp>
 #include <mcudrv/apm32/f4/apm32f4_base.h>
 #include <mcudrv/apm32/f4/system/system.h>
 #include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <apm32f4xx_usart.h>
-#include <emblib/interfaces/tty.h>
 
 
 namespace mcu {
@@ -73,7 +73,7 @@ inline std::array<void(*)(void), peripheral_count> usart_clk_enable_funcs = {
 }
 
 
-class Module : public emb::tty, public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public mcu::uart::tty, public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     USART_T* _reg;
@@ -102,7 +102,7 @@ public:
         _reg->DATA_B.DATA = static_cast<uint16_t>(ch) & 0x1FF;
         return ch;
     }
-    
+
     // TODO
     // virtual int recv(char* buf, size_t len) override {
     //     int i = 0;

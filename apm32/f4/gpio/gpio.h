@@ -5,11 +5,11 @@
 #ifdef APM32F4xx
 
 
+#include <mcudrv/generic/gpio.hpp>
 #include <mcudrv/apm32/f4/apm32f4_base.h>
 #include <mcudrv/apm32/f4/system/system.h>
 #include <apm32f4xx_gpio.h>
 #include <apm32f4xx_rcm.h>
-#include <emblib/interfaces/gpio.h>
 #include <algorithm>
 #include <array>
 #include <optional>
@@ -53,7 +53,7 @@ struct PinConfig {
     Pin pin;
     GPIO_Config_T config;
     GPIO_AF_T altfunc;
-    emb::gpio::active_state active_state;
+    mcu::gpio::active_state active_state;
 };
 
 
@@ -88,7 +88,7 @@ protected:
     bool _initialized{false};
     GPIO_T* _port;
     uint16_t _pin;
-    std::optional<emb::gpio::active_state> _active_state{std::nullopt};
+    std::optional<mcu::gpio::active_state> _active_state{std::nullopt};
     GpioPin() = default;
 public:
     void init(PinConfig config) {
@@ -129,7 +129,7 @@ public:
 } // namespace impl
 
 
-class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
+class InputPin : public mcu::gpio::input_pin, public impl::GpioPin {
     // friend void ::EXTI0_IRQHandler();
     // friend void ::EXTI1_IRQHandler();
     // friend void ::EXTI2_IRQHandler();
@@ -153,12 +153,12 @@ public:
         return 0;
     }
 
-    virtual emb::gpio::pin_state read() const override {
+    virtual mcu::gpio::pin_state read() const override {
         assert(_initialized);
         if (read_level() == std::to_underlying(*_active_state)) {
-            return emb::gpio::pin_state::active;
+            return mcu::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive;
+        return mcu::gpio::pin_state::inactive;
     }
 // TODO
 // private:
@@ -215,11 +215,11 @@ public:
 };
 
 
-class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
+class OutputPin : public mcu::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
-    OutputPin(const PinConfig& config, emb::gpio::pin_state init_state =
-        emb::gpio::pin_state::inactive) {
+    OutputPin(const PinConfig& config, mcu::gpio::pin_state init_state =
+        mcu::gpio::pin_state::inactive) {
         if (config.config.mode != GPIO_MODE_OUT) {
             fatal_error();
         }
@@ -244,17 +244,17 @@ public:
         }
     }
 
-    virtual emb::gpio::pin_state read() const override {
+    virtual mcu::gpio::pin_state read() const override {
         assert(_initialized);
         if (read_level() == std::to_underlying(*_active_state)) {
-            return emb::gpio::pin_state::active;
+            return mcu::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive;
+        return mcu::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::pin_state st = emb::gpio::pin_state::active) override {
+    virtual void set(mcu::gpio::pin_state st = mcu::gpio::pin_state::active) override {
         assert(_initialized);
-        if (st == emb::gpio::pin_state::active) {
+        if (st == mcu::gpio::pin_state::active) {
             set_level(std::to_underlying(*_active_state));
         } else {
             set_level(1 - std::to_underlying(*_active_state));
@@ -263,7 +263,7 @@ public:
 
     virtual void reset() override {
         assert(_initialized);
-        set(emb::gpio::pin_state::inactive);
+        set(mcu::gpio::pin_state::inactive);
     }
 
     virtual void toggle() override {
@@ -346,7 +346,7 @@ public:
                                          .otype = GPIO_OTYPE_PP,
                                          .pupd = GPIO_PUPD_NOPULL},
                               .altfunc{},
-                              .active_state = emb::gpio::active_state::high});
+                              .active_state = mcu::gpio::active_state::high});
         _pins[std::to_underlying(channel)] = {
                 impl::gpio_instances[std::to_underlying(port)],
                 std::to_underlying(pin)};

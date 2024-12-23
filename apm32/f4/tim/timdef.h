@@ -52,7 +52,7 @@ public:
                 .pupd = GPIO_PUPD_NOPULL
             },
             .altfunc = config.altfunc,
-            .active_state = emb::gpio::active_state::high});
+            .active_state = mcu::gpio::active_state::high});
     }
 };
 
@@ -79,7 +79,7 @@ public:
                 .pupd = config.pull
             },
             .altfunc = config.altfunc,
-            .active_state = emb::gpio::active_state::high});
+            .active_state = mcu::gpio::active_state::high});
     }
 };
 

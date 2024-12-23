@@ -30,7 +30,7 @@ Module::Module(Peripheral peripheral,
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = cs_pin_config.altfunc,
-        .active_state = emb::gpio::active_state::low});
+        .active_state = mcu::gpio::active_state::low});
 
     _enable_clk(peripheral);
 
@@ -66,7 +66,7 @@ Module::Module(Peripheral peripheral,
                 .pupd = GPIO_PUPD_UP
             },
             .altfunc{},
-            .active_state = emb::gpio::active_state::low}));
+            .active_state = mcu::gpio::active_state::low}));
         _cs_pins.back().reset();
     }
 
@@ -120,7 +120,7 @@ void Module::_init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = mosi_pin_config.altfunc,
-        .active_state = emb::gpio::active_state::high});
+        .active_state = mcu::gpio::active_state::high});
 
     _miso_pin.init({
         .port = miso_pin_config.port,
@@ -133,7 +133,7 @@ void Module::_init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = miso_pin_config.altfunc,
-        .active_state = emb::gpio::active_state::high});
+        .active_state = mcu::gpio::active_state::high});
 
     _clk_pin.init({
         .port = clk_pin_config.port,
@@ -146,7 +146,7 @@ void Module::_init_mosi_miso_clk(const MosiPinConfig& mosi_pin_config,
             .pupd = GPIO_PUPD_NOPULL
         },
         .altfunc = clk_pin_config.altfunc,
-        .active_state = emb::gpio::active_state::high});
+        .active_state = mcu::gpio::active_state::high});
 }
 
 

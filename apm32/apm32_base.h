@@ -4,7 +4,7 @@
 #ifdef MCUDRV_APM32
 
 
-#include <mcudrv/config.h>
+#include <mcudrv/config.hpp>
 #include <cstdint>
 #include <cassert>
 

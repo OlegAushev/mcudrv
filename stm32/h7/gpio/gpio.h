@@ -58,7 +58,7 @@ inline std::array<void(*)(void), port_count> gpio_clk_enable_funcs = {
     [](){ __HAL_RCC_GPIOH_CLK_ENABLE(); },
     [](){ __HAL_RCC_GPIOI_CLK_ENABLE(); },
     [](){ __HAL_RCC_GPIOJ_CLK_ENABLE(); },
-    [](){ __HAL_RCC_GPIOK_CLK_ENABLE(); }	
+    [](){ __HAL_RCC_GPIOK_CLK_ENABLE(); }
 };
 
 
@@ -79,18 +79,18 @@ public:
             fatal_error();
         }
         _assigned[port_idx] |= uint16_t(config.pin.Pin);
-        
+
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
             _clk_enabled[port_idx] = true;
-        }	
+        }
 
         _cfg = config;
         HAL_GPIO_Init(_cfg.port, &_cfg.pin);
         _initialized = true;
     }
 
-    void deinitialize() {	
+    void deinitialize() {
         if (_initialized) {
             HAL_GPIO_DeInit(_cfg.port, _cfg.pin.Pin);
             _initialized = false;
@@ -107,7 +107,7 @@ public:
 } // namespace impl
 
 
-class InputPin : public emb::gpio::input_pin, public impl::GpioPin {
+class InputPin : public mcu::gpio::input_pin, public impl::GpioPin {
     friend void ::EXTI0_IRQHandler();
     friend void ::EXTI1_IRQHandler();
     friend void ::EXTI2_IRQHandler();
@@ -131,12 +131,12 @@ public:
         return 0;
     }
 
-    virtual emb::gpio::pin_state read() const override {
+    virtual mcu::gpio::pin_state read() const override {
         assert(_initialized);
         if (read_level() == std::to_underlying(_cfg.actstate)) {
-            return emb::gpio::pin_state::active;
+            return mcu::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive; 
+        return mcu::gpio::pin_state::inactive;
     }
 
 private:
@@ -193,7 +193,7 @@ public:
 };
 
 
-class OutputPin : public emb::gpio::output_pin, public impl::GpioPin {
+class OutputPin : public mcu::gpio::output_pin, public impl::GpioPin {
 public:
     OutputPin() = default;
     OutputPin(const Config& config) {
@@ -218,17 +218,17 @@ public:
         }
     }
 
-    virtual emb::gpio::pin_state read() const override {
+    virtual mcu::gpio::pin_state read() const override {
         assert(_initialized);
         if (read_level() == std::to_underlying(_cfg.actstate)) {
-            return emb::gpio::pin_state::active;
+            return mcu::gpio::pin_state::active;
         }
-        return emb::gpio::pin_state::inactive;
+        return mcu::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::pin_state s = emb::gpio::pin_state::active) override {
+    virtual void set(mcu::gpio::pin_state s = mcu::gpio::pin_state::active) override {
         assert(_initialized);
-        if (s == emb::gpio::pin_state::active) {
+        if (s == mcu::gpio::pin_state::active) {
             set_level(std::to_underlying(_cfg.actstate));
         } else {
             set_level(1 - std::to_underlying(_cfg.actstate));
@@ -237,7 +237,7 @@ public:
 
     virtual void reset() override {
         assert(_initialized);
-        set(emb::gpio::pin_state::inactive);
+        set(mcu::gpio::pin_state::inactive);
     }
 
     virtual void toggle() override {
@@ -318,7 +318,7 @@ public:
     }
 
     static OutputPin initialize(GPIO_TypeDef* port, uint32_t pin) {
-        return OutputPin({	
+        return OutputPin({
             .port = port,
             .pin = {
                 .Pin = pin,

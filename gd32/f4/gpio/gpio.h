@@ -66,7 +66,7 @@ protected:
 public:
     void initialize(const Config& config) {
         // enable port clock
-        size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(), 
+        size_t port_idx = static_cast<size_t>(std::distance(gpio_ports.begin(),
                                                             std::find(gpio_ports.begin(), gpio_ports.end(), config.port)));
         if (!_clk_enabled[port_idx]) {
             gpio_clk_enable_funcs[port_idx]();
@@ -116,7 +116,7 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive; 
+        return (read_level() == std::to_underlying(_config.actstate)) ? mcu::gpio::pin_state::active : mcu::gpio::pin_state::inactive;
     }
 // TODO
 // private:
@@ -199,12 +199,12 @@ public:
 
     virtual emb::gpio::State read() const override {
         assert(_initialized);
-        return (read_level() == std::to_underlying(_config.actstate)) ? emb::gpio::pin_state::active : emb::gpio::pin_state::inactive;
+        return (read_level() == std::to_underlying(_config.actstate)) ? mcu::gpio::pin_state::active : mcu::gpio::pin_state::inactive;
     }
 
-    virtual void set(emb::gpio::State state = emb::gpio::pin_state::active) override {
+    virtual void set(emb::gpio::State state = mcu::gpio::pin_state::active) override {
         assert(_initialized);
-        if (state == emb::gpio::pin_state::active) {
+        if (state == mcu::gpio::pin_state::active) {
             set_level(std::to_underlying(_config.actstate));
         } else {
             set_level(1 - std::to_underlying(_config.actstate));
@@ -213,7 +213,7 @@ public:
 
     virtual void reset() override {
         assert(_initialized);
-        set(emb::gpio::pin_state::inactive);
+        set(mcu::gpio::pin_state::inactive);
     }
 
     virtual void toggle() override {
