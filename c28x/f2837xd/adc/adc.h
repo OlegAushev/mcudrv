@@ -4,7 +4,7 @@
 
 #include <emblib/array.h>
 #include <emblib/core.h>
-#include <mcu/adc_channels/adc_channels.h>
+#include <mcu/adc_channels/adc_channels.hpp>
 #include <mcudrv/c28x/f2837xd/system/system.h>
 
 namespace mcu {

@@ -4,7 +4,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <tests/tests_config.h>
+#include <tests/tests_config.hpp>
 #include <emblib/testrunner/testrunner.h>
 #include "../system/system.h"
 #include <mcudrv/c28x/f2837xd/gpio/gpio.h>
