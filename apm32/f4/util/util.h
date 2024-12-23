@@ -2,7 +2,7 @@
 
 
 #include <mcudrv/apm32/f4/adc/adc.h>
-#include <emblib/filter.h>
+#include <emblib/filter.hpp>
 
 
 namespace mcu {

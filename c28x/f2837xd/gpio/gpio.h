@@ -5,9 +5,9 @@
 #include <mcudrv/c28x/f2837xd/system/system.h>
 #include <mcudrv/generic/gpio.h>
 
-#include <emblib/array.h>
-#include <emblib/chrono.h>
-#include <emblib/optional.h>
+#include <emblib/array.hpp>
+#include <emblib/chrono.hpp>
+#include <emblib/optional.hpp>
 
 #include <assert.h>
 

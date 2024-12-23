@@ -6,7 +6,7 @@
 
 
 #include <mcudrv/apm32/apm32_base.h>
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 
 
 namespace mcu {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 
 namespace mcu {
 namespace gpio {

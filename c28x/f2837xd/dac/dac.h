@@ -5,7 +5,7 @@
 
 
 #include "../system/system.h"
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 
 
 namespace mcu {

@@ -3,7 +3,7 @@
 #ifdef MCUDRV_C28X
 
 #include "../system/system.h"
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 #include "F2837xD_Ipc_drivers.h"
 
 namespace mcu {

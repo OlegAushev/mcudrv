@@ -2,7 +2,7 @@
 
 
 #include <mcudrv/c28x/f2837xd/tests/tests.h>
-#include <emblib/scheduler.h>
+#include <emblib/scheduler.hpp>
 
 
 void mcu::c28x::tests::gpio_test() {

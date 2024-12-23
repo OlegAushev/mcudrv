@@ -7,8 +7,8 @@
 
 #include <mcudrv/stm32/h7/stm32_h7_base.h>
 #include <mcudrv/stm32/h7/system/system.h>
-#include <emblib/core.h>
-#include <emblib/static_vector.h>
+#include <emblib/core.hpp>
+#include <emblib/static_vector.hpp>
 #include <array>
 #include <chrono>
 

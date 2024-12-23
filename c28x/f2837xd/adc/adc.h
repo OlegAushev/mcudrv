@@ -2,8 +2,8 @@
 
 #ifdef MCUDRV_C28X
 
-#include <emblib/array.h>
-#include <emblib/core.h>
+#include <emblib/array.hpp>
+#include <emblib/core.hpp>
 #include <mcu/adc_channels/adc_channels.hpp>
 #include <mcudrv/c28x/f2837xd/system/system.h>
 

@@ -6,7 +6,7 @@
 
 
 #include <mcudrv/stm32/f4/tim/adv/base.h>
-#include <emblib/math.h>
+#include <emblib/math.hpp>
 
 
 namespace mcu {

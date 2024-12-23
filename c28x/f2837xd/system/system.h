@@ -5,8 +5,8 @@
 
 
 #include "../../c28x_base.h"
-#include <emblib/core.h>
-#include <emblib/chrono.h>
+#include <emblib/core.hpp>
+#include <emblib/chrono.hpp>
 #include <driverlib.h>
 #include <device.h>
 #include <F28x_Project.h>

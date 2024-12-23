@@ -6,7 +6,7 @@
 
 
 #include <mcudrv/stm32/h7/stm32_h7_base.h>
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 #include <cstdio>
 #include <chrono>
 

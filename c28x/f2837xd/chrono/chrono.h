@@ -5,9 +5,9 @@
 
 
 #include "../system/system.h"
-#include <emblib/core.h>
-#include <emblib/chrono.h>
-#include <emblib/static_vector.h>
+#include <emblib/core.hpp>
+#include <emblib/chrono.hpp>
+#include <emblib/static_vector.hpp>
 
 
 namespace mcu {

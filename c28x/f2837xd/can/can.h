@@ -4,7 +4,7 @@
 #ifdef MCUDRV_C28X
 
 
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 #include <mcudrv/c28x/f2837xd/gpio/gpio.h>
 #include <mcudrv/c28x/f2837xd/system/system.h>
 

@@ -6,8 +6,8 @@
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib/core.h>
-#include <emblib/interfaces/uart.h>
+#include <emblib/core.hpp>
+#include <emblib/interfaces/uart.hpp>
 
 
 namespace mcu {

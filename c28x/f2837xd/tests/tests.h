@@ -5,7 +5,7 @@
 
 
 #include <tests/tests_config.hpp>
-#include <emblib/testrunner/testrunner.h>
+#include <emblib/testrunner/testrunner.hpp>
 #include "../system/system.h"
 #include <mcudrv/c28x/f2837xd/gpio/gpio.h>
 #include <mcudrv/c28x/f2837xd/chrono/chrono.h>

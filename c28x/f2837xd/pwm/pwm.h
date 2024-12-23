@@ -6,9 +6,9 @@
 
 #include "../system/system.h"
 #include "../gpio/gpio.h"
-#include <emblib/array.h>
-#include <emblib/core.h>
-#include <emblib/math.h>
+#include <emblib/array.hpp>
+#include <emblib/core.hpp>
+#include <emblib/math.hpp>
 
 
 namespace mcu {

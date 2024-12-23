@@ -3,7 +3,7 @@
 
 
 #include <mcudrv/stm32/f4/can/can.h>
-#include <emblib/chrono.h>
+#include <emblib/chrono.hpp>
 
 
 namespace mcu {

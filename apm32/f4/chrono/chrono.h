@@ -7,7 +7,7 @@
 
 #include <mcudrv/apm32/f4/apm32f4_base.h>
 #include <apm32f4xx_misc.h>
-#include <emblib/static_vector.h>
+#include <emblib/static_vector.hpp>
 #include <array>
 #include <chrono>
 

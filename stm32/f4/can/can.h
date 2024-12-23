@@ -8,9 +8,9 @@
 #include <mcudrv/stm32/f4/stm32_f4_base.h>
 #include <mcudrv/stm32/f4/system/system.h>
 #include <mcudrv/stm32/f4/gpio/gpio.h>
-#include <emblib/core.h>
+#include <emblib/core.hpp>
 #include <emblib/interfaces/can.h>
-#include <emblib/queue.h>
+#include <emblib/queue.hpp>
 #include <optional>
 #include <utility>
 
