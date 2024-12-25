@@ -11,12 +11,12 @@ namespace adv {
 
 
 PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_bkin)
-        : impl::AbstractTimer(peripheral, OpMode::pwm_generation) 
+        : impl::AbstractTimer(peripheral, OpMode::pwm_generation)
 {
     auto cfg = config;
 
     float timebase_freq = float(core_clk_freq()) / float(config.hal_base_config.division+1);
-    
+
     if (cfg.hal_base_config.period == 0 && cfg.freq != 0) {
         // period specified by freq
         _freq = config.freq;
@@ -42,7 +42,7 @@ PwmTimer::PwmTimer(Peripheral peripheral, const PwmConfig& config, BkinPin* pin_
         case TMR_COUNTER_MODE_CENTER_ALIGNED2:
         case TMR_COUNTER_MODE_CENTER_ALIGNED3:
             _freq = timebase_freq / float(cfg.hal_base_config.period * 2);
-            break;            
+            break;
         }
     } else {
         fatal_error();
@@ -110,7 +110,7 @@ void PwmTimer::_init_bdt(const PwmConfig& config, BkinPin* pin_bkin) {
             _deadtime = float(32 + (dtg & 0x1F)) * 16 * _t_dts_ns * 1E-09f;
         } else {
             fatal_error();
-        }       
+        }
     }
 
     TMR_ConfigBDT(_reg, &bdt_cfg);
@@ -122,25 +122,25 @@ void PwmTimer::init_channel(Channel channel, ChPin* pin_ch, ChPin* pin_chn, cons
 
     switch (channel) {
     case Channel::channel1:
-        _reg->CCM1_COMPARE_B.OC1PEN = config.oc_preload;
+        _reg->CCM1_COMPARE_B.OC1PEN = config.oc_preload & 0x01;
         TMR_ConfigOC1(_reg, &cfg.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC1EN = 1; } else { _reg->CCEN_B.CC1EN = 0; }
         if (pin_chn) { _reg->CCEN_B.CC1NEN = 1; } else { _reg->CCEN_B.CC1NEN = 0; }
         break;
     case Channel::channel2:
-        _reg->CCM1_COMPARE_B.OC2PEN = config.oc_preload;
+        _reg->CCM1_COMPARE_B.OC2PEN = config.oc_preload & 0x01;
         TMR_ConfigOC2(_reg, &cfg.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC2EN = 1; } else { _reg->CCEN_B.CC2EN = 0; }
         if (pin_chn) { _reg->CCEN_B.CC2NEN = 1; } else { _reg->CCEN_B.CC2NEN = 0; }
         break;
     case Channel::channel3:
-        _reg->CCM2_COMPARE_B.OC3PEN = config.oc_preload;
+        _reg->CCM2_COMPARE_B.OC3PEN = config.oc_preload & 0x01;
         TMR_ConfigOC3(_reg, &cfg.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC3EN = 1; } else { _reg->CCEN_B.CC3EN = 0; }
         if (pin_chn) { _reg->CCEN_B.CC3NEN = 1; } else { _reg->CCEN_B.CC3NEN = 0; }
         break;
     case Channel::channel4:
-        _reg->CCM2_COMPARE_B.OC4PEN = config.oc_preload;
+        _reg->CCM2_COMPARE_B.OC4PEN = config.oc_preload & 0x01;
         TMR_ConfigOC4(_reg, &cfg.hal_oc_config);
         if (pin_ch) { _reg->CCEN_B.CC4EN = 1; } else { _reg->CCEN_B.CC4EN = 0; }
         break;

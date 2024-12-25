@@ -119,7 +119,7 @@ exec_status Module::put_frame(const can_frame& frame) {
     }
 
     // set up dlc
-    _reg->sTxMailBox[mailboxid].TXDLEN_B.DLCODE = frame.len;
+    _reg->sTxMailBox[mailboxid].TXDLEN_B.DLCODE = frame.len & 0x0F;
 
     // set up data field
     write_reg(_reg->sTxMailBox[mailboxid].TXMDL,
