@@ -1,52 +1,47 @@
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-
 #include <mcudrv/apm32/f4/can/can.h>
 #include <mcudrv/apm32/f4/chrono/chrono.h>
+
 #include <emblib/chrono.hpp>
 
-
 namespace mcu {
+namespace apm32 {
 namespace can {
 
+Module::Module(Peripheral peripheral,
+               const RxPinConfig& rx_pin_config,
+               const TxPinConfig& tx_pin_config,
+               Config config)
+        : emb::singleton_array<Module, peripheral_count>(
+                  this, std::to_underlying(peripheral)),
+          _peripheral(peripheral) {
+    _rx_pin.init({.port = rx_pin_config.port,
+                  .pin = rx_pin_config.pin,
+                  .config = {.pin{},
+                             .mode = GPIO_MODE_AF,
+                             .speed = GPIO_SPEED_50MHz,
+                             .otype = GPIO_OTYPE_PP,
+                             .pupd = GPIO_PUPD_NOPULL},
+                  .altfunc = rx_pin_config.altfunc,
+                  .active_state{}});
 
-Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, Config config)
-        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
-        , _peripheral(peripheral)
-{
-    _rx_pin.init({
-        .port = rx_pin_config.port,
-        .pin = rx_pin_config.pin,
-        .config = {
-            .pin{},
-            .mode = GPIO_MODE_AF,
-            .speed = GPIO_SPEED_50MHz,
-            .otype = GPIO_OTYPE_PP,
-            .pupd = GPIO_PUPD_NOPULL
-        },
-        .altfunc = rx_pin_config.altfunc,
-        .active_state{}});
-
-    _tx_pin.init({
-        .port = tx_pin_config.port,
-        .pin = tx_pin_config.pin,
-        .config = {
-            .pin{},
-            .mode = GPIO_MODE_AF,
-            .speed = GPIO_SPEED_50MHz,
-            .otype = GPIO_OTYPE_PP,
-            .pupd = GPIO_PUPD_NOPULL
-        },
-        .altfunc = tx_pin_config.altfunc,
-        .active_state{}});
+    _tx_pin.init({.port = tx_pin_config.port,
+                  .pin = tx_pin_config.pin,
+                  .config = {.pin{},
+                             .mode = GPIO_MODE_AF,
+                             .speed = GPIO_SPEED_50MHz,
+                             .otype = GPIO_OTYPE_PP,
+                             .pupd = GPIO_PUPD_NOPULL},
+                  .altfunc = tx_pin_config.altfunc,
+                  .active_state{}});
 
     _enable_clk(peripheral);
     _reg = impl::can_instances[static_cast<size_t>(_peripheral)];
 
     CAN_Config(_reg, &config.hal_config);
 }
-
 
 RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
     RxMessageAttribute attr = {};
@@ -71,7 +66,6 @@ RxMessageAttribute Module::register_rxmessage(CAN_FilterConfig_T& filter) {
     return attr;
 }
 
-
 void Module::start() {
     _reg->MCTRL_B.INITREQ = 0;
     emb::chrono::watchdog start_wd(std::chrono::milliseconds(2));
@@ -82,7 +76,6 @@ void Module::start() {
     }
 }
 
-
 void Module::stop() {
     _reg->MCTRL_B.INITREQ = 1;
     emb::chrono::watchdog stop_wd(std::chrono::milliseconds(2));
@@ -92,7 +85,6 @@ void Module::stop() {
         }
     }
 }
-
 
 exec_status Module::put_frame(const can_frame& frame) {
     if (mailbox_full()) {
@@ -111,7 +103,7 @@ exec_status Module::put_frame(const can_frame& frame) {
     // set up id
     if (frame.id <= 0x7FF) {
         write_reg(_reg->sTxMailBox[mailboxid].TXMID, (frame.id << 21));
-    } else if (frame.id <=0x1FFFFFFF) {
+    } else if (frame.id <= 0x1FFFFFFF) {
         write_reg(_reg->sTxMailBox[mailboxid].TXMID, (frame.id << 3));
         _reg->sTxMailBox[mailboxid].TXMID_B.IDTYPESEL = 1;
     } else {
@@ -123,15 +115,15 @@ exec_status Module::put_frame(const can_frame& frame) {
 
     // set up data field
     write_reg(_reg->sTxMailBox[mailboxid].TXMDL,
-        (uint32_t(frame.payload[0]) << 0) |
-        (uint32_t(frame.payload[1]) << 8) |
-        (uint32_t(frame.payload[2]) << 16) |
-        (uint32_t(frame.payload[3]) << 24));
+              (uint32_t(frame.payload[0]) << 0) |
+                      (uint32_t(frame.payload[1]) << 8) |
+                      (uint32_t(frame.payload[2]) << 16) |
+                      (uint32_t(frame.payload[3]) << 24));
     write_reg(_reg->sTxMailBox[mailboxid].TXMDH,
-        (uint32_t(frame.payload[4]) << 0) |
-        (uint32_t(frame.payload[5]) << 8) |
-        (uint32_t(frame.payload[6]) << 16) |
-        (uint32_t(frame.payload[7]) << 24));
+              (uint32_t(frame.payload[4]) << 0) |
+                      (uint32_t(frame.payload[5]) << 8) |
+                      (uint32_t(frame.payload[6]) << 16) |
+                      (uint32_t(frame.payload[7]) << 24));
 
     // request transmission
     _reg->sTxMailBox[mailboxid].TXMID_B.TXMREQ = 1;
@@ -139,8 +131,8 @@ exec_status Module::put_frame(const can_frame& frame) {
     return exec_status::ok;
 }
 
-
-std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fifo) const {
+std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame,
+                                                    RxFifo fifo) const {
     if (rxfifo_level(fifo) == 0) {
         return {};
     }
@@ -176,23 +168,26 @@ std::optional<RxMessageAttribute> Module::get_frame(can_frame& frame, RxFifo fif
         _reg->RXF0_B.RFOM0 = 1;
         break;
     case RxFifo::fifo1:
-        _reg->RXF1_B.RFOM1 = 1;;
+        _reg->RXF1_B.RFOM1 = 1;
         break;
     }
 
     return {attr};
 }
 
-
 void Module::init_interrupts(uint32_t interrupt_bitset) {
     set_bit(_reg->INTEN, interrupt_bitset);
 }
 
-
-void Module::set_interrupt_priority(IrqPriority rx0_priority, IrqPriority rx1_priority, IrqPriority tx_priority) {
-    set_irq_priority(impl::can_rx0_irqn[std::to_underlying(_peripheral)], rx0_priority);
-    set_irq_priority(impl::can_rx1_irqn[std::to_underlying(_peripheral)], rx1_priority);
-    set_irq_priority(impl::can_tx_irqn[std::to_underlying(_peripheral)], tx_priority);
+void Module::set_interrupt_priority(IrqPriority rx0_priority,
+                                    IrqPriority rx1_priority,
+                                    IrqPriority tx_priority) {
+    set_irq_priority(impl::can_rx0_irqn[std::to_underlying(_peripheral)],
+                     rx0_priority);
+    set_irq_priority(impl::can_rx1_irqn[std::to_underlying(_peripheral)],
+                     rx1_priority);
+    set_irq_priority(impl::can_tx_irqn[std::to_underlying(_peripheral)],
+                     tx_priority);
 }
 
 void Module::enable_interrupts() {
@@ -207,7 +202,6 @@ void Module::disable_interrupts() {
     disable_irq(impl::can_tx_irqn[std::to_underlying(_peripheral)]);
 }
 
-
 void Module::_enable_clk(Peripheral peripheral) {
     auto can_idx = std::to_underlying(peripheral);
     if (_clk_enabled[can_idx]) {
@@ -218,34 +212,29 @@ void Module::_enable_clk(Peripheral peripheral) {
     _clk_enabled[can_idx] = true;
 }
 
-
 } // namespace can
+} // namespace apm32
 } // namespace mcu
-
 
 // extern "C" void CAN2_RX0_IRQHandler() {
 //     using namespace mcu::can;
 //     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
 // }
 
-
 // extern "C" void CAN1_RX1_IRQHandler() {
 //     using namespace mcu::can;
 //     HAL_CAN_IRQHandler(Module::instance(Peripheral::can1)->handle());
 // }
-
 
 // extern "C" void CAN2_RX1_IRQHandler() {
 //     using namespace mcu::can;
 //     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
 // }
 
-
 // extern "C" void CAN2_TX_IRQHandler() {
 //     using namespace mcu::can;
 //     HAL_CAN_IRQHandler(Module::instance(Peripheral::can2)->handle());
 // }
-
 
 #endif
 #endif
