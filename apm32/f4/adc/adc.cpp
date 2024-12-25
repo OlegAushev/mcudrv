@@ -1,19 +1,16 @@
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-
 #include <mcudrv/apm32/f4/adc/adc.h>
 
-
 namespace mcu {
-
-
+namespace apm32 {
 namespace adc {
 
-
 Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
-        : emb::singleton_array<Module, peripheral_count>(this, std::to_underlying(peripheral))
-        , _peripheral(peripheral) {
+        : emb::singleton_array<Module, peripheral_count>(
+                  this, std::to_underlying(peripheral)),
+          _peripheral(peripheral) {
     _enable_clk(peripheral);
     _reg = impl::adc_instances[std::to_underlying(_peripheral)];
 
@@ -41,8 +38,7 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
 
     _reg->CTRL2_B.ADCEN = 1;
     auto counter = (3 * (core_clk_freq() / 1000000));
-    while(counter != 0)
-    {
+    while (counter != 0) {
         --counter;
     }
 
@@ -57,7 +53,8 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
 
     if (config.discontinuous_mode) {
         _reg->CTRL1_B.REGDISCEN = 1;
-        if (config.discontinuous_conv_num == 0 || config.discontinuous_conv_num > 8) {
+        if (config.discontinuous_conv_num == 0 ||
+            config.discontinuous_conv_num > 8) {
             fatal_error();
         }
         _reg->CTRL1_B.DISCNUMCFG = (config.discontinuous_conv_num - 1) & 0x7;
@@ -71,75 +68,77 @@ Module::Module(Peripheral peripheral, Config config, dma::Stream* dma)
         _reg->INJSEQ_B.INJSEQLEN = (config.injected.value().conv_num - 1) & 0x3;
         _reg->CTRL1_B.INJGACEN = config.injected.value().auto_conv;
         _reg->CTRL1_B.INJDISCEN = config.injected.value().discontinuous_mode;
-        ADC_ConfigExternalTrigInjectedConvEdge(_reg, config.injected.value().ext_trigger_edge);
-        ADC_ConfigExternalTrigInjectedConv(_reg, config.injected.value().ext_trigger);
+        ADC_ConfigExternalTrigInjectedConvEdge(
+                _reg, config.injected.value().ext_trigger_edge);
+        ADC_ConfigExternalTrigInjectedConv(_reg,
+                                           config.injected.value().ext_trigger);
     }
 }
 
-
-void Module::init_injected(const PinConfig& pin_config, const InjectedChannelConfig& channel_config) {
-    mcu::gpio::PinConfig cfg{
-        .port = pin_config.port,
-        .pin = pin_config.pin,
-        .config = {
-            .pin{},
-            .mode = GPIO_MODE_AN,
-            .speed{},
-            .otype{},
-            .pupd = GPIO_PUPD_NOPULL
-        },
-        .altfunc{},
-        .active_state{}};
+void Module::init_injected(const PinConfig& pin_config,
+                           const InjectedChannelConfig& channel_config) {
+    mcu::gpio::PinConfig cfg{.port = pin_config.port,
+                             .pin = pin_config.pin,
+                             .config = {.pin{},
+                                        .mode = GPIO_MODE_AN,
+                                        .speed{},
+                                        .otype{},
+                                        .pupd = GPIO_PUPD_NOPULL},
+                             .altfunc{},
+                             .active_state{}};
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {
-        ADC_ConfigInjectedChannel(_reg, channel_config.channel,
+        ADC_ConfigInjectedChannel(_reg,
+                                  channel_config.channel,
                                   static_cast<ADC_INJEC_CHANNEL_T>(rank),
                                   channel_config.sampletime);
-        ADC_ConfigInjectedOffset(_reg, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.offset);
+        ADC_ConfigInjectedOffset(_reg,
+                                 static_cast<ADC_INJEC_CHANNEL_T>(rank),
+                                 channel_config.offset);
     }
 }
 
-
-void Module::init_regular(const PinConfig& pin_config, const RegularChannelConfig& channel_config) {
-    mcu::gpio::PinConfig cfg{
-        .port = pin_config.port,
-        .pin = pin_config.pin,
-        .config = {
-            .pin{},
-            .mode = GPIO_MODE_AN,
-            .speed{},
-            .otype{},
-            .pupd = GPIO_PUPD_NOPULL
-        },
-        .altfunc{},
-        .active_state{}};
+void Module::init_regular(const PinConfig& pin_config,
+                          const RegularChannelConfig& channel_config) {
+    mcu::gpio::PinConfig cfg{.port = pin_config.port,
+                             .pin = pin_config.pin,
+                             .config = {.pin{},
+                                        .mode = GPIO_MODE_AN,
+                                        .speed{},
+                                        .otype{},
+                                        .pupd = GPIO_PUPD_NOPULL},
+                             .altfunc{},
+                             .active_state{}};
     mcu::gpio::AnalogPin input(cfg);
 
     for (auto rank : channel_config.ranks) {
-        ADC_ConfigRegularChannel(_reg, channel_config.channel, rank, channel_config.sampletime);
+        ADC_ConfigRegularChannel(
+                _reg, channel_config.channel, rank, channel_config.sampletime);
     }
 }
 
-
-void Module::init_internal_injected(const InjectedChannelConfig& channel_config) {
+void Module::init_internal_injected(
+        const InjectedChannelConfig& channel_config) {
     for (auto rank : channel_config.ranks) {
-        ADC_ConfigInjectedChannel(_reg, channel_config.channel,
+        ADC_ConfigInjectedChannel(_reg,
+                                  channel_config.channel,
                                   static_cast<ADC_INJEC_CHANNEL_T>(rank),
                                   channel_config.sampletime);
-        ADC_ConfigInjectedOffset(_reg, static_cast<ADC_INJEC_CHANNEL_T>(rank), channel_config.offset);
+        ADC_ConfigInjectedOffset(_reg,
+                                 static_cast<ADC_INJEC_CHANNEL_T>(rank),
+                                 channel_config.offset);
     }
     ADC_EnableTempSensorVrefint();
 }
-
 
 void Module::init_internal_regular(const RegularChannelConfig& channel_config) {
     for (auto rank : channel_config.ranks) {
-        ADC_ConfigRegularChannel(_reg, channel_config.channel, rank, channel_config.sampletime);
+        ADC_ConfigRegularChannel(
+                _reg, channel_config.channel, rank, channel_config.sampletime);
     }
     ADC_EnableTempSensorVrefint();
 }
-
 
 void Module::init_interrupts(uint32_t interrupt_bitset) {
     _reg->STS_B.AWDFLG = 0;
@@ -152,7 +151,6 @@ void Module::init_interrupts(uint32_t interrupt_bitset) {
     set_bit(_reg->CTRL1, interrupt_bitset);
 }
 
-
 void Module::_enable_clk(Peripheral peripheral) {
     auto adc_idx = std::to_underlying(peripheral);
     if (_clk_enabled[adc_idx]) {
@@ -163,12 +161,9 @@ void Module::_enable_clk(Peripheral peripheral) {
     _clk_enabled[adc_idx] = true;
 }
 
-
-}
-
-
+} // namespace adc
+} // namespace apm32
 } // namespace mcu
-
 
 #endif
 #endif
