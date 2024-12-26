@@ -1,20 +1,18 @@
 #pragma once
 
-
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-
-#include <mcudrv/generic/uart.hpp>
-#include <mcudrv/apm32/f4/apm32f4_base.h>
-#include <mcudrv/apm32/f4/system/system.h>
-#include <mcudrv/apm32/f4/gpio/gpio.h>
 #include <apm32f4xx_usart.h>
 
+#include <mcudrv/apm32/f4/apm32f4_base.h>
+#include <mcudrv/apm32/f4/gpio/gpio.h>
+#include <mcudrv/apm32/f4/system/system.h>
+#include <mcudrv/generic/uart.hpp>
 
 namespace mcu {
+namespace apm32 {
 namespace usart {
-
 
 enum class Peripheral : unsigned int {
     usart1,
@@ -25,9 +23,7 @@ enum class Peripheral : unsigned int {
     usart6,
 };
 
-
 constexpr size_t peripheral_count = 6;
-
 
 struct RxPinConfig {
     gpio::Port port;
@@ -35,45 +31,42 @@ struct RxPinConfig {
     GPIO_AF_T altfunc;
 };
 
-
 struct TxPinConfig {
     gpio::Port port;
     gpio::Pin pin;
     GPIO_AF_T altfunc;
 };
 
-
 struct Config {
     USART_Config_T hal_config;
 };
 
-
 namespace impl {
 
-
-inline const std::array<USART_T*, peripheral_count> usart_instances = {USART1, USART2, USART3, UART4, UART5, USART6};
-
+inline const std::array<USART_T*, peripheral_count> usart_instances = {
+    USART1, USART2, USART3, UART4, UART5, USART6};
 
 inline Peripheral to_peripheral(const USART_T* instance) {
-    return static_cast<Peripheral>(
-        std::distance(usart_instances.begin(), std::find(usart_instances.begin(), usart_instances.end(), instance)));
+    return static_cast<Peripheral>(std::distance(
+            usart_instances.begin(),
+            std::find(
+                    usart_instances.begin(), usart_instances.end(), instance)));
 }
 
-
-inline std::array<void(*)(void), peripheral_count> usart_clk_enable_funcs = {
-    [](){ RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_USART1); },
-    [](){ RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USART2); },
-    [](){ RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USART3); },
-    [](){ RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_UART4); },
-    [](){ RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_UART5); },
-    [](){ RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_USART6); },
+inline std::array<void (*)(void), peripheral_count> usart_clk_enable_funcs = {
+    []() { RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_USART1); },
+    []() { RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USART2); },
+    []() { RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_USART3); },
+    []() { RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_UART4); },
+    []() { RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_UART5); },
+    []() { RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_USART6); },
 };
 
+} // namespace impl
 
-}
-
-
-class Module : public mcu::uart::tty, public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public mcu::uart::tty,
+               public emb::singleton_array<Module, peripheral_count>,
+               private emb::noncopyable {
 private:
     const Peripheral _peripheral;
     USART_T* _reg;
@@ -82,10 +75,14 @@ private:
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
-    Module(Peripheral peripheral, const RxPinConfig& rx_pin_config, const TxPinConfig& tx_pin_config, Config config);
+    Module(Peripheral peripheral,
+           const RxPinConfig& rx_pin_config,
+           const TxPinConfig& tx_pin_config,
+           Config config);
     Peripheral peripheral() const { return _peripheral; }
     static Module* instance(Peripheral peripheral) {
-        return emb::singleton_array<Module, peripheral_count>::instance(std::to_underlying(peripheral));
+        return emb::singleton_array<Module, peripheral_count>::instance(
+                std::to_underlying(peripheral));
     }
 
     virtual int getchar() override {
@@ -125,11 +122,9 @@ protected:
     static void _enable_clk(Peripheral peripheral);
 };
 
-
-
 } // namespace usart
+} // namespace apm32
 } // namespace mcu
-
 
 #endif
 #endif

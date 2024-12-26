@@ -163,8 +163,8 @@ public:
 
 public:
     void init_interrupts(uint32_t interrupt_bitset);
-    static void set_interrupt_priority(mcu::IrqPriority priority) {
-        mcu::set_irq_priority(ADC_IRQn, priority);
+    static void set_interrupt_priority(IrqPriority priority) {
+        set_irq_priority(ADC_IRQn, priority);
     }
     static void enable_interrupts() { enable_irq(ADC_IRQn); }
     static void disable_interrupts() { disable_irq(ADC_IRQn); }

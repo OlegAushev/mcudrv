@@ -1,15 +1,12 @@
 #pragma once
 
-
 #include <mcudrv/apm32/f4/adc/adc.h>
+
 #include <emblib/filter.hpp>
 
-
 namespace mcu {
-
-
+namespace apm32 {
 namespace util {
-
 
 class temperature_sensor {
 public:
@@ -19,6 +16,6 @@ public:
     }
 };
 
-
 } // namespace util
+} // namespace apm32
 } // namespace mcu

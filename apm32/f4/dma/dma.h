@@ -104,7 +104,7 @@ public:
                 std::to_underlying(stream_id));
     }
 
-    void init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority);
+    void init_interrupts(uint32_t interrupt_bitset, IrqPriority priority);
 
     void enable_interrupts() {
         enable_irq(impl::dma_irqn[std::to_underlying(_stream_id)]);
