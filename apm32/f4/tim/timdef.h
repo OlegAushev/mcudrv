@@ -32,16 +32,15 @@ struct ChPinConfig {
 class ChPin {
 public:
     ChPin(const ChPinConfig& config) {
-        mcu::gpio::AlternatePin(
-                {.port = config.port,
-                 .pin = config.pin,
-                 .config = {.pin{},
-                            .mode = GPIO_MODE_AF,
-                            .speed = GPIO_SPEED_50MHz,
-                            .otype = GPIO_OTYPE_PP,
-                            .pupd = GPIO_PUPD_NOPULL},
-                 .altfunc = config.altfunc,
-                 .active_state = mcu::gpio::active_state::high});
+        gpio::AlternatePin({.port = config.port,
+                            .pin = config.pin,
+                            .config = {.pin{},
+                                       .mode = GPIO_MODE_AF,
+                                       .speed = GPIO_SPEED_50MHz,
+                                       .otype = GPIO_OTYPE_PP,
+                                       .pupd = GPIO_PUPD_NOPULL},
+                            .altfunc = config.altfunc,
+                            .active_state = mcu::gpio::active_state::high});
     }
 };
 
@@ -55,16 +54,15 @@ struct BkinPinConfig {
 class BkinPin {
 public:
     BkinPin(const BkinPinConfig& config) {
-        mcu::gpio::AlternatePin(
-                {.port = config.port,
-                 .pin = config.pin,
-                 .config = {.pin{},
-                            .mode = GPIO_MODE_AF,
-                            .speed = GPIO_SPEED_50MHz,
-                            .otype = GPIO_OTYPE_PP,
-                            .pupd = config.pull},
-                 .altfunc = config.altfunc,
-                 .active_state = mcu::gpio::active_state::high});
+        gpio::AlternatePin({.port = config.port,
+                            .pin = config.pin,
+                            .config = {.pin{},
+                                       .mode = GPIO_MODE_AF,
+                                       .speed = GPIO_SPEED_50MHz,
+                                       .otype = GPIO_OTYPE_PP,
+                                       .pupd = config.pull},
+                            .altfunc = config.altfunc,
+                            .active_state = mcu::gpio::active_state::high});
     }
 };
 

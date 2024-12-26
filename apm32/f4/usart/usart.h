@@ -70,8 +70,8 @@ class Module : public mcu::uart::tty,
 private:
     const Peripheral _peripheral;
     USART_T* _reg;
-    mcu::gpio::AlternatePin _rx_pin;
-    mcu::gpio::AlternatePin _tx_pin;
+    gpio::AlternatePin _rx_pin;
+    gpio::AlternatePin _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:

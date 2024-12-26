@@ -19,27 +19,45 @@ enum class Peripheral : unsigned int { i2c1, i2c2, i2c3 };
 enum class Direction { rx, tx };
 
 enum class Event : uint32_t {
-    ev5_master_mode_select = 0x00030001, /*!< BUSBSYFLG, MSFLG and STARTFLG flag */
-    ev6_master_transmitter_mode_selected = 0x00070082, /*!< BUSBSYFLG, MSFLG, ADDRFLG, TXBEFLG and TRFLG flags */
-    ev6_master_receiver_mode_selected = 0x00030002, /*!< BUSBSYFLG, MSFLG and ADDRFLG flags */
-    ev9_master_mode_address10 = 0x00030008, /*!< BUSBSYFLG, MSFLG and ADDR10FLG flags */
-    ev7_master_byte_received = 0x00030040, /*!< BUSBSYFLG, MSFLG and RXBNEFLG flags */
-    ev8_master_byte_transmitting = 0x00070080, /*!< TRFLG, BUSBSYFLG, MSFLG, TXBEFLG flags */
-    ev8_2_master_byte_transmitted = 0x00070084, /*!< TRFLG, BUSBSYFLG, MSFLG, TXBEFLG and BTCFLG flags */
+    ev5_master_mode_select =
+            0x00030001, /*!< BUSBSYFLG, MSFLG and STARTFLG flag */
+    ev6_master_transmitter_mode_selected =
+            0x00070082, /*!< BUSBSYFLG, MSFLG, ADDRFLG, TXBEFLG and TRFLG flags */
+    ev6_master_receiver_mode_selected =
+            0x00030002, /*!< BUSBSYFLG, MSFLG and ADDRFLG flags */
+    ev9_master_mode_address10 =
+            0x00030008, /*!< BUSBSYFLG, MSFLG and ADDR10FLG flags */
+    ev7_master_byte_received =
+            0x00030040, /*!< BUSBSYFLG, MSFLG and RXBNEFLG flags */
+    ev8_master_byte_transmitting =
+            0x00070080, /*!< TRFLG, BUSBSYFLG, MSFLG, TXBEFLG flags */
+    ev8_2_master_byte_transmitted =
+            0x00070084, /*!< TRFLG, BUSBSYFLG, MSFLG, TXBEFLG and BTCFLG flags */
 
-    ev1_slave_receiver_address_matched = 0x00020002, /*!< BUSBSYFLG and ADDRFLG flags */
-    ev1_slave_transmitter_address_matched = 0x00060082, /*!< TRFLG, BUSBSYFLG, TXBEFLG and ADDRFLG flags */
-    ev1_slave_receiver_secondaddress_matched = 0x00820000, /*!< DUALF and BUSBSYFLG flags */
-    ev1_slave_transmitter_secondaddress_matched = 0x00860080, /*!< DUALF, TRFLG, BUSBSYFLG and TXBEFLG flags */
-    ev1_slave_generalcalladdress_matched = 0x00120000,                   /*!< GENCALL and BUSBSYFLG flags */
+    ev1_slave_receiver_address_matched =
+            0x00020002, /*!< BUSBSYFLG and ADDRFLG flags */
+    ev1_slave_transmitter_address_matched =
+            0x00060082, /*!< TRFLG, BUSBSYFLG, TXBEFLG and ADDRFLG flags */
+    ev1_slave_receiver_secondaddress_matched =
+            0x00820000, /*!< DUALF and BUSBSYFLG flags */
+    ev1_slave_transmitter_secondaddress_matched =
+            0x00860080, /*!< DUALF, TRFLG, BUSBSYFLG and TXBEFLG flags */
+    ev1_slave_generalcalladdress_matched =
+            0x00120000,                   /*!< GENCALL and BUSBSYFLG flags */
     ev2_slave_byte_received = 0x00020040, /*!< BUSBSYFLG and RXBNEFLG flags */
-    ev2_slave_byte_received1 = 0x00820040, /*!< DUALADDRFLG, BUSBSYFLG and RXBNEFLG flags */
-    ev2_slave_byte_received2 = 0x00120040, /*!< GENCALLFLG, BUSBSYFLG and RXBNEFLG flags */
+    ev2_slave_byte_received1 =
+            0x00820040, /*!< DUALADDRFLG, BUSBSYFLG and RXBNEFLG flags */
+    ev2_slave_byte_received2 =
+            0x00120040, /*!< GENCALLFLG, BUSBSYFLG and RXBNEFLG flags */
     ev4_slave_stop_detected = 0x00000010, /*!< STOPFLG flag */
-    ev3_slave_byte_transmitted = 0x00060084, /*!< TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
-    ev3_slave_byte_transmitted1 = 0x00860084, /*!< DUALADDRFLG, TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
-    ev3_slave_byte_transmitted2 = 0x00160084, /*!< GENCALLFLG, TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
-    ev3_slave_byte_transmitting = 0x00060080, /*!< TRFLG, BUSBSYFLG and TXBEFLG flags */
+    ev3_slave_byte_transmitted =
+            0x00060084, /*!< TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
+    ev3_slave_byte_transmitted1 =
+            0x00860084, /*!< DUALADDRFLG, TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
+    ev3_slave_byte_transmitted2 =
+            0x00160084, /*!< GENCALLFLG, TRFLG, BUSBSYFLG, TXBEFLG and BTCFLG flags */
+    ev3_slave_byte_transmitting =
+            0x00060080, /*!< TRFLG, BUSBSYFLG and TXBEFLG flags */
     ev3_2_slave_ack_failure = 0x00000400, /*!< AEFLG flag */
 };
 
@@ -87,8 +105,8 @@ class Module : public emb::singleton_array<Module, peripheral_count>,
 private:
     const Peripheral _peripheral;
     I2C_T* const _reg;
-    mcu::gpio::AlternatePin _sda_pin;
-    mcu::gpio::AlternatePin _scl_pin;
+    gpio::AlternatePin _sda_pin;
+    gpio::AlternatePin _scl_pin;
     Config _cfg;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};

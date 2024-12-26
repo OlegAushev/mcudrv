@@ -82,8 +82,8 @@ private:
     const Peripheral _peripheral;
     CAN_T* _reg;
 
-    mcu::gpio::AlternatePin _rx_pin;
-    mcu::gpio::AlternatePin _tx_pin;
+    gpio::AlternatePin _rx_pin;
+    gpio::AlternatePin _tx_pin;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 

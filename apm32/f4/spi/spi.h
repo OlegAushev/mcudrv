@@ -80,11 +80,11 @@ class Module : public emb::singleton_array<Module, peripheral_count>,
 private:
     const Peripheral _peripheral;
     SPI_T* const _reg;
-    mcu::gpio::AlternatePin _mosi_pin;
-    mcu::gpio::AlternatePin _miso_pin;
-    mcu::gpio::AlternatePin _clk_pin;
-    mcu::gpio::AlternatePin _cs_pin;
-    std::vector<mcu::gpio::OutputPin> _cs_pins;
+    gpio::AlternatePin _mosi_pin;
+    gpio::AlternatePin _miso_pin;
+    gpio::AlternatePin _clk_pin;
+    gpio::AlternatePin _cs_pin;
+    std::vector<gpio::OutputPin> _cs_pins;
 
     static inline std::array<bool, peripheral_count> _clk_enabled{};
 public:
