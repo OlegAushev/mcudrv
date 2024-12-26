@@ -1,23 +1,20 @@
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-
 #include <mcudrv/apm32/f4/dma/dma.h>
 
-
 namespace mcu {
+namespace apm32 {
 namespace dma {
 
-
 Stream::Stream(Config config)
-        : emb::singleton_array<Stream, stream_count>(this, std::to_underlying(config.stream_id))
-        , _stream_id(config.stream_id)
-{
+        : emb::singleton_array<Stream, stream_count>(
+                  this, std::to_underlying(config.stream_id)),
+          _stream_id(config.stream_id) {
     _enable_clk(_stream_id);
     _stream_reg = impl::dma_stream_instances[std::to_underlying(_stream_id)];
     DMA_Config(_stream_reg, &config.hal_config);
 }
-
 
 void Stream::_enable_clk(StreamId stream_id) {
     switch (stream_id) {
@@ -52,8 +49,8 @@ void Stream::_enable_clk(StreamId stream_id) {
     }
 }
 
-
-void Stream::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priority) {
+void Stream::init_interrupts(uint32_t interrupt_bitset,
+                             mcu::IrqPriority priority) {
     if ((interrupt_bitset & DMA_INT_FEIFLG) == DMA_INT_FEIFLG) {
         _stream_reg->FCTRL_B.FEIEN = 1;
     }
@@ -65,10 +62,9 @@ void Stream::init_interrupts(uint32_t interrupt_bitset, mcu::IrqPriority priorit
     set_irq_priority(impl::dma_irqn[std::to_underlying(_stream_id)], priority);
 }
 
-
 } // namespace dma
+} // namespace apm32
 } // namespace mcu
-
 
 #endif
 #endif
