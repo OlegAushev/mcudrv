@@ -5,9 +5,9 @@
 
 #include <apm32f4xx_spi.h>
 
-#include <mcudrv/apm32/apm32_base.h>
-#include <mcudrv/apm32/f4/gpio/gpio.h>
-#include <mcudrv/apm32/f4/system/system.h>
+#include <mcudrv/apm32/apm32_base.hpp>
+#include <mcudrv/apm32/f4/gpio/gpio.hpp>
+#include <mcudrv/apm32/f4/system/system.hpp>
 
 #include <initializer_list>
 #include <optional>

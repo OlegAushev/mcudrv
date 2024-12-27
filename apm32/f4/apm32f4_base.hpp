@@ -5,7 +5,7 @@
 #ifdef APM32F4xx
 
 
-#include <mcudrv/apm32/apm32_base.h>
+#include <mcudrv/apm32/apm32_base.hpp>
 #include <emblib/core.hpp>
 
 

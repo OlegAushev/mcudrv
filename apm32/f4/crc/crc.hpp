@@ -6,7 +6,7 @@
 #include <apm32f4xx_crc.h>
 #include <apm32f4xx_rcm.h>
 
-#include <mcudrv/apm32/f4/system/system.h>
+#include <mcudrv/apm32/f4/system/system.hpp>
 
 #include <cstddef>
 

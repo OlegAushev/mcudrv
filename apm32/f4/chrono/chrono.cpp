@@ -1,8 +1,8 @@
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-#include <mcudrv/apm32/f4/chrono/chrono.h>
-#include <mcudrv/apm32/f4/system/system.h>
+#include <mcudrv/apm32/f4/chrono/chrono.hpp>
+#include <mcudrv/apm32/f4/system/system.hpp>
 
 extern "C" void SysTick_Handler() {
     // TODO HAL_IncTick();

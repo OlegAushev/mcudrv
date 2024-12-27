@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mcudrv/apm32/f4/adc/adc.h>
+#include <mcudrv/apm32/f4/adc/adc.hpp>
 
 #include <emblib/filter.hpp>
 

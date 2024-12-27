@@ -4,9 +4,10 @@
 #ifdef APM32F4xx
 
 #include <apm32f4xx_tmr.h>
-#include <mcudrv/apm32/f4/apm32f4_base.h>
-#include <mcudrv/apm32/f4/gpio/gpio.h>
-#include <mcudrv/apm32/f4/system/system.h>
+
+#include <mcudrv/apm32/f4/apm32f4_base.hpp>
+#include <mcudrv/apm32/f4/gpio/gpio.hpp>
+#include <mcudrv/apm32/f4/system/system.hpp>
 
 namespace mcu {
 namespace apm32 {

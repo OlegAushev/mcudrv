@@ -5,7 +5,7 @@
 
 #include <apm32f4xx_misc.h>
 
-#include <mcudrv/apm32/f4/apm32f4_base.h>
+#include <mcudrv/apm32/f4/apm32f4_base.hpp>
 
 #include <array>
 #include <chrono>

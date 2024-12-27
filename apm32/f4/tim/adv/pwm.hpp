@@ -4,7 +4,7 @@
 #ifdef APM32F4xx
 
 #include <emblib/math.hpp>
-#include <mcudrv/apm32/f4/tim/adv/base.h>
+#include <mcudrv/apm32/f4/tim/adv/base.hpp>
 
 namespace mcu {
 namespace apm32 {

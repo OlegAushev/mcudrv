@@ -1,7 +1,7 @@
 #ifdef MCUDRV_APM32
 #ifdef APM32F4xx
 
-#include <mcudrv/apm32/f4/tim/adv/pwm.h>
+#include <mcudrv/apm32/f4/tim/adv/pwm.hpp>
 
 namespace mcu {
 namespace apm32 {

@@ -5,8 +5,8 @@
 
 #include <apm32f4xx_dac.h>
 
-#include <mcudrv/apm32/f4/gpio/gpio.h>
-#include <mcudrv/apm32/f4/system/system.h>
+#include <mcudrv/apm32/f4/gpio/gpio.hpp>
+#include <mcudrv/apm32/f4/system/system.hpp>
 
 #include <utility>
 
