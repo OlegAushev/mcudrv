@@ -51,7 +51,7 @@ inline constexpr std::array<IRQn_Type, peripheral_count> up_irq_nums = {TIM1_UP_
 inline constexpr std::array<IRQn_Type, peripheral_count> brk_irq_nums = {TIM1_BRK_TIM9_IRQn, TIM8_BRK_TIM12_IRQn};
 
 
-class AbstractTimer : public emb::singleton_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
+class AbstractTimer : public emb::singleton_array<AbstractTimer, peripheral_count>, private emb::noncopyable {
 protected:
     const Peripheral _peripheral;
     TIM_TypeDef* const _reg;

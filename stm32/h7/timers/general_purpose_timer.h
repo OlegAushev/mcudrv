@@ -75,7 +75,7 @@ inline constexpr std::array<IRQn_Type, gp_timer_peripheral_count> gp_timer_irqn 
 
 
 template <OperationMode OpMode>
-class GeneralPurposeTimer : public emb::singleton_array<GeneralPurposeTimer<OpMode>, gp_timer_peripheral_count>, public emb::noncopyable {
+class GeneralPurposeTimer : public emb::singleton_array<GeneralPurposeTimer<OpMode>, gp_timer_peripheral_count>, private emb::noncopyable {
 private:
     const GeneralPurposePeripheral _peripheral;
     TIM_HandleTypeDef _handle{};

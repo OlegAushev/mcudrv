@@ -60,7 +60,7 @@ inline std::array<void(*)(void), peripheral_count> clk_enable_funcs = {
 inline constexpr std::array<IRQn_Type, peripheral_count> irq_nums = {TIM2_IRQn, TIM5_IRQn};
 
 
-class AbstractTimer : public emb::singleton_array<AbstractTimer, peripheral_count>, public emb::noncopyable {
+class AbstractTimer : public emb::singleton_array<AbstractTimer, peripheral_count>, private emb::noncopyable {
 protected:
     const Peripheral _peripheral;
     TIM_TypeDef* const _reg;

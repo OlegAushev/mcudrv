@@ -43,7 +43,7 @@ inline constexpr std::array<IRQn_Type, peripheral_count> brk_irq_nums = {
 
 class AbstractTimer
         : public emb::singleton_array<AbstractTimer, peripheral_count>,
-          public emb::noncopyable {
+          private emb::noncopyable {
 protected:
     const Peripheral _peripheral;
     TMR_T* const _reg;

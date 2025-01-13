@@ -81,7 +81,7 @@ struct DMA_Base_Registers
 } // namespace impl
 
 
-class Stream : public emb::singleton_array<Stream, stream_count>, public emb::noncopyable {
+class Stream : public emb::singleton_array<Stream, stream_count>, private emb::noncopyable {
 private:
     const StreamId _stream_id;
     DMA_HandleTypeDef _handle{};

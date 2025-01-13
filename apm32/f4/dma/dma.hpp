@@ -88,7 +88,7 @@ inline const std::array<DMA_Stream_T*, stream_count> dma_stream_instances = {
 } // namespace impl
 
 class Stream : public emb::singleton_array<Stream, stream_count>,
-               public emb::noncopyable {
+               private emb::noncopyable {
 private:
     const StreamId _stream_id;
     DMA_Stream_T* _stream_reg;
