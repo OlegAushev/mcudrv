@@ -31,18 +31,16 @@ SCOPED_ENUM_DECLARE_BEGIN(FlagType) {
 
 class Flag {
 private:
-    uint32_t bitmask_;
-    Cpu master_cpu_;
-    FlagType type_;
+    const uint32_t bitmask_;
+    const Cpu master_cpu_;
+    const FlagType type_;
 public:
     Flag(uint32_t flag_id, Cpu master_cpu)
-            : bitmask_(1 << flag_id), master_cpu_(master_cpu) {
+            : bitmask_(uint32_t(1) << flag_id),
+              master_cpu_(master_cpu),
+              type_((this_cpu == master_cpu_) ?
+                    FlagType::local : FlagType::remote) {
         assert(flag_id < 32);
-        if (this_cpu == master_cpu_) {
-            type_ = FlagType::local;
-        } else {
-            type_ = FlagType::remote;
-        }
     }
 
     FlagType type() const { return type_; }
