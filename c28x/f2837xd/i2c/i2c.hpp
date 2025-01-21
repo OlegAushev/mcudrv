@@ -16,7 +16,7 @@ namespace c28x {
 namespace i2c {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     i2ca,
     i2cb
 } SCOPED_ENUM_DECLARE_END(Peripheral)

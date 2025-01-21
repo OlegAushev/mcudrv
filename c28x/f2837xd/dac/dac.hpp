@@ -15,7 +15,7 @@ namespace c28x {
 namespace dac {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     daca,
     dacb,
     dacc

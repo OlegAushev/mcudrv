@@ -16,7 +16,7 @@ inline float vref() { return 3.0f; }
 template<typename T>
 inline T nmax() { return static_cast<T>(4095); }
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     adca,
     adcb,
     adcc,

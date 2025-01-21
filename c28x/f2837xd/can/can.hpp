@@ -14,7 +14,7 @@ namespace c28x {
 namespace can {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     cana,
     canb
 } SCOPED_ENUM_DECLARE_END(Peripheral)
@@ -31,7 +31,7 @@ SCOPED_ENUM_UT_DECLARE_BEGIN(Bitrate, uint32_t) {
 } SCOPED_ENUM_DECLARE_END(Bitrate)
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Mode) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Mode, uint16_t) {
     normal = 0,
     silent = CAN_TEST_SILENT,
     loopback = CAN_TEST_LBACK,

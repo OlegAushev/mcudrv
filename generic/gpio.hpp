@@ -7,12 +7,12 @@ namespace gpio {
 
 #if defined(MCUDRV_C28X)
 
-SCOPED_ENUM_DECLARE_BEGIN(active_state) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(active_state, uint32_t) {
     low = 0,
     high = 1
 } SCOPED_ENUM_DECLARE_END(active_state)
 
-SCOPED_ENUM_DECLARE_BEGIN(pin_state) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(pin_state, uint32_t) {
     inactive = 0,
     active = 1
 } SCOPED_ENUM_DECLARE_END(pin_state)
@@ -41,12 +41,12 @@ public:
 
 #else
 
-enum class active_state : unsigned int {
+enum class active_state : uint32_t {
     low = 0,
     high = 1
 };
 
-enum class pin_state : unsigned int {
+enum class pin_state : uint32_t {
     inactive = 0,
     active = 1
 };
@@ -59,7 +59,6 @@ public:
     virtual pin_state read() const = 0;
     virtual unsigned int read_level() const = 0;
 };
-
 
 class output_pin {
 public:

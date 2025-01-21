@@ -43,7 +43,7 @@ Module::Module(Peripheral peripheral, const RxPinConfig& rx_pin, const TxPinConf
     CAN_enableAutoBusOn(_module.base);
 
     if (config.mode != Mode::normal) {
-        CAN_enableTestMode(_module.base, static_cast<uint16_t>(config.mode.underlying_value()));
+        CAN_enableTestMode(_module.base, config.mode.underlying_value());
     }
 
     CAN_startModule(_module.base);

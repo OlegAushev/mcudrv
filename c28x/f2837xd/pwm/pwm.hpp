@@ -24,7 +24,7 @@ SCOPED_ENUM_DECLARE_BEGIN(CountDirection) {
 } SCOPED_ENUM_DECLARE_END(CountDirection)
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     pwm1,
     pwm2,
     pwm3,

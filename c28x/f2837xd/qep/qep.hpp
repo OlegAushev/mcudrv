@@ -17,7 +17,7 @@ namespace c28x {
 namespace qep {
 
 
-SCOPED_ENUM_DECLARE_BEGIN(Peripheral) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     qep1,
     qep2,
     qep3
