@@ -31,7 +31,7 @@ SCOPED_ENUM_UT_DECLARE_BEGIN(Bitrate, uint32_t) {
 } SCOPED_ENUM_DECLARE_END(Bitrate)
 
 
-SCOPED_ENUM_UT_DECLARE_BEGIN(Mode, uint16_t) {
+SCOPED_ENUM_DECLARE_BEGIN(Mode) {
     normal = 0,
     silent = CAN_TEST_SILENT,
     loopback = CAN_TEST_LBACK,

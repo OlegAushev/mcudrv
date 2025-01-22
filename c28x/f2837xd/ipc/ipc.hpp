@@ -77,7 +77,7 @@ public:
     }
 };
 
-SCOPED_ENUM_DECLARE_BEGIN(InterruptType) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(InterruptType, uint32_t) {
     ipc_interrupt0 = INT_IPC_0,
     ipc_interrupt1 = INT_IPC_1,
     ipc_interrupt2 = INT_IPC_2,

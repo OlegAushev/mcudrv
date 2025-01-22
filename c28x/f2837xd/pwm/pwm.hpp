@@ -88,8 +88,8 @@ SCOPED_ENUM_DECLARE_BEGIN(CounterMode) {
 
 
 SCOPED_ENUM_DECLARE_BEGIN(OutputSwap) {
-    no,
-    yes
+    disabled,
+    enabled
 } SCOPED_ENUM_DECLARE_END(OutputSwap)
 
 
@@ -357,11 +357,11 @@ public:
             EPWM_setDeadBandCounterClock(_module.base[i], EPWM_DB_COUNTER_CLOCK_FULL_CYCLE);
 
             switch (config.output_swap.native_value()) {
-            case OutputSwap::no:
+            case OutputSwap::disabled:
                 EPWM_setDeadBandOutputSwapMode(_module.base[i], EPWM_DB_OUTPUT_A, false);
                 EPWM_setDeadBandOutputSwapMode(_module.base[i], EPWM_DB_OUTPUT_B, false);
                 break;
-            case OutputSwap::yes:
+            case OutputSwap::enabled:
                 EPWM_setDeadBandOutputSwapMode(_module.base[i], EPWM_DB_OUTPUT_A, true);
                 EPWM_setDeadBandOutputSwapMode(_module.base[i], EPWM_DB_OUTPUT_B, true);
                 break;

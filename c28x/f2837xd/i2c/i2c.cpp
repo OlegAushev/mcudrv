@@ -25,7 +25,9 @@ Module::Module(Peripheral peripheral, const SdaPinConfig& sda_pin, const SclPinC
 
     I2C_initMaster(_module.base, mcu::c28x::sysclk_freq(), config.bitrate,
             static_cast<I2C_DutyCycle>(config.duty_cycle.underlying_value()));
-    I2C_setBitCount(_module.base, static_cast<I2C_BitCount>(config.bitcount.underlying_value()));
+    I2C_setBitCount(_module.base,
+                    static_cast<I2C_BitCount>(
+                            config.bitcount.underlying_value()));
     I2C_setSlaveAddress(_module.base, config.slave_addr);
     I2C_setEmulationMode(_module.base, I2C_EMULATION_FREE_RUN);
 

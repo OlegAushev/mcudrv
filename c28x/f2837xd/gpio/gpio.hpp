@@ -261,7 +261,7 @@ SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerMode) {
     toggle
 } SCOPED_ENUM_DECLARE_END(DurationLoggerMode)
 
-SCOPED_ENUM_DECLARE_BEGIN(DurationLoggerChannel) {
+SCOPED_ENUM_UT_DECLARE_BEGIN(DurationLoggerChannel, uint32_t) {
     channel0,
     channel1,
     channel2,
