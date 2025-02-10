@@ -1,19 +1,13 @@
 #pragma once
 
-
 #ifdef MCUDRV_C28X
-
 
 #include <mcudrv/c28x/f2837xd/system/system.hpp>
 #include <emblib/core.hpp>
 
-
 namespace mcu {
-
 namespace c28x {
-
 namespace dac {
-
 
 SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     daca,
@@ -21,58 +15,48 @@ SCOPED_ENUM_UT_DECLARE_BEGIN(Peripheral, uint32_t) {
     dacc
 } SCOPED_ENUM_DECLARE_END(Peripheral)
 
-
 const size_t peripheral_count = 3;
 
-
 namespace impl {
-
 
 struct Module {
     uint32_t base;
     Module(uint32_t base_) : base(base_) {}
 };
 
-
 extern const uint32_t dac_bases[3];
-
 
 } // namespace impl
 
-
 class Input {
 private:
-    uint16_t _tag : 4;
-    uint16_t _value : 12;
+    uint16_t tag_ : 4;
+    uint16_t value_ : 12;
 public:
-    Input() : _tag(0), _value(0) {}
-    explicit Input(uint16_t value) : _tag(0), _value(value & 0x0FFF) {}
+    Input() : tag_(0), value_(0) {}
+    explicit Input(uint16_t value) : tag_(0), value_(value & 0x0FFF) {}
     Input(uint16_t value, Peripheral peripheral)
-            : _tag(static_cast<uint16_t>(peripheral.underlying_value()))
-            , _value(value & 0x0FFF) {}
+            : tag_(static_cast<uint16_t>(peripheral.underlying_value()))
+            , value_(value & 0x0FFF) {}
 
-    uint16_t get() const { return _value; }
-    uint16_t tag() const { return _tag; }
+    uint16_t get() const { return value_; }
+    uint16_t tag() const { return tag_; }
 };
 
-
-class Module : public emb::singleton_array<Module, peripheral_count>, private emb::noncopyable {
+class Module : public emb::singleton_array<Module, peripheral_count>,
+               private emb::noncopyable {
 private:
-    const Peripheral _peripheral;
-    impl::Module _module;
+    const Peripheral peripheral_;
+    impl::Module module_;
 public:
     Module(Peripheral peripheral);
-    Peripheral peripheral() const { return _peripheral; }
-    uint32_t base() const { return _module.base; }
-    void convert(Input input) { DAC_setShadowValue(_module.base, input.get()); }
+    Peripheral peripheral() const { return peripheral_; }
+    uint32_t base() const { return module_.base; }
+    void convert(Input input) { DAC_setShadowValue(module_.base, input.get()); }
 };
 
-
 } // namespace dac
-
 } // namespace c28x
-
 } // namespace mcu
-
 
 #endif

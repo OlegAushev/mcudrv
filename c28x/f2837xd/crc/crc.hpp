@@ -1,19 +1,13 @@
 #pragma once
 
-
 #ifdef MCUDRV_C28X
-
 
 #include <mcudrv/c28x/f2837xd/system/system.hpp>
 #include <dsp/vcu/vcu2_crc.h>
 
-
 namespace mcu {
-
 namespace c28x {
-
 namespace crc {
-
 
 inline uint32_t calc_crc32(const uint16_t* buf, size_t bytes) {
     // CRC-32/MPEG-2
@@ -33,14 +27,14 @@ inline uint32_t calc_crc32(const uint16_t* buf, size_t bytes) {
     return crc_obj.crcResult;
 }
 
-
 inline uint32_t calc_crc32_byte8(const uint8_t* buf, size_t len) {
     // calculate CRC with padding zeros
     return calc_crc32(buf, len*2);
 }
 
-
-inline uint8_t calc_crc8(const uint16_t* buf, size_t bytes, CRC_parity_e parity) {
+inline uint8_t calc_crc8(const uint16_t* buf,
+                         size_t bytes,
+                         CRC_parity_e parity) {
     CRC_Obj crc_obj;
 
     crc_obj.seedValue = 0;
@@ -57,7 +51,6 @@ inline uint8_t calc_crc8(const uint16_t* buf, size_t bytes, CRC_parity_e parity)
     return crc_obj.crcResult;
 }
 
-
 inline void reset() {
     //CRC_reset();
     uint16_t buf[4] = {0x0100, 0x0302, 0x0504, 0x0706};
@@ -65,12 +58,8 @@ inline void reset() {
     EMB_UNUSED(res);
 }
 
-
 } // namespace crc
-
 } // namespace c28x
-
 } // namespace mcu
-
 
 #endif
