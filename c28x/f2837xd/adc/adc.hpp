@@ -95,90 +95,90 @@ class Module : public emb::singleton_array<Module, peripheral_count>,
                private emb::noncopyable {
     friend class Channel;
 private:
-    const Peripheral _peripheral;
-    impl::Module _module;
-    const uint32_t sample_window_cycles;
+    const Peripheral peripheral_;
+    impl::Module module_;
+    const uint32_t sample_window_cycles_;
 
-    static emb::array<impl::Channel, ChannelId::count> _channels;
-    static emb::array<impl::Irq, IrqId::count> _irqs;
-    static bool _channels_and_irqs_initialized;
+    static emb::array<impl::Channel, ChannelId::count> channels_;
+    static emb::array<impl::Irq, IrqId::count> irqs_;
+    static bool channels_and_irqs_initialized_;
 public:
     Module(Peripheral peripheral, const adc::Config& config);
 #ifdef CPU1
     static void transfer_control_to_cpu2(Peripheral peripheral);
 #endif
-    Peripheral peripheral() const { return _peripheral; }
-    uint32_t base() const { return _module.base; }
+    Peripheral peripheral() const { return peripheral_; }
+    uint32_t base() const { return module_.base; }
 
     void start(ChannelId channel) {
-        assert(_channels[channel.underlying_value()].peripheral == _peripheral);
-        ADC_forceSOC(_module.base, _channels[channel.underlying_value()].soc);
+        assert(channels_[channel.underlying_value()].peripheral == peripheral_);
+        ADC_forceSOC(module_.base, channels_[channel.underlying_value()].soc);
     }
 
     uint16_t read(ChannelId channel) const {
-        assert(_channels[channel.underlying_value()].peripheral == _peripheral);
-        return ADC_readResult(_module.result_base,
-                              _channels[channel.underlying_value()].soc);
+        assert(channels_[channel.underlying_value()].peripheral == peripheral_);
+        return ADC_readResult(module_.result_base,
+                              channels_[channel.underlying_value()].soc);
     }
 
     void enable_interrupts() {
-        for (size_t i = 0; i < _irqs.size(); ++i) {
-            if (_irqs[i].peripheral == _peripheral) {
-                Interrupt_enable(_irqs[i].pie_int_num);
+        for (size_t i = 0; i < irqs_.size(); ++i) {
+            if (irqs_[i].peripheral == peripheral_) {
+                Interrupt_enable(irqs_[i].pie_int_num);
             }
         }
     }
 
     void disable_interrupts() {
-        for (size_t i = 0; i < _irqs.size(); ++i) {
-            if (_irqs[i].peripheral == _peripheral) {
-                Interrupt_disable(_irqs[i].pie_int_num);
+        for (size_t i = 0; i < irqs_.size(); ++i) {
+            if (irqs_[i].peripheral == peripheral_) {
+                Interrupt_disable(irqs_[i].pie_int_num);
             }
         }
     }
 
     void register_interrupt_handler(IrqId irq, void (*handler)(void)) {
-        assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
-        Interrupt_register(_irqs[irq.underlying_value()].pie_int_num, handler);
+        assert(irqs_[irq.underlying_value()].peripheral == peripheral_);
+        Interrupt_register(irqs_[irq.underlying_value()].pie_int_num, handler);
     }
 
     void acknowledge_interrupt(IrqId irq) {
-        assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
-        ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
-        Interrupt_clearACKGroup(impl::adc_pie_int_groups[_irqs[irq.underlying_value()].int_num]);
+        assert(irqs_[irq.underlying_value()].peripheral == peripheral_);
+        ADC_clearInterruptStatus(module_.base, irqs_[irq.underlying_value()].int_num);
+        Interrupt_clearACKGroup(impl::adc_pie_int_groups[irqs_[irq.underlying_value()].int_num]);
     }
 
     bool interrupt_pending(IrqId irq) const {
-        assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
-        return ADC_getInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
+        assert(irqs_[irq.underlying_value()].peripheral == peripheral_);
+        return ADC_getInterruptStatus(module_.base, irqs_[irq.underlying_value()].int_num);
     }
 
     void clear_interrupt_status(IrqId irq) {
-        assert(_irqs[irq.underlying_value()].peripheral == _peripheral);
-        ADC_clearInterruptStatus(_module.base, _irqs[irq.underlying_value()].int_num);
+        assert(irqs_[irq.underlying_value()].peripheral == peripheral_);
+        ADC_clearInterruptStatus(module_.base, irqs_[irq.underlying_value()].int_num);
     }
 };
 
 class Channel {
 private:
-    Module* _adc;
-    ChannelId _channel;
+    Module* adc_;
+    ChannelId channel_;
 public:
-    Channel() : _adc(static_cast<Module*>(NULL)), _channel(ChannelId::count) {}
+    Channel() : adc_(static_cast<Module*>(NULL)), channel_(ChannelId::count) {}
     Channel(ChannelId channel) {
         init(channel);
     }
 
-    void init(ChannelId channel) {
-        assert(Module::_channels_and_irqs_initialized);
-        assert(Module::_channels[channel.underlying_value()].registered);
-        _channel = channel;
-        _adc = Module::instance(Module::_channels[channel.underlying_value()].peripheral.underlying_value());
+    void init(ChannelId ch) {
+        assert(Module::channels_and_irqs_initialized_);
+        assert(Module::channels_[ch.underlying_value()].registered);
+        channel_ = ch;
+        adc_ = Module::instance(Module::channels_[ch.underlying_value()].peripheral.underlying_value());
     }
 
-    void start() { _adc->start(_channel); }
-    uint16_t read() const {	return _adc->read(_channel); }
-    Module* adc() { return _adc; }
+    void start() { adc_->start(channel_); }
+    uint16_t read() const {	return adc_->read(channel_); }
+    Module* adc() { return adc_; }
 };
 
 } // namespace adc
