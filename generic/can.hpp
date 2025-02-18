@@ -4,21 +4,21 @@
 
 #include <emblib/array.hpp>
 
-typedef emb::array<uint8_t, 8> can_payload;
-typedef uint32_t can_id;
+typedef emb::array<uint8_t, 8> canpayload_t;
+typedef uint32_t canid_t;
 
 #else
 
 #include <array>
 #include <cstdint>
 
-using can_payload = std::array<uint8_t, 8>;
-using can_id = uint32_t;
+using canpayload_t = std::array<uint8_t, 8>;
+using canid_t = uint32_t;
 
 struct can_frame {
-    can_id id;
+    canid_t id;
     uint8_t len;
-    can_payload payload;
+    canpayload_t payload;
 };
 
 #endif
