@@ -6,9 +6,9 @@ namespace mcu {
 namespace c28x {
 namespace chrono {
 
-bool steady_clock::initialized_ __attribute__((section("shared_mcu_chrono"), retain)) = false;
-volatile int64_t steady_clock::time_ __attribute__((section("shared_mcu_chrono"), retain)) = 0;
-const emb::chrono::milliseconds steady_clock::time_step __attribute__((section("shared_mcu_chrono"), retain)) = emb::chrono::milliseconds(1);
+bool steady_clock::initialized_ __attribute__((section("mcu_chrono"), retain)) = false;
+volatile int64_t steady_clock::time_ __attribute__((section("mcu_chrono"), retain)) = 0;
+const emb::chrono::milliseconds steady_clock::time_step __attribute__((section("mcu_chrono"), retain)) = emb::chrono::milliseconds(1);
 
 #ifdef CPU1
 void steady_clock::init() {
