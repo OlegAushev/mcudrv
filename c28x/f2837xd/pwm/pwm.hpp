@@ -415,11 +415,13 @@ public:
         SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
     }
 
-    void init_tripzone(const gpio::InputPin& pin, XBAR_InputNum xbar_input) {
+    void init_tripzone(const gpio::DigitalInput& pin,
+                       XBAR_InputNum xbar_input) {
 #ifdef CPU2
         assert(false);
 #else
-        assert(static_cast<uint32_t>(xbar_input) <= static_cast<uint32_t>(XBAR_INPUT3));
+        assert(static_cast<uint32_t>(xbar_input) <=
+               static_cast<uint32_t>(XBAR_INPUT3));
 
         switch (pin.active_state().native_value()) {
         case mcu::gpio::active_state::low:
@@ -587,11 +589,16 @@ protected:
 
 public:
 #ifdef CPU1
-    static void preset_pins(const emb::array<PinConfig, 2*Phases>& pins, mcu::gpio::active_state active_state) {
+    static void preset_pins(const emb::array<PinConfig, 2*Phases>& pins,
+                            mcu::gpio::active_state active_state) {
         for (size_t i = 0; i < pins.size(); ++i) {
-            mcu::c28x::gpio::PinConfig cfg = {pins[i].pin, pins[i].mux, mcu::c28x::gpio::Direction::output, active_state,
-                                     mcu::c28x::gpio::Type::std, mcu::c28x::gpio::QualMode::sync, 1, mcu::c28x::gpio::MasterCore::cpu1};
-            mcu::c28x::gpio::OutputPin pin(cfg);
+            mcu::c28x::gpio::DigitalOutputConfig cfg = {
+                pins[i].pin,
+                pins[i].mux,
+                active_state,
+                mcu::c28x::gpio::Type::std,
+                mcu::c28x::gpio::MasterCore::cpu1};
+            mcu::c28x::gpio::DigitalOutput pin(cfg);
             pin.reset();
         }
     }

@@ -18,7 +18,8 @@ const uint32_t impl::cap_pie_int_nums[6] = {INT_ECAP1, INT_ECAP2, INT_ECAP3, INT
 void (*Module::_on_interrupt_callbacks[peripheral_count])(Module*, uint16_t);
 
 
-Module::Module(Peripheral peripheral, const gpio::PinConfig& pin_config)
+Module::Module(Peripheral peripheral,
+               const gpio::DigitalInputConfig& pin_config)
         : emb::singleton_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::cap_bases[peripheral.underlying_value()],

@@ -17,7 +17,10 @@ const uint16_t impl::sci_pie_int_groups[4] = {
 };
 
 
-Module::Module(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin, const Config& config)
+Module::Module(Peripheral peripheral,
+               const RxPinConfig& rx_pin,
+               const TxPinConfig& tx_pin,
+               const Config& config)
         : emb::singleton_array<Module, peripheral_count>(this, peripheral.underlying_value())
         , _peripheral(peripheral)
         , _module(impl::sci_bases[peripheral.underlying_value()],
@@ -55,7 +58,9 @@ Module::Module(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio:
 
 
 #ifdef CPU1
-void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin) {
+void Module::transfer_control_to_cpu2(Peripheral peripheral,
+                                      const RxPinConfig& rx_pin,
+                                      const TxPinConfig& tx_pin) {
     _init_pins(rx_pin, tx_pin);
     GPIO_setMasterCore(rx_pin.pin, GPIO_CORE_CPU2);
     GPIO_setMasterCore(tx_pin.pin, GPIO_CORE_CPU2);
@@ -66,7 +71,7 @@ void Module::transfer_control_to_cpu2(Peripheral peripheral, const gpio::PinConf
 
 
 #ifdef CPU1
-void Module::_init_pins(const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin) {
+void Module::_init_pins(const RxPinConfig& rx_pin, const TxPinConfig& tx_pin) {
     GPIO_setPinConfig(rx_pin.mux);
     GPIO_setDirectionMode(rx_pin.pin, GPIO_DIR_MODE_IN);
     GPIO_setPadConfig(rx_pin.pin, GPIO_PIN_TYPE_STD);

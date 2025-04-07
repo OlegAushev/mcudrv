@@ -46,14 +46,21 @@ extern const uint32_t pie_xint_nums[5];
 extern const uint16_t pie_xint_groups[5];
 } // namespace impl
 
-struct PinConfig {
+struct DigitalInputConfig {
     uint32_t pin;
     uint32_t mux;
-    Direction direction;
     mcu::gpio::active_state active_state;
     Type type;
     QualMode qual_mode;
     uint32_t qual_period;
+    MasterCore master_core;
+};
+
+struct DigitalOutputConfig {
+    uint32_t pin;
+    uint32_t mux;
+    mcu::gpio::active_state active_state;
+    Type type;
     MasterCore master_core;
 };
 
@@ -81,15 +88,14 @@ public:
 
 } // namespace impl
 
-class InputPin : public mcu::gpio::input_pin, public impl::GpioPin {
+class DigitalInput : public mcu::gpio::digital_input, public impl::GpioPin {
 private:
     GPIO_ExternalIntNum int_num_;
 public:
-    InputPin() {}
-    InputPin(const PinConfig& config) { init(config); }
+    DigitalInput() {}
+    DigitalInput(const DigitalInputConfig& config) { init(config); }
 
-    void init(const PinConfig& config)	{
-        assert(config.direction == Direction::input);
+    void init(const DigitalInputConfig& config)	{
         pin_ = config.pin;
         mux_ = config.mux;
         active_state_ = config.active_state;
@@ -143,26 +149,25 @@ public:
     }
 };
 
-class OutputPin : public mcu::gpio::output_pin, public impl::GpioPin {
+class DigitalOutput : public mcu::gpio::digital_output, public impl::GpioPin {
 public:
-    OutputPin() {}
-    OutputPin(const PinConfig& config,
-              mcu::gpio::pin_state init_state =
+    DigitalOutput() {}
+    DigitalOutput(const DigitalOutputConfig& config,
+                  mcu::gpio::pin_state init_state =
                       mcu::gpio::pin_state::inactive) {
         init(config, init_state);
     }
 
-    void init(const PinConfig& config,
+    void init(const DigitalOutputConfig& config,
               mcu::gpio::pin_state init_state =
                       mcu::gpio::pin_state::inactive) {
-        assert(config.direction == Direction::output);
         pin_ = config.pin;
         mux_ = config.mux;
         active_state_ = config.active_state;
         initialized_ = true;
 #ifdef CPU1
         GPIO_setPadConfig(config.pin, config.type.underlying_value());
-        OutputPin::set(init_state);
+        DigitalOutput::set(init_state);
         GPIO_setPinConfig(config.mux);
         GPIO_setDirectionMode(config.pin, GPIO_DIR_MODE_OUT);
         GPIO_setMasterCore(config.pin, static_cast<GPIO_CoreSelect>(
@@ -210,14 +215,14 @@ public:
 
 class InputDebouncer {
 private:
-    const InputPin pin_;
+    const DigitalInput pin_;
     const int active_debounce_count_;
     const int inactive_debounce_count_;
     int count_;
     mcu::gpio::pin_state state_;
     bool state_changed_;
 public:
-    InputDebouncer(const InputPin& pin,
+    InputDebouncer(const DigitalInput& pin,
                    emb::chrono::milliseconds acq_period,
                    emb::chrono::milliseconds active_debounce,
                    emb::chrono::milliseconds inactive_debounce)
@@ -294,16 +299,13 @@ private:
 public:
     static void init_channel(DurationLoggerChannel ch,
                              const DurationLoggerPinConfig config) {
-        PinConfig out_config = {
+        DigitalOutputConfig out_config = {
             config.pin,
             config.mux,
-            mcu::c28x::gpio::Direction::output,
             mcu::gpio::active_state::high,
             mcu::c28x::gpio::Type::std,
-            mcu::c28x::gpio::QualMode::sync,
-            1,
             config.core};
-        OutputPin out(out_config);
+        DigitalOutput out(out_config);
         pins_[ch.underlying_value()] = config.pin;
     }
 

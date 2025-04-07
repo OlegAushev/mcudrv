@@ -52,12 +52,12 @@ class Module : public emb::singleton_array<Module, peripheral_count>, private em
 private:
     const Peripheral _peripheral;
     impl::Module _module;
-    gpio::InputPin _pin;
+    gpio::DigitalInput _pin;
 public:
-    Module(Peripheral peripheral, const gpio::PinConfig& pin_config);
+    Module(Peripheral peripheral, const gpio::DigitalInputConfig& pin_config);
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
-    const gpio::InputPin& pin() const { return _pin; }
+    const gpio::DigitalInput& pin() const { return _pin; }
     uint32_t counter() const { return ECAP_getTimeBaseCounter(_module.base); }
     uint32_t event_timestamp(ECAP_Events event) const { return ECAP_getEventTimeStamp(_module.base, event); }
 

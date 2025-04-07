@@ -65,6 +65,9 @@ SCOPED_ENUM_DECLARE_BEGIN(AutoBaudMode) {
 } SCOPED_ENUM_DECLARE_END(AutoBaudMode)
 
 
+struct RxPinConfig { uint32_t pin; uint32_t mux; };
+struct TxPinConfig { uint32_t pin; uint32_t mux; };
+
 struct Config {
     Baudrate baudrate;
     WordLen word_len;
@@ -100,9 +103,14 @@ private:
     const Peripheral _peripheral;
     impl::Module _module;
 public:
-    Module(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin, const Config& config);
+    Module(Peripheral peripheral,
+           const RxPinConfig& rx_pin,
+           const TxPinConfig& tx_pin,
+           const Config& config);
 #ifdef CPU1
-    static void transfer_control_to_cpu2(Peripheral peripheral, const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin);
+    static void transfer_control_to_cpu2(Peripheral peripheral,
+                                         const RxPinConfig& rx_pin,
+                                         const TxPinConfig& tx_pin);
 #endif
     Peripheral peripheral() const { return _peripheral; }
     uint32_t base() const { return _module.base; }
@@ -161,7 +169,7 @@ public:
     }
 protected:
 #ifdef CPU1
-    static void _init_pins(const gpio::PinConfig& rx_pin, const gpio::PinConfig& tx_pin);
+    static void _init_pins(const RxPinConfig& rx_pin, const TxPinConfig& tx_pin);
 #endif
 };
 

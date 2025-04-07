@@ -17,19 +17,19 @@ SCOPED_ENUM_UT_DECLARE_BEGIN(pin_state, unsigned int) {
     active = 1
 } SCOPED_ENUM_DECLARE_END(pin_state)
 
-class input_pin {
+class digital_input {
 public:
-    input_pin() {}
-    virtual ~input_pin() {}
+    digital_input() {}
+    virtual ~digital_input() {}
 
     virtual pin_state read() const = 0;
     virtual unsigned int read_level() const = 0;
 };
 
-class output_pin {
+class digital_output {
 public:
-    output_pin() {}
-    virtual ~output_pin() {}
+    digital_output() {}
+    virtual ~digital_output() {}
 
     virtual pin_state read() const = 0;
     virtual void set(pin_state s = pin_state::active) = 0;
